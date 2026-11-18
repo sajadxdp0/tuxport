@@ -28,11 +28,11 @@ and can also be dispatched by hand.
 
 ## Favicon
 
-`dist/favicon.svg` mirrors the Android launcher foreground: a flat neon Tux
-carrying a terminal screen, drawn from `res/values/colors.xml`. The body is the
-palette's light tone on a `#0d1117` rounded tile, and one cyan-to-magenta
-gradient sweeps the flippers, feet, beak, screen border and prompt glyph.
-A `26 25 56 56` viewBox removes the adaptive-icon padding so the penguin
+`dist/favicon.svg` mirrors the Android launcher foreground: the terminal
+prompt as solid geometry, white on a `#0d1117` rounded tile — the chevron
+drawn as a uniform stroke with a miter tip, the underscore as a filled bar,
+matching the notification icon's glyph.
+A `26 25 56 56` viewBox removes the adaptive-icon padding so the mark
 remains legible at favicon sizes.
 
 Maintain the SVG directly. When the Android icon changes, update the favicon as

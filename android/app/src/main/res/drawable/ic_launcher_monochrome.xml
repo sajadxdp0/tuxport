@@ -6,30 +6,17 @@
         android:viewportWidth="108"
         android:viewportHeight="108">
 
-    <!-- Tuxport's monochrome layer for themed icons: the same Tux silhouette in a single
-         colour, the terminal screen kept as a white outline with the prompt glyph. -->
+    <!-- Tuxport's monochrome layer for themed icons: the same terminal-prompt glyph
+         in a single colour, matching the launcher foreground. -->
 
     <group>
-        <path android:pathData="M 43.1 49.5 C 39.2 53 38 59.4 39.7 64.6 C 40.6 67.2 43.1 67.5 44.1 65 C 45.7 60.5 45.3 54.4 44.3 50.6 Z"
+        <path android:pathData="M 40 41.5 L 55.5 54 L 40 66.5"
+              android:strokeColor="@android:color/white"
+              android:strokeWidth="8"
+              android:strokeLineCap="butt"
+              android:strokeLineJoin="miter" />
+        <path android:pathData="M 60 63 H 72.5 V 70 H 60 Z"
               android:fillColor="@android:color/white" />
-        <path android:pathData="M 64.9 49.5 C 68.8 53 70 59.4 68.3 64.6 C 67.4 67.2 64.9 67.5 63.9 65 C 62.3 60.5 62.7 54.4 63.7 50.6 Z"
-              android:fillColor="@android:color/white" />
-        <path android:pathData="M 47 69.6 C 44.1 69.6 42 71.4 42 73.6 C 42 75 43.4 75.8 45.8 75.8 C 48.3 75.8 49.4 74.9 49.4 73.1 C 49.4 71.2 49.2 69.6 47 69.6 Z"
-              android:fillColor="@android:color/white" />
-        <path android:pathData="M 61 69.6 C 63.9 69.6 66 71.4 66 73.6 C 66 75 64.6 75.8 62.2 75.8 C 59.7 75.8 58.6 74.9 58.6 73.1 C 58.6 71.2 58.8 69.6 61 69.6 Z"
-              android:fillColor="@android:color/white" />
-        <path android:pathData="M 54 29.5 C 45.6 29.5 40 38.2 40 48.3 C 40 60.6 42.4 74.2 54 74.2 C 65.6 74.2 68 60.6 68 48.3 C 68 38.2 62.4 29.5 54 29.5 Z"
-              android:fillColor="@android:color/white" />
-        <path android:pathData="M 50.9 45.2 C 52.4 43.9 55.6 43.9 57.1 45.2 C 57.6 45.6 57.5 46.4 56.8 46.9 C 55.2 48.2 52.8 48.2 51.2 46.9 C 50.5 46.4 50.4 45.6 50.9 45.2 Z"
-              android:fillColor="@android:color/white" />
-        <path android:pathData="M 47.2 52.6 H 60.8 A 2.6 2.6 0 0 1 63.4 55.2 V 63.6 A 2.6 2.6 0 0 1 60.8 66.2 H 47.2 A 2.6 2.6 0 0 1 44.6 63.6 V 55.2 A 2.6 2.6 0 0 1 47.2 52.6 Z"
-              android:strokeColor="@android:color/white" android:strokeWidth="1.6" />
-        <path android:pathData="M 48.6 56.6 L 52.4 59.2 L 48.6 61.8"
-              android:strokeColor="@android:color/white" android:strokeWidth="1.8"
-              android:strokeLineCap="round" android:strokeLineJoin="round" />
-        <path android:pathData="M 55.4 61.8 L 59.6 61.8"
-              android:strokeColor="@android:color/white" android:strokeWidth="1.8"
-              android:strokeLineCap="round" />
     </group>
 
 </vector>
