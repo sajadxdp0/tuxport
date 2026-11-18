@@ -10,10 +10,6 @@ Alpine Linux comes bundled with the app. Debian is available from **Settings**.
 
 Requires Android 11 or later on a 64-bit ARM device.
 
-> **About this fork:** Tuxport is a rebranded, Neon Terminal-themed fork of
-> [Appine](https://github.com/mthli/appine) by Matthew Lee. The original AGPL-3.0
-> copyright, license and third-party notices are preserved.
-
 ## Features
 
 <!-- The 128px dividers give all five columns the same minimum width on narrow screens. -->
@@ -242,10 +238,8 @@ OOM killer.
 
 ## License
 
-Copyright (C) 2026 Matthew Lee.
-Tuxport rebrand and theme Copyright (C) 2026 Sajad.
-
-Tuxport is licensed under the [GNU Affero General Public License, version 3 or later](LICENSE).
+Tuxport is Copyright (C) 2026 Sajad and licensed under the
+[GNU Affero General Public License, version 3 or later](LICENSE).
 
 Parts of the terminal line discipline in `core/kernel/src/tty.rs` are adapted
 from Fuchsia's Starnix and retain [The Fuchsia Authors' BSD-style license](android/licenses/fuchsia-LICENSE).

@@ -25,12 +25,12 @@ policy file in this repository, which is reachable as soon as the repository is 
 
 ## Favicon
 
-`dist/favicon.svg` is adapted from the Android launcher foreground vector and
-`res/values/colors.xml`. It retains the light body, cyan-to-magenta gradient outer
-stroke and clipping, uses a transparent background, and fills the two facial
-cutouts with the dark base.
-A `26 25 56 56` viewBox removes the adaptive-icon padding so the symbol remains legible
-at favicon sizes.
+`dist/favicon.svg` mirrors the Android launcher foreground: a flat neon Tux
+carrying a terminal screen, drawn from `res/values/colors.xml`. The body is the
+palette's light tone on a `#0d1117` rounded tile, and one cyan-to-magenta
+gradient sweeps the flippers, feet, beak, screen border and prompt glyph.
+A `26 25 56 56` viewBox removes the adaptive-icon padding so the penguin
+remains legible at favicon sizes.
 
 Maintain the SVG directly. When the Android icon changes, update the favicon as
 needed and review its crop and appearance at small sizes. Deployment only copies

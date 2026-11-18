@@ -6,6 +6,7 @@
     <color name="tuxport_base">#0D1117</color>
     <color name="tuxport_primary">#00E5FF</color>
     <color name="tuxport_accent">#FF4081</color>
+    <color name="tuxport_body">#E6EDF3</color>
 
     <!-- Material 3 fallback tokens, used where Dynamic Colors are unavailable. -->
     <color name="tuxport_on_primary">#0D1117</color>

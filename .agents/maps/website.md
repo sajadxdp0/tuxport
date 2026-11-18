@@ -30,8 +30,8 @@ asset adapted from the Android launcher foreground and colors.
 - The site is maintained in the repository as static files; hosting is not configured.
   The Android app links to the policy file at
   `https://github.com/sajadxdp0/tuxport/blob/main/website/dist/privacy.html`.
-- The privacy page names Sajad as the maintainer, credits the upstream Appine fork,
-  and points support requests to `https://github.com/sajadxdp0/tuxport/issues`.
+- The privacy page names Sajad as the maintainer and points support requests to
+  `https://github.com/sajadxdp0/tuxport/issues`.
 
 ## Data flow / lifecycle
 
