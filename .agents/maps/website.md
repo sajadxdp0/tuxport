@@ -22,11 +22,12 @@ asset adapted from the Android launcher foreground and colors.
 
 ## Public entry points
 
-- `dist/index.html`, opened directly or served as the static site's index.
+- `dist/index.html`, opened directly or served as the static site's index; its hero
+  shows `dist/terminal.png`, a capture of the running app.
 - `dist/privacy.html`, reached through the homepage's relative Privacy Policy link or
   opened directly.
 - Both pages reference the local `favicon.svg` with an SVG icon link and share the
-  Neon Terminal palette (dark base with cyan and magenta accents).
+  app's dark palette: an ink-dark base with one cyan accent and quiet hairlines.
 - The site is published to GitHub Pages by the Website workflow, served at
   `https://sajadxdp0.github.io/tuxport/`.
 - Android Settings About opens `https://sajadxdp0.github.io/tuxport/privacy.html`

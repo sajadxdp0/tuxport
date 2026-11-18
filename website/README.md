@@ -1,9 +1,10 @@
 # Tuxport website
 
-A minimal homepage in `dist/index.html` links to the English privacy policy in
-`dist/privacy.html`. Both use inline CSS and a local SVG favicon with no JavaScript,
-remote assets, dependencies or compilation step. The pages use Tuxport's Neon Terminal
-palette: a `#0d1117` base with cyan and magenta accents.
+A single page in `dist/index.html` links to the English privacy policy in
+`dist/privacy.html`, with the app screenshot `dist/terminal.png` as the hero.
+The pages use inline CSS and a local SVG favicon with no JavaScript, remote
+assets, dependencies or compilation step, on the app's own dark palette:
+an ink-dark base, one cyan accent and quiet hairlines.
 
 `dist/` contains the directly maintained website source and is committed to Git.
 It is also the directory uploaded for deployment; no generation or copying is needed.
@@ -25,6 +26,12 @@ Pages artifact and deploys it. The site is served at
 <https://sajadxdp0.github.io/tuxport/privacy.html>, the URL the Android app's
 About → Privacy policy link opens. The workflow runs when `website/**` changes
 and can also be dispatched by hand.
+
+## Screenshot
+
+`dist/terminal.png` is a screenshot of the running app captured from the
+debug build on an emulator, resized to a third of the capture. When the app's
+look changes, replace it with a fresh capture of the same session.
 
 ## Favicon
 
