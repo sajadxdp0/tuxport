@@ -1,66 +1,83 @@
-# Tuxport
+<p align="center">
+  <img src="website/dist/favicon.svg" width="72" alt="Tuxport logo">
+</p>
 
-Run Linux on Android.
+<h1 align="center">Tuxport</h1>
 
-Tuxport is a high-performance Linux terminal for Android phones and tablets.
-Install packages, edit code and build projects on the device — without rooting
-it. Alpine Linux comes bundled with the app, and Debian is one Settings screen
-away.
+<p align="center">
+  A Linux terminal for Android.<br>
+  Alpine Linux is bundled with the app. No root access required.
+</p>
 
-<img src="docs/screenshots/terminal.png" width="270" alt="Tuxport running an Alpine Linux shell on Android">
+<p align="center">
+  <a href="https://github.com/sajadxdp0/tuxport/releases"><strong>Download</strong></a> ·
+  <a href="https://sajadxdp0.github.io/tuxport/">Website</a> ·
+  <a href="https://sajadxdp0.github.io/tuxport/privacy.html">Privacy policy</a>
+</p>
 
-**[Download from GitHub Releases](https://github.com/sajadxdp0/tuxport/releases)** ·
-**[Source](https://github.com/sajadxdp0/tuxport)** ·
-**[Website](https://sajadxdp0.github.io/tuxport/)**
+<p align="center">
+  <img src="docs/screenshots/terminal-demo.gif" width="360" alt="Tuxport booting Alpine Linux, running uname, ls and top on an Android phone">
+</p>
 
-Requires Android 11 or later on a 64-bit ARM device.
+## What Tuxport does
 
-## What you get
+Tuxport runs a complete Linux command line on an unrooted Android phone or
+tablet. Alpine Linux 3.24 ships inside the APK, so the first launch opens a
+root shell without setup, downloads or a rooted device. A Debian system is
+available from Settings.
 
-- A complete Linux command line on an unrooted phone: bundled Alpine Linux
-  with the apk package manager, or Debian from **Settings → Distribution**.
-- Multiple terminal tabs with the extra keys row, find in scrollback,
-  rectangle and line selection, and safe-paste confirmation.
-- Codex CLI, Vim, Python, Node.js, Go, Rust and other ARM64 tools run as they
-  are: Tuxport executes unmodified Linux binaries.
-- Background sessions with notifications, listening-port reports, a privacy
-  lock, and a diagnostic log exporter for troubleshooting.
-- An execution-mode setting for troubleshooting: the default translates guest
-  instructions for speed, and the interpreter mode runs everything step by
-  step.
+Inside the terminal, the environment is a normal Linux system:
+
+- `apk` installs packages from the Alpine repositories, over the phone's
+  network.
+- Unmodified ARM64 binaries run as they are: Python, Node.js, Go, Rust,
+  tmux, Vim, Codex CLI.
+- Programs keep running while the screen is off, and notifications report
+  finished commands, bells and listening ports.
+- The terminal is Ghostty's libghostty-vt, with tabs, an extra keys row,
+  scrollback find and safe paste confirmation.
+- A privacy lock requires biometrics to reopen the app, and a diagnostic log
+  exporter helps with problems.
+
+The execution mode is selectable. The default translates guest instructions
+into native code for speed. An interpreter mode runs every instruction step
+by step and exists for troubleshooting.
 
 ## How it works
 
-Tuxport runs unmodified ARM64 Linux binaries inside the Android app process.
-Its CPU engine translates ARM64 instructions into ARM64 code and uses an
-interpreter for instructions it does not translate, and a user-space kernel
-implements the Linux system calls. The terminal is Ghostty's libghostty-vt.
+Tuxport executes unmodified ARM64 Linux binaries inside the Android app
+process. A CPU engine translates ARM64 instructions into ARM64 code and
+interprets the instructions it does not translate. A user-space kernel
+implements the Linux system calls, and the terminal runs on Ghostty's
+libghostty-vt.
+
+## Requirements
+
+Android 11 or later on a 64-bit ARM device.
 
 ## Development
 
 Requirements: JDK 17 or later, the Android SDK with platform 37 and NDK
 29.0.14206865, Rust through rustup (`rust-toolchain.toml` pins the version),
-`cargo install cargo-ndk --locked`, and Zig 0.17.x on `PATH` or in
-`android/local.properties` as `zig.path`.
+`cargo install cargo-ndk --locked`, and Zig 0.17.x on `PATH` or as `zig.path`
+in `android/local.properties`.
 
 From the repository root:
 
 ```sh
-scripts/fetch-rootfs      # Alpine minirootfs and bundled packages
-scripts/fetch-ghostty    # libghostty-vt source and its Zig packages
+scripts/fetch-rootfs      # Alpine minirootfs and the bundled packages
+scripts/fetch-ghostty     # libghostty-vt source and its Zig packages
 
 cd android
-./gradlew installDebug          # build and install on a connected device
-./gradlew assembleRelease       # release APK with R8 and resource shrinking
-./gradlew connectedDebugAndroidTest   # instrumentation tests on the device
+./gradlew installDebug                # build and install on a device
+./gradlew assembleRelease             # release APK with R8 shrinking
+./gradlew connectedDebugAndroidTest   # instrumentation tests on a device
 ```
 
-The Rust workspace's tests need an ARM64 Linux host or container; `scripts/dev
-cargo test --workspace` runs them in the project's ARM64 container. The
-Android instrumentation tests cover the kernel, the terminal and the app
-against a real guest system.
+The Rust workspace tests need an ARM64 Linux host or container.
+`scripts/dev cargo test --workspace` runs them in the project container.
 
-## Project documentation
+## Documentation
 
 - [Architecture overview](docs/design/README.md) and the
   [module index](.agents/MODULES.md) for navigating the source.
@@ -69,9 +86,9 @@ against a real guest system.
 
 ## License
 
-Tuxport is Copyright (C) 2026 Sajad and licensed under the
+Tuxport is Copyright (C) 2026 Sajad, licensed under the
 [GNU Affero General Public License, version 3 or later](LICENSE).
 
-The app bundles third-party software under their own licenses — libghostty-vt
-and its dependencies, JetBrains Mono, and Alpine Linux packages. Read them in
-**Settings → Open source licenses**.
+Bundled third-party software keeps its own licenses: libghostty-vt and its
+dependencies, JetBrains Mono, and the Alpine Linux packages. Read them in
+Settings, under Open source licenses.

@@ -23,7 +23,7 @@ asset adapted from the Android launcher foreground and colors.
 ## Public entry points
 
 - `dist/index.html`, opened directly or served as the static site's index; its hero
-  shows `dist/terminal.png`, a capture of the running app.
+  shows `dist/terminal-demo.gif`, a screen recording of the running app.
 - `dist/privacy.html`, reached through the homepage's relative Privacy Policy link or
   opened directly.
 - Both pages reference the local `favicon.svg` with an SVG icon link and share the

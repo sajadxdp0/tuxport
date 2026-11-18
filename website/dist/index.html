@@ -3,10 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Tuxport runs a full Linux terminal on unrooted Android phones. Alpine Linux is bundled; Debian is one Settings screen away.">
-    <meta property="og:title" content="Tuxport">
-    <meta property="og:description" content="Run Linux on Android. No root required.">
-    <meta property="og:image" content="terminal.png">
+    <meta name="description" content="Tuxport runs a complete Linux terminal on unrooted Android phones. Alpine Linux is bundled with the app.">
     <title>Tuxport</title>
     <link rel="icon" href="favicon.svg" type="image/svg+xml" sizes="any">
     <style>
@@ -35,7 +32,7 @@
         line-height: 22px;
       }
 
-      .wrap { max-width: 72rem; margin: 0 auto; padding: 0 24px; }
+      .wrap { max-width: 68rem; margin: 0 auto; padding: 0 24px; }
 
       a { color: var(--accent); text-decoration: none; transition: color 150ms cubic-bezier(0.22, 1, 0.36, 1); }
       a:hover { color: var(--text); }
@@ -48,6 +45,16 @@
       .wordmark { display: flex; align-items: center; gap: 10px; color: var(--text); font-size: 16px; font-weight: 500; }
       .wordmark svg { display: block; }
       header nav { display: flex; align-items: center; gap: 24px; font-size: 14px; }
+      .navbtn {
+        display: inline-flex; align-items: center;
+        height: 32px; padding: 0 16px;
+        border-radius: 8px;
+        background: var(--raised); border: 1px solid var(--hairline);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+        color: var(--text);
+        transition: color 150ms cubic-bezier(0.22, 1, 0.36, 1);
+      }
+      .navbtn:hover { color: var(--accent); }
 
       .hero {
         display: grid;
@@ -85,7 +92,7 @@
 
       .shot { margin: 0; }
       .shot img {
-        display: block; width: 100%; max-height: 640px; object-fit: cover; object-position: top;
+        display: block; width: 100%; height: auto;
         border: 1px solid var(--hairline);
         border-radius: 16px;
         background: var(--card);
@@ -111,7 +118,6 @@
         .hero { grid-template-columns: minmax(0, 1fr); gap: 48px; padding: 64px 0 80px; }
         h1 { font-size: 38px; }
         .sub { font-size: 16px; line-height: 24px; }
-        .shot img { max-height: 480px; }
         .facts { grid-template-columns: minmax(0, 1fr); }
       }
     </style>
@@ -121,6 +127,7 @@
       <header>
         <a class="wordmark" href="/" aria-label="Tuxport">
           <svg width="18" height="18" viewBox="26 25 56 56" aria-hidden="true">
+            <rect x="26" y="25" width="56" height="56" rx="12" fill="#11141c"/>
             <path fill="#eef0f5" d="M 37 41 L 58 54 L 37 67 L 45.5 67 L 49.5 54 L 45.5 41 Z"/>
             <path fill="#eef0f5" d="M 60.5 60.5 H 71.5 V 67.5 H 60.5 Z"/>
           </svg>
@@ -128,7 +135,7 @@
         </a>
         <nav>
           <a href="https://github.com/sajadxdp0/tuxport">GitHub</a>
-          <a class="btn" style="height: 32px; padding: 0 16px;" href="https://github.com/sajadxdp0/tuxport/releases">Download</a>
+          <a class="navbtn" href="https://github.com/sajadxdp0/tuxport/releases">Download</a>
         </nav>
       </header>
 
@@ -137,15 +144,15 @@
           <div>
             <p class="kicker"><b>$</b> tuxport</p>
             <h1>Run Linux on your Android phone</h1>
-            <p class="sub">A full terminal, with Alpine Linux bundled. Install the app and you are at a shell — no root, no setup.</p>
+            <p class="sub">A full terminal with Alpine Linux bundled. Install the app and you are at a shell. No root, no setup.</p>
             <div class="actions">
               <a class="btn primary" href="https://github.com/sajadxdp0/tuxport/releases">Download</a>
               <a class="btn" href="https://github.com/sajadxdp0/tuxport">View source</a>
             </div>
           </div>
           <figure class="shot">
-            <img src="terminal.png" width="360" height="800"
-                 alt="Tuxport running an Alpine Linux shell on an Android phone: the welcome message and a root prompt over a near-black terminal.">
+            <img src="terminal-demo.gif" width="540" height="740" loading="lazy"
+                 alt="Tuxport booting an Alpine Linux shell on an Android phone, then running uname, ls and top.">
             <figcaption>Alpine Linux 3.24 · bundled with the app</figcaption>
           </figure>
         </div>
@@ -155,7 +162,7 @@
           <dl class="facts">
             <div class="fact"><dt>Distribution</dt><dd>Alpine Linux 3.24 bundled, Debian from Settings</dd></div>
             <div class="fact"><dt>Requirements</dt><dd>Android 11 or later, 64-bit ARM device</dd></div>
-            <div class="fact"><dt>Terminal</dt><dd>Ghostty's libghostty-vt, multiple tabs, extra keys, scrollback find</dd></div>
+            <div class="fact"><dt>Terminal</dt><dd>Ghostty's libghostty-vt, tabs, extra keys, scrollback find</dd></div>
             <div class="fact"><dt>Programs</dt><dd>Unmodified ARM64 binaries: apk, Python, Node.js, Go, Rust, tmux</dd></div>
             <div class="fact"><dt>License</dt><dd>GNU AGPL 3.0 or later, source on GitHub</dd></div>
             <div class="fact"><dt>Support</dt><dd><a href="https://github.com/sajadxdp0/tuxport/issues">github.com/sajadxdp0/tuxport/issues</a></dd></div>

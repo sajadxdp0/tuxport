@@ -27,18 +27,20 @@ Pages artifact and deploys it. The site is served at
 About → Privacy policy link opens. The workflow runs when `website/**` changes
 and can also be dispatched by hand.
 
-## Screenshot
+## Screenshot and demo
 
-`dist/terminal.png` is a screenshot of the running app captured from the
-debug build on an emulator, resized to a third of the capture. When the app's
-look changes, replace it with a fresh capture of the same session.
+`dist/terminal-demo.gif` is a screen recording of the running app captured
+from the debug build on an emulator and cropped to the terminal: the session
+boots, types `uname -a`, `ls` and `top`. `docs/screenshots/terminal-demo.gif`
+is the same recording for the README. When the app's look changes, replace
+them with a fresh capture of the same session.
 
 ## Favicon
 
 `dist/favicon.svg` mirrors the Android launcher foreground: the terminal
-prompt as solid geometry, white on a `#0d1117` rounded tile — the chevron
-drawn as a uniform stroke with a miter tip, the underscore as a filled bar,
-matching the notification icon's glyph.
+prompt as solid geometry, white on a `#0d1117` rounded tile. The chevron is
+a uniform stroke with a miter tip, the underscore a filled bar, matching the
+notification icon's glyph.
 A `26 25 56 56` viewBox removes the adaptive-icon padding so the mark
 remains legible at favicon sizes.
 
