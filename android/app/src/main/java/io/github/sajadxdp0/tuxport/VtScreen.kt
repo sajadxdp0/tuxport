@@ -36,7 +36,9 @@ internal class VtScreen {
         private set
 
     var defaultFg = Color.WHITE
-    var defaultBg = TERMINAL_BG
+    // Opaque black, matching the palette's default so pre-frame and post-frame draws are
+    // pixel-identical (TerminalResizeTest compares them); the chrome keeps the brand base.
+    var defaultBg = Color.BLACK
     var cursorColor = 0
     var cursorShown = false
     var cursorStyle = VtNative.CURSOR_BLOCK
