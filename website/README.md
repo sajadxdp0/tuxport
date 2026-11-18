@@ -18,10 +18,13 @@ Visit <http://127.0.0.1:8000> for the homepage or
 <http://127.0.0.1:8000/privacy.html> for the policy. Edit `dist/privacy.html` to update
 the policy and its effective date.
 
-For static hosting, use `website/dist/` as the site root; no build step is needed.
-GitHub Pages can publish it with an Actions workflow that uploads `website/dist` as a
-Pages artifact. Until that is configured, the Android app's About links point to the
-policy file in this repository, which is reachable as soon as the repository is public.
+For static hosting, GitHub Pages publishes the site through the
+[Website workflow](../.github/workflows/pages.yml): it uploads `website/dist` as a
+Pages artifact and deploys it. The site is served at
+<https://sajadxdp0.github.io/tuxport/> with the policy at
+<https://sajadxdp0.github.io/tuxport/privacy.html>, the URL the Android app's
+About → Privacy policy link opens. The workflow runs when `website/**` changes
+and can also be dispatched by hand.
 
 ## Favicon
 

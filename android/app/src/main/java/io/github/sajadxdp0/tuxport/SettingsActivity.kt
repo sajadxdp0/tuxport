@@ -674,7 +674,7 @@ class SettingsFragment : PreferenceFragmentCompat(), TerminalService.Listener {
         private const val SUPPORT_URL = "https://github.com/sajadxdp0/tuxport/issues"
         private const val PROJECT_URL = "https://github.com/sajadxdp0/tuxport"
         private const val PRIVACY_POLICY_URL =
-            "https://github.com/sajadxdp0/tuxport/blob/main/website/dist/privacy.html"
+            "https://sajadxdp0.github.io/tuxport/privacy.html"
         private const val RELEASES_URL = "https://github.com/sajadxdp0/tuxport/releases"
         private const val CHOICE_DIALOG = "settings.choice"
 

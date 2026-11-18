@@ -27,9 +27,10 @@ asset adapted from the Android launcher foreground and colors.
   opened directly.
 - Both pages reference the local `favicon.svg` with an SVG icon link and share the
   Neon Terminal palette (dark base with cyan and magenta accents).
-- The site is maintained in the repository as static files; hosting is not configured.
-  The Android app links to the policy file at
-  `https://github.com/sajadxdp0/tuxport/blob/main/website/dist/privacy.html`.
+- The site is published to GitHub Pages by the Website workflow, served at
+  `https://sajadxdp0.github.io/tuxport/`.
+- Android Settings About opens `https://sajadxdp0.github.io/tuxport/privacy.html`
+  through its shared Custom Tabs link action; the entry is implemented in `android/setup`.
 - The privacy page names Sajad as the maintainer and points support requests to
   `https://github.com/sajadxdp0/tuxport/issues`.
 

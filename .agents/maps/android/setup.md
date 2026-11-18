@@ -391,7 +391,7 @@ session consuming their state and events (`android/vt`).
     (android/terminal).
 - About starts with a support link (`https://github.com/sajadxdp0/tuxport/issues`),
   followed by the project website (`https://github.com/sajadxdp0/tuxport`) and the privacy policy
-  (`https://github.com/sajadxdp0/tuxport/blob/main/website/dist/privacy.html`).
+  (`https://sajadxdp0.github.io/tuxport/privacy.html`).
   All three use the shared `link` preference helper, show their URL
   as the summary and open it with AndroidX `CustomTabsIntent`, without pinning a browser package.
   The support label is non-translatable and used in every locale. A browser without Custom
