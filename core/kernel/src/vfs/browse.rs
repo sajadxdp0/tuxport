@@ -625,7 +625,8 @@ mod tests {
     use std::io::{Read, Write};
 
     fn sample(name: &str) -> (Store, std::path::PathBuf) {
-        let dir = std::env::temp_dir().join(format!("tuxport-browse-{name}-{}", std::process::id()));
+        let dir =
+            std::env::temp_dir().join(format!("tuxport-browse-{name}-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&dir);
         let s = Store::create(&dir).unwrap();
         let home = s.mkdir(ROOT, b"home", 0o755, 0, 0).unwrap();

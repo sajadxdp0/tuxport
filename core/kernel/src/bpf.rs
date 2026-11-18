@@ -947,7 +947,9 @@ fn memory<'a>(ctx: &'a [u8], stack: &'a [u8], addr: u64, size: usize) -> Option<
 fn helper(id: i32, env: &Env) -> u64 {
     match id {
         // CLOCK_MONOTONIC
-        5 => tuxport_hal::clock_gettime(1).map_or(0, |(s, ns)| s as u64 * 1_000_000_000 + ns as u64),
+        5 => {
+            tuxport_hal::clock_gettime(1).map_or(0, |(s, ns)| s as u64 * 1_000_000_000 + ns as u64)
+        }
         7 => {
             let mut b = [0u8; 4];
             let _ = tuxport_hal::fill_random(&mut b);

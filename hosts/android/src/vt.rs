@@ -31,10 +31,10 @@ use std::sync::{Arc, Condvar, Mutex, MutexGuard, Once, PoisonError};
 use std::thread;
 use std::time::{Duration, Instant};
 
-use tuxport_kernel::Machine;
 use jni::JNIEnv;
 use jni::objects::{JByteArray, JClass, JObject, JString, JValue};
 use jni::sys::{jboolean, jbyteArray, jfloat, jint, jintArray, jlong, jobject, jstring};
+use tuxport_kernel::Machine;
 
 use super::{machine, string, throw};
 
@@ -106,7 +106,13 @@ unsafe extern "C" {
     fn tuxport_vt_feed(vt: *mut TuxportVt, data: *const u8, len: usize, background: bool);
     fn tuxport_vt_take_replies(vt: *mut TuxportVt, len: *mut usize) -> *const u8;
     fn tuxport_vt_set_password_input(vt: *mut TuxportVt, on: bool);
-    fn tuxport_vt_resize(vt: *mut TuxportVt, cols: u16, rows: u16, cell_width: u32, cell_height: u32);
+    fn tuxport_vt_resize(
+        vt: *mut TuxportVt,
+        cols: u16,
+        rows: u16,
+        cell_width: u32,
+        cell_height: u32,
+    );
     fn tuxport_vt_scroll(vt: *mut TuxportVt, delta: i32);
     fn tuxport_vt_at_prompt(vt: *mut TuxportVt) -> bool;
     fn tuxport_vt_jump_prompt(vt: *mut TuxportVt, delta: i32);
@@ -133,7 +139,8 @@ unsafe extern "C" {
         out: *mut u8,
         cap: usize,
     ) -> isize;
-    fn tuxport_vt_paste(vt: *mut TuxportVt, data: *const u8, len: usize, allow_unsafe: bool) -> i32;
+    fn tuxport_vt_paste(vt: *mut TuxportVt, data: *const u8, len: usize, allow_unsafe: bool)
+    -> i32;
     #[allow(clippy::too_many_arguments)]
     fn tuxport_vt_mouse(
         vt: *mut TuxportVt,
@@ -190,7 +197,11 @@ unsafe extern "C" {
     fn tuxport_vt_prompt_click(vt: *mut TuxportVt, x: u16, y: u16) -> bool;
     fn tuxport_vt_search(vt: *mut TuxportVt, needle: *const u8, len: usize) -> bool;
     fn tuxport_vt_search_select(vt: *mut TuxportVt, older: bool) -> bool;
-    fn tuxport_vt_search_rows(vt: *mut TuxportVt, len: *mut usize, selected: *mut i64) -> *const u32;
+    fn tuxport_vt_search_rows(
+        vt: *mut TuxportVt,
+        len: *mut usize,
+        selected: *mut i64,
+    ) -> *const u32;
     fn tuxport_vt_search_end(vt: *mut TuxportVt);
     fn tuxport_vt_clear(vt: *mut TuxportVt) -> i32;
     fn tuxport_vt_reset(vt: *mut TuxportVt) -> bool;
@@ -1029,7 +1040,8 @@ pub extern "system" fn Java_io_github_sajadxdp0_tuxport_VtNative_paste<'l>(
         };
         let bytes = {
             let mut term = tab.term();
-            match unsafe { tuxport_vt_paste(term.0, text.as_ptr(), text.len(), allow_unsafe != 0) } {
+            match unsafe { tuxport_vt_paste(term.0, text.as_ptr(), text.len(), allow_unsafe != 0) }
+            {
                 0 => term.take_replies(),
                 1 => return std::ptr::null_mut(),
                 _ => Vec::new(),

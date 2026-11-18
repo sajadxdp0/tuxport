@@ -314,9 +314,9 @@ fn host_calls_survive_kernel_bugs() {
     // that call fails, a call on a console also hangs up that console, and the Machine stays usable
     // afterwards. A spawn whose thread cannot start fails without leaving its process or the
     // console's session behind
+    use std::os::unix::ffi::OsStrExt;
     use tuxport_kernel::errno::Errno;
     use tuxport_kernel::{ExitStatus, KillReason, Machine, MachineOptions, RunError, Stdio, Tier};
-    use std::os::unix::ffi::OsStrExt;
     if !cfg!(debug_assertions) {
         return;
     }
@@ -602,9 +602,9 @@ fn bkl_watchdog_reports_a_hold_right_after_another() {
 fn bkl_stall_reaches_the_host() {
     // Machine::stall answers without the BKL while a hold goes on, then carries its kernel log
     // record once it ended
-    use tuxport_kernel::{ExitStatus, Machine, MachineOptions, Stdio};
     use std::os::unix::ffi::OsStrExt;
     use std::time::{Duration, Instant};
+    use tuxport_kernel::{ExitStatus, Machine, MachineOptions, Stdio};
     if !cfg!(debug_assertions) {
         return;
     }

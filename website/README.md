@@ -26,8 +26,9 @@ policy file in this repository, which is reachable as soon as the repository is 
 ## Favicon
 
 `dist/favicon.svg` is adapted from the Android launcher foreground vector and
-`res/values/colors.xml`. It retains the light body, neon-cyan outer stroke and clipping,
-uses a transparent background, and fills the two facial cutouts with the dark base.
+`res/values/colors.xml`. It retains the light body, cyan-to-magenta gradient outer
+stroke and clipping, uses a transparent background, and fills the two facial
+cutouts with the dark base.
 A `26 25 56 56` viewBox removes the adaptive-icon padding so the symbol remains legible
 at favicon sizes.
 

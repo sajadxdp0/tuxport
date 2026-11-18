@@ -9,64 +9,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "320119579fcad9c21884f5c4861d16174d0e06250625266f50fe6898340abefa"
 
 [[package]]
-name = "tuxport-android"
-version = "1.0.0"
-dependencies = [
- "tuxport-kernel",
- "cc",
- "jni",
- "libc",
-]
-
-[[package]]
-name = "tuxport-bench"
-version = "1.0.0"
-
-[[package]]
-name = "tuxport-engine"
-version = "1.0.0"
-dependencies = [
- "cc",
- "libc",
-]
-
-[[package]]
-name = "tuxport-hal"
-version = "1.0.0"
-dependencies = [
- "libc",
-]
-
-[[package]]
-name = "tuxport-kernel"
-version = "1.0.0"
-dependencies = [
- "tuxport-engine",
- "tuxport-hal",
- "flate2",
- "libc",
- "rusqlite",
- "tar",
-]
-
-[[package]]
-name = "tuxport-lockstep"
-version = "1.0.0"
-dependencies = [
- "tuxport-engine",
- "cc",
-]
-
-[[package]]
-name = "tuxport-run"
-version = "1.0.0"
-dependencies = [
- "tuxport-bench",
- "tuxport-hal",
- "tuxport-kernel",
-]
-
-[[package]]
 name = "bitflags"
 version = "2.13.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -490,6 +432,64 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 3.0.9",
+]
+
+[[package]]
+name = "tuxport-android"
+version = "1.0.0"
+dependencies = [
+ "cc",
+ "jni",
+ "libc",
+ "tuxport-kernel",
+]
+
+[[package]]
+name = "tuxport-bench"
+version = "1.0.0"
+
+[[package]]
+name = "tuxport-engine"
+version = "1.0.0"
+dependencies = [
+ "cc",
+ "libc",
+]
+
+[[package]]
+name = "tuxport-hal"
+version = "1.0.0"
+dependencies = [
+ "libc",
+]
+
+[[package]]
+name = "tuxport-kernel"
+version = "1.0.0"
+dependencies = [
+ "flate2",
+ "libc",
+ "rusqlite",
+ "tar",
+ "tuxport-engine",
+ "tuxport-hal",
+]
+
+[[package]]
+name = "tuxport-lockstep"
+version = "1.0.0"
+dependencies = [
+ "cc",
+ "tuxport-engine",
+]
+
+[[package]]
+name = "tuxport-run"
+version = "1.0.0"
+dependencies = [
+ "tuxport-bench",
+ "tuxport-hal",
+ "tuxport-kernel",
 ]
 
 [[package]]

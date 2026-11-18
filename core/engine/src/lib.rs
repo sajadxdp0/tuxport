@@ -158,11 +158,17 @@ impl CpuState {
 unsafe extern "C" {
     fn tuxport_mmu_new() -> *mut RawMmu;
     fn tuxport_mmu_free(mmu: *mut RawMmu);
-    fn tuxport_mmu_map(mmu: *mut RawMmu, gva: u64, host: *mut c_void, len: u64, prot: u32) -> c_int;
+    fn tuxport_mmu_map(mmu: *mut RawMmu, gva: u64, host: *mut c_void, len: u64, prot: u32)
+    -> c_int;
     fn tuxport_mmu_unmap(mmu: *mut RawMmu, gva: u64, len: u64) -> c_int;
     fn tuxport_mmu_protect(mmu: *mut RawMmu, gva: u64, len: u64, prot: u32) -> c_int;
-    fn tuxport_mmu_fill(mmu: *mut RawMmu, gva: u64, host: *mut c_void, len: u64, prot: u32)
-    -> c_int;
+    fn tuxport_mmu_fill(
+        mmu: *mut RawMmu,
+        gva: u64,
+        host: *mut c_void,
+        len: u64,
+        prot: u32,
+    ) -> c_int;
     fn tuxport_mmu_move(mmu: *mut RawMmu, from: u64, to: u64, len: u64) -> c_int;
     fn tuxport_mmu_next_present(mmu: *const RawMmu, gva: u64, end: u64) -> u64;
     fn tuxport_mmu_translate(mmu: *const RawMmu, gva: u64, required_prot: u32) -> *mut c_void;

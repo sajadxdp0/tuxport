@@ -799,7 +799,8 @@ impl Mm {
             let space = match self.join_group(groups) {
                 Some(space) => space,
                 None => {
-                    let space = tuxport_engine::DbtSpace::new(self.exe.unwrap_or(0), self.dbt_regs)?;
+                    let space =
+                        tuxport_engine::DbtSpace::new(self.exe.unwrap_or(0), self.dbt_regs)?;
                     // With translations a previous user left in the pool, blocks in program files
                     // of the same version need no further check
                     space.trust(&self.code_sources());
@@ -4632,7 +4633,12 @@ impl CodeGroup {
     /// and not overlap ranges private to other members, and private must not overlap registered
     /// ranges: if so, registers layout, installs this member's private ranges and returns true;
     /// otherwise changes nothing.
-    fn admit(&self, tag: u16, layout: &[tuxport_engine::DbtSource], private: &[(u64, u64)]) -> bool {
+    fn admit(
+        &self,
+        tag: u16,
+        layout: &[tuxport_engine::DbtSource],
+        private: &[(u64, u64)],
+    ) -> bool {
         let overlap = |start: u64, end: u64, s: u64, e: u64| start < e && s < end;
         let ranges = self.ranges.borrow();
         if private.iter().any(|&(s, e)| {

@@ -56,8 +56,6 @@ mod vdso;
 pub mod vfs;
 mod watchdog;
 
-pub use tuxport_engine::DbtStats;
-pub use tuxport_hal::net::Route as HostRoute;
 pub use bug::{KillReason, KillReport};
 pub use inittab::Power;
 pub use loader::LoadError;
@@ -65,6 +63,8 @@ pub use machine::{Machine, MachineOptions, SHUTDOWN_TIMEOUT, Stdio, run};
 pub use portmap::ListenEvent;
 pub use process::{ExitStatus, RunError, RunOptions, RunReport, Signal, Tier};
 pub use terminal::Terminal;
+pub use tuxport_engine::DbtStats;
+pub use tuxport_hal::net::Route as HostRoute;
 pub use watchdog::Stall;
 
 use std::path::Path;

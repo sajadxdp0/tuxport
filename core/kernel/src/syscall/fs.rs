@@ -5259,7 +5259,8 @@ pub(super) fn cachestat(cx: &mut Cx<'_>, fd: i32, range: u64, out: u64, flags: u
     let len = u64::from_le_bytes(r[8..].try_into().unwrap());
     let stats = match &file.borrow().kind {
         FileKind::Regular { file, .. } => {
-            tuxport_hal::cachestat(std::os::fd::AsRawFd::as_raw_fd(file), off, len).map_err(Errno)?
+            tuxport_hal::cachestat(std::os::fd::AsRawFd::as_raw_fd(file), off, len)
+                .map_err(Errno)?
         }
         _ => [0; 5],
     };

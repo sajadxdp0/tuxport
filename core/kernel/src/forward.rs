@@ -510,8 +510,8 @@ fn open(t: &Target, client: Option<([u8; 4], u16)>) -> Result<(i32, bool, Option
         Some((ip, port)) => {
             let host = take_outside();
             let at = |p: u16| tuxport_hal::net::sockaddr(std::net::SocketAddr::from((host, p)));
-            let r =
-                tuxport_hal::net::bind(fd, &at(port)).or_else(|_| tuxport_hal::net::bind(fd, &at(0)));
+            let r = tuxport_hal::net::bind(fd, &at(port))
+                .or_else(|_| tuxport_hal::net::bind(fd, &at(0)));
             if r.is_ok() {
                 let hport = tuxport_hal::net::sockname(fd, false)
                     .ok()

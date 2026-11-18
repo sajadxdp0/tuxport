@@ -2280,9 +2280,9 @@ fn files_app_changes_reach_inotify_watchers() {
     // rename, delete. busybox's inotifyd prints events as "letters\tdirectory\tname", the letters
     // in event-bit order being acew0rmynd: c is IN_MODIFY, r IN_OPEN, w IN_CLOSE_WRITE, m and y
     // moved out and moved in
+    use std::io::Write;
     use tuxport_kernel::vfs::browse;
     use tuxport_kernel::{ExitStatus, Machine, MachineOptions, Stdio, Tier};
-    use std::io::Write;
     let Some(store) = store() else {
         return;
     };
@@ -2360,9 +2360,9 @@ fn files_app_writes_stay_out_of_clones() {
     // sharing its object, so the app's later writes stay out of the clone; and when the app opens
     // a file that shares its object for writing, the guest's descriptions of the file move to the
     // file's new object with it and read what the app wrote (tests/guest/hostclone.c)
+    use std::os::unix::fs::FileExt;
     use tuxport_kernel::vfs::browse;
     use tuxport_kernel::{ExitStatus, Machine, MachineOptions, Stdio as Io, Tier};
-    use std::os::unix::fs::FileExt;
     let (Some(store), Some(program)) = (store(), build_static("hostclone")) else {
         return;
     };
