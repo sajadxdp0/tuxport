@@ -3,7 +3,7 @@ name: Full tests
 # The slow suites, kept off every push (ci.yml has the quick checks): the differential tests
 # against native Linux (including Fuchsia Starnix's and gVisor's syscall tests), the extended
 # lockstep run, the network test and the engine built with clang. They run
-# every night on develop when it has new commits, on pushes to master, and on demand
+# every night on main when it has new commits, and on demand
 # (`gh workflow run full.yml --ref <branch>`).
 on:
   schedule:
@@ -20,7 +20,7 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  # The nightly run tests develop, and only when develop changed in the last day
+  # The nightly run tests main, and only when it changed in the last day
   changed:
     name: Anything new
     runs-on: ubuntu-24.04
@@ -29,7 +29,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
-          ref: ${{ github.event_name == 'schedule' && 'develop' || github.ref }}
+          ref: ${{ github.event_name == 'schedule' && 'main' || github.ref }}
       - id: check
         run: |
           if [ "${{ github.event_name }}" != schedule ] ||
@@ -48,7 +48,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
-          ref: ${{ github.event_name == 'schedule' && 'develop' || github.ref }}
+          ref: ${{ github.event_name == 'schedule' && 'main' || github.ref }}
 
       - name: Install rustup
         run: |
