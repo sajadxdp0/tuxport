@@ -23,8 +23,8 @@ asset adapted from the Android launcher foreground and colors.
 ## Public entry points
 
 - `dist/index.html`, opened directly or served as the static site's index; its
-  hero carries the app's prompt mark and a terminal transcript captured from
-  the running app.
+  hero carries the app's own favicon as the logo and a terminal transcript
+  captured from the running app.
 - `dist/privacy.html`, reached through the homepage's relative Privacy Policy link or
   opened directly.
 - Both pages reference the local `favicon.svg` with an SVG icon link and share the

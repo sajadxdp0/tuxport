@@ -1,12 +1,12 @@
 # Tuxport website
 
 A single page in `dist/index.html` links to the English privacy policy in
-`dist/privacy.html`. The page is a quiet, dark one-pager in a small-site
-style: the app's prompt mark as the logo, a terminal transcript captured
-from the running app as the only content moment, lowercase labels and
-hairline rows. Inline CSS, a local SVG favicon, no JavaScript, no remote
-assets, no dependencies, no compilation step. The palette is near-black
-`#0c0c0d` with one cyan accent.
+`dist/privacy.html`. The page is a minimal dark one-pager in a small-site
+style: the app's own `favicon.svg` as the logo in the header and the hero,
+a terminal transcript captured from the running app, and three quiet fact
+lines. Inline CSS, a local SVG favicon, no JavaScript, no remote assets,
+no dependencies, no compilation step. The palette is near-black `#0c0c0d`
+with one cyan accent.
 
 `dist/` contains the directly maintained website source and is committed to Git.
 It is also the directory uploaded for deployment; no generation or copying is needed.
