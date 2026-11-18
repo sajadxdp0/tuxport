@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="How Tuxport handles your data, uses Android permissions, and lets you control and delete your information.">
+    <title>Privacy Policy · Tuxport</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" sizes="any">
+    <style>
+      :root {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: #e6edf3;
+        background: #0d1117;
+        font-synthesis: none;
+        text-rendering: optimizeLegibility;
+      }
+
+      body {
+        max-width: 42rem;
+        margin: 0 auto;
+        padding: 3.5rem 1.5rem;
+        font-size: 1rem;
+        line-height: 1.85;
+        overflow-wrap: anywhere;
+      }
+
+      header { margin-bottom: 2.5rem; }
+      h1 { margin: 0.25rem 0 0.75rem; font-size: 2rem; line-height: 1.4; }
+      h2 { margin: 2rem 0 0.5rem; font-size: 1.125rem; }
+      p { margin: 0.75rem 0; }
+      ul { padding-left: 1.5rem; }
+      a { color: #00e5ff; text-underline-offset: 0.15em; }
+      a:focus-visible { outline: 2px solid #00e5ff; outline-offset: 3px; }
+      code { font-size: 0.875em; }
+      li + li { margin-top: 0.5rem; }
+      .meta, footer { color: #8b949e; font-size: 0.875rem; }
+      footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid #30363d;
+        box-shadow: 0 -1px 0 rgba(0, 229, 255, 0.25); }
+
+      @media (max-width: 480px) {
+        body { padding: 2rem 1.25rem; }
+      }
+
+      @media print {
+        body { max-width: none; padding: 0; color: #000; background: #fff; }
+        a { color: #000; }
+        h2 { break-after: avoid; }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>Privacy Policy</h1>
+        <p class="meta">Effective <time datetime="2026-11-18">November 18, 2026</time></p>
+        <p>Sajad ("the maintainer") maintains Tuxport, an Android app for running a Linux
+          command-line environment on your device. Tuxport is a rebranded fork of Appine by
+          Matthew Lee. This policy explains how Tuxport handles information, uses Android
+          permissions, and lets you control your data.</p>
+      </header>
+
+      <section aria-labelledby="overview">
+        <h2 id="overview">1. Overview</h2>
+        <p>You do not need an online Tuxport account. Linux user accounts you create inside
+          Tuxport belong to the local Linux environment.</p>
+        <p>Tuxport stores your Linux files, settings, saved terminal state, and diagnostic
+          logs on your device. It does not automatically upload this content to me.
+          Tuxport has no advertising or analytics SDKs, and I do not sell your personal data
+          or use it for advertising.</p>
+        <p>Some features involve other services: Tuxport contacts software mirrors during
+          setup, programs you run can use the network, and you can choose to share files or
+          diagnostics. The sections below explain these cases.</p>
+      </section>
+
+      <section aria-labelledby="local-data">
+        <h2 id="local-data">2. Information processed on your device</h2>
+        <ul>
+          <li><strong>Linux environment and files.</strong> Tuxport stores the installed
+            distribution, packages, local user accounts, configuration, and files you create
+            or import. Programs you run may store command history, credentials, or other
+            information in that environment.</li>
+          <li><strong>Terminal content and session state.</strong> Tuxport processes your input
+            and program output to provide the terminal. It saves terminal snapshots, recent
+            output, tab layout, local login names, and working directories so it can restore
+            the terminal display after the app stops unexpectedly. Terminal content may
+            contain sensitive information that you type or that a program displays.</li>
+          <li><strong>Preferences.</strong> Tuxport stores settings such as appearance,
+            screen-off running behavior, file access, privacy mode, and permission-prompt
+            history to remember your choices.</li>
+          <li><strong>Clipboard.</strong> Tuxport accesses clipboard text for paste operations
+            and when a foreground terminal program requests to read it. For a program's read
+            request, Tuxport reads the text to show a confirmation and passes it to the program
+            only if you allow it. Copy operations and terminal programs can also place text
+            on the system clipboard while Tuxport permits clipboard access.</li>
+          <li><strong>Network configuration.</strong> Tuxport reads network status and routing
+            information to support networking for the Linux environment.</li>
+        </ul>
+      </section>
+
+      <section aria-labelledby="diagnostics">
+        <h2 id="diagnostics">3. Diagnostics and support</h2>
+        <p>Tuxport keeps local logs to help diagnose setup failures, crashes, and runtime
+          problems. These may include the Tuxport version, Android version, device manufacturer
+          and model, CPU architecture, Linux distribution, timestamps, process names, paths,
+          and error messages. An exported diagnostic archive can also include Android process
+          exit records and an available crash or unresponsive-app trace.</p>
+        <p>The diagnostic exporter does not deliberately gather terminal transcripts,
+          shell history, an environment-variable dump, or your Linux files. Error messages
+          and system traces can still contain sensitive details. Review an archive before
+          sharing it.</p>
+        <p>Tuxport does not send diagnostics automatically. When you use <strong>Export diagnostic logs</strong>,
+          you choose whether to save an archive or share it with another app. That destination
+          receives the archive you select and handles it under its own privacy practices.</p>
+        <p>If you contact me through the project's GitHub issues, I receive your message
+          and any attachments you attach. I use them to respond to your request, investigate
+          the issue, and maintain Tuxport. GitHub processes those messages to host the
+          discussion. Please do not send passwords, private keys, or unrelated personal
+          information.</p>
+      </section>
+
+      <section aria-labelledby="network">
+        <h2 id="network">4. Network connections and third parties</h2>
+        <p>After importing a Linux system, Tuxport automatically requests small amounts of
+          repository data from its configured mirrors to choose a responsive package source.
+          For Alpine Linux these include Alpine's download service, Tsinghua University TUNA,
+          the University of Science and Technology of China (USTC), and Aliyun. For Debian
+          these include Debian's download service, TUNA, USTC, and Aliyun. Choosing to install
+          Debian also downloads its system image from GitHub's raw-content service.</p>
+        <p>These services receive your network IP address, the requested resource, and normal
+          connection and HTTP request metadata. They may keep server logs under their own
+          policies. Tuxport uses these connections to test download speed and retrieve software;
+          it does not attach your terminal contents, Linux files, or diagnostic archive to
+          those setup requests.</p>
+        <p>Programs you install or run can connect to servers, download packages, authenticate
+          to services, or transmit files and other information. The data they send depends
+          on those programs, your commands, and their configuration. This can continue in
+          the background while the programs run. Use software and destinations you trust.</p>
+        <p>Opening a web link sends the address to your browser. Importing a file through
+          Android's file picker gives Tuxport access to the selected file and its name; a
+          cloud file provider may download it from its service. Sharing or saving a file
+          gives the selected recipient or provider the content needed for that action.</p>
+        <p>Apart from the transfers described in this policy, Tuxport does not upload your
+          local content to the developer. Third-party services control their own storage,
+          retention, and processing locations, which may be outside your country.</p>
+      </section>
+
+      <section aria-labelledby="permissions">
+        <h2 id="permissions">5. Android permissions and access</h2>
+        <ul>
+          <li><strong>Internet and network state</strong>
+            (<code>INTERNET</code>, <code>ACCESS_NETWORK_STATE</code>): support Linux
+            programs' network connections, system-image downloads, mirror speed checks,
+            and network configuration. Android grants these without a runtime dialog.
+            Without connectivity, network-dependent operations will not work.</li>
+          <li><strong>Foreground service</strong>
+            (<code>FOREGROUND_SERVICE</code>, <code>FOREGROUND_SERVICE_SPECIAL_USE</code>):
+            keep user-started terminal sessions and Linux programs running while you use
+            another app. You can stop sessions using Tuxport's exit controls.</li>
+          <li><strong>Notifications</strong> (<code>POST_NOTIFICATIONS</code>): show running
+            session status, command completion, and errors. On Android 13 and later, Tuxport
+            requests notification access through Android when you choose to enable it.
+            You can decline or turn notifications off in Android settings and continue
+            using the terminal, although you may miss alerts.</li>
+          <li><strong>Wake lock</strong> (<code>WAKE_LOCK</code>): keep the CPU awake when
+            needed by your screen-off running setting. Change <strong>Screen-off running</strong>
+            in Tuxport settings to control this behavior.</li>
+          <li><strong>Battery optimization exemption</strong>
+            (<code>REQUEST_IGNORE_BATTERY_OPTIMIZATIONS</code>): let you ask Android to
+            reduce battery restrictions that can interrupt long-running programs. You can
+            decline the request or change Tuxport's battery settings later. Android may
+            suspend or stop background work when restrictions apply.</li>
+          <li><strong>Biometric authentication</strong>
+            (<code>USE_BIOMETRIC</code>, and the compatibility permission
+            <code>USE_FINGERPRINT</code>): use Android's authentication prompt for optional
+            Privacy mode and protected actions such as exporting diagnostics in that mode.
+            Android verifies your biometrics or screen-lock credential. Tuxport receives the
+            authentication result, not your fingerprint, face template, PIN, pattern, or password.</li>
+        </ul>
+        <p>Tuxport uses Android's file picker for imports and exports rather than requesting
+          broad access to shared storage. It does not request Android permissions for your
+          contacts, location, camera, microphone, SMS, or call logs.</p>
+        <p><strong>Allow other apps to access files</strong> is a Tuxport setting, off by default. Enabling
+          it exposes the Linux environment through Android's system file picker. Other apps
+          can access files or folders you grant them; access outside the Linux home directory
+          is read-only. Turning it off revokes grants and blocks further file access through
+          this provider, but cannot retrieve copies already made or close file handles another
+          app already holds.</p>
+      </section>
+
+      <section aria-labelledby="security">
+        <h2 id="security">6. Security</h2>
+        <p>Tuxport keeps its internal files in Android's app-private storage and configures
+          Android backup and device transfer to exclude its app data. File sharing uses
+          Android's access grants. Privacy mode adds a system-authenticated app lock,
+          restricts screen capture, hides notification details, and disables file-provider
+          access. It does not stop running Linux programs or encrypt the Linux filesystem
+          with a separate Tuxport password.</p>
+        <p>Tuxport uses HTTPS for its built-in mirror probes and system-image download, and
+          verifies the downloaded system image against an expected checksum. Network
+          traffic from programs you run depends on their protocols and configuration.
+          In particular, the default Debian package repository configuration uses HTTP;
+          Tuxport does not guarantee encryption for all guest traffic. Use encrypted
+          protocols such as HTTPS or SSH when sending sensitive information.</p>
+      </section>
+
+      <section aria-labelledby="retention">
+        <h2 id="retention">7. Retention and deletion</h2>
+        <ul>
+          <li><strong>Linux files and settings:</strong> remain on your device until you
+            delete them, reset or replace the Linux system where applicable, clear Tuxport's
+            app storage, or uninstall Tuxport. Resetting the Linux system removes that system's
+            data, but is not a substitute for clearing all Android app storage.</li>
+          <li><strong>Saved terminal state:</strong> updates as sessions run. Tuxport removes
+            saved restoration state on a normal service exit, except when a later startup
+            has not yet restored data from an earlier interrupted run. After an unexpected
+            stop or incomplete restoration, saved state can remain until a later run replaces
+            or clears it, or you clear app storage.</li>
+          <li><strong>Local diagnostics:</strong> use size-limited rotating logs for the
+            current and previous app process runs. New runs and log rotation replace older
+            records; there is no fixed number of retention days. Cached export archives
+            remain until Tuxport prunes them, Android clears the cache, or you clear app storage.</li>
+          <li><strong>Support correspondence:</strong> I retain messages and attachments
+            for as long as needed to resolve your request and related follow-up, then delete
+            them unless a legal obligation requires further retention. You can request
+            earlier deletion by opening an issue at the address below.</li>
+        </ul>
+        <p>To remove Tuxport's local data, open Android <strong>Settings → Apps → Tuxport →
+          Storage</strong> and choose <strong>Clear storage</strong> or <strong>Clear data</strong>,
+          or uninstall Tuxport and choose to remove its data if Android offers that choice.
+          Labels vary by device. These actions remove your local Linux environment and files,
+          so save anything you want to keep first.</p>
+        <p>Copies you export, clipboard entries, emails, and information held by third-party
+          apps or servers are outside Tuxport's local storage. Delete those copies at their
+          destination or contact the recipient. I cannot remotely access or delete the files
+          on your device or data held by services you use from the terminal.</p>
+      </section>
+
+      <section aria-labelledby="choices">
+        <h2 id="choices">8. Your choices and requests</h2>
+        <p>You can manage notifications and battery access in Android settings, change
+          Tuxport's file access and Privacy mode settings, choose which files to import or
+          share, and stop programs that use the network. You do not have to send diagnostics
+          or contact support to use Tuxport.</p>
+        <p>For personal information you have sent to me, you can request access, correction,
+          or deletion by opening an issue in the project repository. I may ask for the minimum information needed to verify that
+          the request concerns your correspondence. There is no online Tuxport account to
+          close; deleting local Linux accounts and files is under your control.</p>
+      </section>
+
+      <section aria-labelledby="updates">
+        <h2 id="updates">9. Changes to this policy</h2>
+        <p>I will publish changes on this page and update the date above. If a change requires
+          additional notice or consent, I will provide it before applying the new data practice.</p>
+      </section>
+
+      <section aria-labelledby="contact">
+        <h2 id="contact">10. Contact</h2>
+        <p>For privacy questions or requests about information you have sent to me, open an
+          issue in the project repository:</p>
+        <p><a href="https://github.com/sajadxdp0/tuxport/issues">github.com/sajadxdp0/tuxport/issues</a></p>
+      </section>
+    </main>
+
+    <footer>Tuxport · Privacy Policy</footer>
+  </body>
+</html>

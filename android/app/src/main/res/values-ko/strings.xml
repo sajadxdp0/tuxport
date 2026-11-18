@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- Keep section and resource order aligned between locales. -->
+<resources>
+
+    <!-- Application and common actions -->
+    <string name="navigate_up">뒤로</string>
+    <string name="close">닫기</string>
+    <string name="allow">허용</string>
+    <string name="deny">거부</string>
+
+    <!-- Startup and shutdown -->
+    <string name="starting">시작 중…</string>
+    <string name="preparing">%1$s 준비 중…</string>
+    <string name="downloading">%1$s 다운로드 중… %2$d / %3$d MB</string>
+    <string name="restarting">다시 시작 중…</string>
+    <string name="stopping">서비스 중지 중…</string>
+    <string name="start_failed_title">시작할 수 없습니다</string>
+    <string name="start_failed">시작할 수 없습니다: %1$s</string>
+
+    <!-- Tabs and terminal controls -->
+    <string name="new_tab">새 탭</string>
+    <string name="close_tab">탭 닫기</string>
+    <string name="tab_list">탭 목록</string>
+    <string name="more_options">옵션 더보기</string>
+    <string name="menu_settings">설정</string>
+
+    <string name="close_other_tabs">다른 탭 닫기</string>
+    <string name="close_all_tabs">모든 탭 닫기</string>
+    <string name="close_tab_title">이 탭을 닫을까요?</string>
+    <string name="close_tab_message">탭을 닫으면 셸 연결이 끊어집니다. 일반적으로 셸에서 실행 중인 프로그램도 종료됩니다.</string>
+    <plurals name="close_tabs_title">
+        <item quantity="other">탭 %d개를 닫을까요?</item>
+    </plurals>
+    <string name="close_tabs_message">탭을 닫으면 각 셸의 연결이 끊어집니다. 일반적으로 해당 셸에서 실행 중인 프로그램도 종료됩니다.</string>
+
+    <string name="next_tab">다음 탭</string>
+    <string name="previous_tab">이전 탭</string>
+    <string name="shortcuts_tabs">탭</string>
+    <string name="shortcuts_terminal">터미널</string>
+    <string name="previous_prompt">이전 프롬프트</string>
+    <string name="next_prompt">다음 프롬프트</string>
+
+    <string name="clear_screen">화면 지우기</string>
+    <string name="reset_terminal">터미널 초기화</string>
+    <string name="keep_screen_on">화면 켜짐 유지</string>
+    <string name="modifier_locked">%1$s 잠금 설정됨</string>
+    <string name="tmux_control_detached">여기서는 tmux 제어 모드(tmux -CC)를 표시할 수 없어 Tuxport이 연결을 분리했습니다. 세션은 계속 실행 중이며 tmux attach로 다시 연결할 수 있습니다.</string>
+
+    <string name="tab_number">탭 %1$d</string>
+    <string name="tab_description">탭 %1$d: %2$s</string>
+    <string name="tab_description_status">탭 %1$d: %2$s(%3$s)</string>
+    <string name="tab_ended">%1$s(종료됨)</string>
+    <string name="close_tab_description">탭 %1$d 닫기: %2$s</string>
+
+    <!-- Search -->
+    <string name="find">찾기</string>
+    <string name="find_previous">이전 일치 항목</string>
+    <string name="find_next">다음 일치 항목</string>
+    <string name="find_close">찾기 닫기</string>
+
+    <!-- Selection and clipboard -->
+    <string name="select_rectangle">사각형 선택</string>
+    <string name="select_lines">줄 선택</string>
+    <string name="select_output">출력 선택</string>
+
+    <string name="paste_unsafe_title">명령이 실행될 수 있는 텍스트를 붙여넣을까요?</string>
+    <string name="paste_unsafe">프로그램은 각 줄바꿈을 Enter 입력으로 처리하므로 붙여넣는 즉시 각 줄이 명령으로 실행될 수 있습니다:\n\n^1</string>
+    <string name="paste_as_is">그대로 붙여넣기</string>
+    <string name="paste_without_trailing_newlines">끝의 줄바꿈 제거</string>
+
+    <string name="clipboard_read_title">프로그램이 클립보드를 읽도록 허용할까요?</string>
+    <string name="clipboard_read">이 탭의 프로그램이 클립보드 내용을 요청합니다:\n\n%1$s</string>
+    <string name="program_copied">프로그램이 텍스트를 클립보드에 복사했습니다</string>
+
+    <!-- Links -->
+    <string name="open_link">링크 열기</string>
+    <string name="link_no_app">이 링크를 열 수 있는 앱이 없습니다</string>
+    <string name="link_remote_file">이 파일은 Tuxport이 아닌 %1$s에 있습니다</string>
+    <string name="link_hidden_file">파일 접근이 꺼져 있습니다. 설정에서 ‘다른 앱의 파일 접근 허용’을 켜세요</string>
+    <string name="link_missing_file">파일을 찾을 수 없습니다</string>
+
+    <!-- File import -->
+    <string name="import_files">파일 가져오기</string>
+    <string name="importing_files">파일 가져오는 중…</string>
+    <string name="import_file_name">가져온 파일</string>
+    <string name="import_file_failed">%1$s 가져오기 실패: %2$s</string>
+    <string name="import_files_saved">홈 디렉터리에 저장했습니다:\n\n^1</string>
+    <string name="import_picker_missing">사용 가능한 파일 선택기가 없습니다</string>
+    <string name="copy_paths">경로 복사</string>
+
+    <!-- Program status and command completion -->
+    <string name="status_percent">%1$s, %2$d%%</string>
+    <string name="status_message">%1$s: %2$s</string>
+    <string name="status_working">작업 중</string>
+    <string name="status_idle">유휴 상태</string>
+    <string name="status_blocked">사용자 조치 대기 중</string>
+    <string name="status_permission">승인 대기 중</string>
+    <string name="status_question">답변 대기 중</string>
+    <string name="status_auth">인증 정보 대기 중</string>
+    <string name="status_done">완료</string>
+    <string name="status_error">실패</string>
+    <string name="status_paused">일시 중지됨</string>
+
+    <string name="command_succeeded">명령 실행 성공</string>
+    <string name="command_failed">명령 실행 실패</string>
+    <string name="command_finished">명령 종료</string>
+    <string name="command_took">소요 시간: %1$s</string>
+    <string name="command_took_code">소요 시간: %1$s, 종료 코드: %2$d</string>
+
+    <!-- Settings: system -->
+    <string name="settings">설정</string>
+    <string name="settings_group_system">시스템</string>
+
+    <string name="settings_distro">배포판</string>
+    <string name="switch_title">%1$s 배포판으로 전환할까요?</string>
+    <string name="switch_message">모든 세션이 종료되고 /root를 포함한 rootfs의 모든 파일이 삭제됩니다. 그런 다음 %1$s 배포판을 가져옵니다.</string>
+    <string name="switch_message_download">먼저 %1$s(%2$d MB)를 다운로드합니다. 다운로드 중에는 현재 시스템을 계속 사용할 수 있습니다. 완료되면 모든 세션이 종료되고 /root를 포함한 rootfs의 모든 파일이 삭제됩니다.</string>
+    <string name="switch_confirm">계속</string>
+    <string name="switch_downloading">%1$s 다운로드 중… %2$d / %3$d MB. 탭하여 취소</string>
+    <string name="cancel_download_title">%1$s 다운로드를 중지할까요?</string>
+    <string name="cancel_download">다운로드 취소</string>
+    <string name="keep_downloading">다운로드 계속</string>
+    <string name="download_failed">%1$s 다운로드 실패: %2$s</string>
+    <string name="switch_failed">%1$s 준비 실패: %2$s\n\n대신 %3$s 배포판을 사용합니다.</string>
+
+    <string name="settings_reset">rootfs 초기화</string>
+    <string name="reset_summary">모든 파일을 삭제하고 rootfs를 다시 초기화</string>
+    <string name="reset_title">rootfs를 초기화할까요?</string>
+
+    <string name="settings_login">로그인 계정</string>
+    <string name="login_auto_choice">자동(일반 사용자 우선)</string>
+    <string name="login_auto">자동(%1$s)</string>
+    <string name="login_missing">%1$s(계정을 찾을 수 없어 새 탭에서 root로 로그인)</string>
+    <string name="login_changed">새 탭에서 %1$s 계정으로 로그인합니다</string>
+
+    <!-- Settings: Android and screen-off running -->
+    <string name="settings_group_android">Android</string>
+    <string name="settings_notifications">알림 켜기</string>
+    <string name="settings_notifications_summary">백그라운드 활동 확인</string>
+    <string name="settings_battery_usage">앱 배터리 사용량</string>
+
+    <string name="settings_run_policy">화면이 꺼졌을 때 실행 방식</string>
+    <string name="allow_sleep">절전 허용</string>
+    <string name="run_sleep_summary">절전 허용, 프로그램이 일시 중지될 수 있음</string>
+    <string name="run_busy">작업 중에는 계속 실행</string>
+    <string name="run_busy_summary">작업 중에는 계속 실행, 30초간 유휴 상태이면 절전 허용</string>
+    <string name="run_always">항상 실행</string>
+    <string name="run_always_summary">항상 실행, 배터리 사용량 증가</string>
+
+    <!-- Privacy mode -->
+    <string name="settings_privacy">개인정보 보호 모드</string>
+    <string name="privacy_summary">앱으로 돌아올 때 잠금 해제 필요</string>
+    <string name="privacy_enable_message">Tuxport을 열 때 생체 인증 또는 화면 잠금 인증이 필요합니다. 스크린샷이 차단되고 알림 세부정보가 숨겨지며 다른 앱의 파일 접근이 차단됩니다. 백그라운드 프로그램은 계속 실행됩니다.</string>
+    <string name="privacy_file_access">개인정보 보호 모드에서는 사용할 수 없음</string>
+
+    <string name="privacy_locked">Tuxport이 잠겨 있습니다</string>
+    <string name="privacy_unlock">잠금 해제</string>
+    <string name="privacy_leave">Tuxport 나가기</string>
+    <string name="privacy_authenticate">생체 인증 또는 화면 잠금으로 인증하세요</string>
+    <string name="privacy_unavailable">인증을 사용할 수 없습니다. Android 설정에서 화면 잠금을 설정하거나 나중에 다시 시도하세요.</string>
+
+    <string name="privacy_notification">Tuxport의 잠금을 해제하여 터미널 보기</string>
+
+    <!-- File access and document roots -->
+    <string name="settings_file_access">다른 앱의 파일 접근 허용</string>
+    <string name="file_access_summary">HOME 디렉터리는 읽기 및 쓰기 가능, 나머지는 읽기 전용</string>
+    <string name="file_access_title">다른 앱의 파일 접근을 허용할까요?</string>
+    <string name="file_access_message">HOME 디렉터리와 시스템 디렉터리가 시스템 파일 선택기에 표시됩니다. 접근을 허용한 앱은 읽기 전용 파일에서도 SSH 개인 키, 비밀번호 등의 민감한 정보를 읽거나 복사할 수 있습니다.</string>
+    <string name="file_access_enable">사용</string>
+
+    <string name="documents_system">전체 시스템(읽기 전용) · %1$s</string>
+
+    <!-- Settings: terminal -->
+    <string name="settings_group_terminal">터미널</string>
+
+    <string name="settings_fill_wide">한중일 문자 확대</string>
+    <string name="fill_wide_on">비율을 유지하며 두 칸 너비로 확대</string>
+    <string name="fill_wide_off">원래 크기로 두 칸 가운데에 표시</string>
+
+    <string name="settings_cursor_style">커서 모양</string>
+    <string name="cursor_block">블록</string>
+    <string name="cursor_bar">세로 막대</string>
+    <string name="cursor_underline">밑줄</string>
+
+    <string name="settings_cursor_blink">커서 깜박임</string>
+    <string name="cursor_blink_on">기본적으로 깜박임, 프로그램에서 변경 가능</string>
+    <string name="cursor_blink_off">기본적으로 깜박이지 않음, 프로그램에서 변경 가능</string>
+
+    <string name="settings_volume_keys">음량 키로 탭 전환</string>
+    <string name="volume_keys_on">위로 이전 탭, 아래로 다음 탭, 탭이 하나면 음량 조절</string>
+    <string name="volume_keys_off">평소처럼 음량 조절</string>
+
+    <string name="settings_show_tab_list">탭 목록 버튼 표시</string>
+    <string name="tab_list_on">탭 표시줄 왼쪽에 표시</string>
+    <string name="tab_list_off">탭 표시줄에 표시하지 않음</string>
+
+    <!-- Settings: debugging and execution mode -->
+    <string name="settings_group_debug">디버깅</string>
+
+    <string name="settings_tier">실행 모드</string>
+    <string name="tier_1">Tier 1: 변환 실행(기본값)</string>
+    <string name="tier_0">Tier 0: 인터프리터 실행(느림, 문제 해결용)</string>
+    <string name="tier_1_summary">변환 실행 · Tier 1</string>
+    <string name="tier_0_summary">인터프리터 실행 · Tier 0(느림)</string>
+    <string name="restart_title">다시 시작할까요?</string>
+    <string name="restart_message">모든 세션이 종료되고 새 실행 모드로 시스템이 다시 시작됩니다.</string>
+    <string name="restart">다시 시작</string>
+
+    <!-- Diagnostic log export -->
+    <string name="settings_export_logs">진단 로그 내보내기</string>
+    <string name="export_logs_summary">최근 로그와 기기 정보를 저장하거나 공유하여 문제 해결에 활용</string>
+    <string name="export_logs_save">파일로 저장</string>
+    <string name="export_logs_share">공유</string>
+
+    <string name="export_logs_preparing">진단 로그 준비 중…</string>
+    <string name="export_logs_saving">진단 로그 저장 중…</string>
+    <string name="export_logs_saved">진단 로그를 저장했습니다</string>
+    <string name="export_logs_failed">로그를 내보낼 수 없습니다. 저장 공간을 확인하고 다시 시도하세요.</string>
+    <string name="export_logs_no_picker">저장 위치를 선택할 수 있는 앱이 없습니다</string>
+    <string name="export_logs_no_app">로그를 공유할 수 있는 앱이 없습니다</string>
+
+    <!-- Settings: about and licenses -->
+    <string name="settings_group_about">정보</string>
+    <string name="settings_project">프로젝트 웹사이트</string>
+    <string name="settings_privacy_policy">개인정보 처리방침</string>
+    <string name="settings_version">버전</string>
+
+    <string name="settings_licenses">오픈소스 라이선스</string>
+    <string name="licenses_summary">GNU AGPL 3.0 이상</string>
+    <string name="license_public_domain">퍼블릭 도메인</string>
+    <plurals name="license_packages">
+        <item quantity="other">패키지 %d개 · 여러 라이선스</item>
+    </plurals>
+    <string name="license_unavailable">이 라이선스를 표시할 수 없습니다. 뒤로 돌아가 다시 여세요.</string>
+
+    <!-- Notifications and background service -->
+    <string name="notification_prompt">알림을 켜서 백그라운드 활동 확인</string>
+    <string name="notification_prompt_dismiss">알림 안내 닫기</string>
+    <string name="battery_prompt">백그라운드 작업에 배터리 사용 제한 해제</string>
+    <string name="battery_prompt_dismiss">배터리 사용량 안내 닫기</string>
+
+    <string name="channel_sessions">터미널 세션</string>
+    <plurals name="sessions_running">
+        <item quantity="other">세션 %d개 실행 중</item>
+    </plurals>
+    <string name="background_running">백그라운드에서 실행 중</string>
+    <string name="exit_all">모두 종료</string>
+
+    <string name="channel_terminal">벨, 프로그램 알림 및 명령 완료</string>
+    <string name="bell_rang">터미널 벨이 울렸습니다</string>
+
+    <string name="channel_network">네트워크 서비스</string>
+    <string name="listening_title">%1$s: 포트 %2$d에서 연결 대기 중</string>
+    <string name="listening_mapped">다른 기기는 포트 %1$d에 연결하세요. 이 휴대전화의 앱은 포트 %2$d를 사용할 수 없어 Tuxport이 연결 포트를 변경했습니다.</string>
+    <string name="listening_direct">같은 네트워크의 다른 기기에서 연결할 수 있습니다</string>
+
+    <string name="channel_problems">프로세스 및 서비스</string>
+
+    <!-- Session restoration -->
+    <string name="restored_notice">%1$s(탭 저장 시각: %2$s). 실행 중이던 프로그램은 복원되지 않았습니다.</string>
+    <string name="ended_android">Android가 앱을 중지하여 이전 세션이 종료되었습니다</string>
+    <string name="ended_memory">Android가 메모리 확보를 위해 앱을 중지하여 이전 세션이 종료되었습니다</string>
+    <string name="ended_resources">백그라운드 리소스 사용량이 너무 많아 Android가 앱을 중지하여 이전 세션이 종료되었습니다</string>
+    <string name="ended_user">앱이 강제 중지되어 이전 세션이 종료되었습니다</string>
+    <string name="ended_updated">앱이 업데이트되어 이전 세션이 종료되었습니다</string>
+    <string name="ended_crash">Tuxport의 버그로 앱이 비정상 종료되어 이전 세션이 종료되었습니다</string>
+    <string name="ended_anr">Tuxport의 버그로 앱이 응답하지 않아 이전 세션이 종료되었습니다</string>
+
+    <!-- Problem reports -->
+    <string name="crashed_title">Tuxport이 비정상 종료되었습니다</string>
+    <string name="crashed_text">%1$s에 Tuxport이 비정상 종료되어 이전 세션이 종료되었습니다. Tuxport의 버그입니다. 의견을 보낼 때 복사한 보고서를 첨부해 주세요.</string>
+    <string name="anr_title">Tuxport이 응답하지 않습니다</string>
+    <string name="anr_text">%1$s에 Tuxport이 응답하지 않아 이전 세션이 종료되었습니다. Tuxport의 버그입니다. 의견을 보낼 때 복사한 보고서를 첨부해 주세요.</string>
+
+    <string name="killed_title">%1$s 강제 종료됨</string>
+    <string name="killed_oom_app">%1$s(pid %2$d) 강제 종료됨: 앱의 메모리 사용량이 한도에 도달하여(사용량 %3$s, 한도 %4$s) OOM killer가 이 프로세스를 선택했습니다.</string>
+    <string name="killed_oom_cgroup">%1$s(pid %2$d) 강제 종료됨: cgroup %3$s의 메모리 사용량이 memory.max에 도달했습니다(사용량 %4$s, 한도 %5$s).</string>
+    <string name="killed_bug">%1$s(pid %2$d) 프로세스가 Tuxport 내부 오류로 종료되었습니다. Tuxport의 버그입니다. 알림에서 보고서를 복사하거나 dmesg로 확인할 수 있습니다.</string>
+
+    <string name="stall_title">Tuxport 커널이 멈췄습니다</string>
+    <string name="stall_text">Tuxport 커널의 한 작업이 %1$d초 동안 실행 중이며 모든 프로그램이 완료를 기다리고 있습니다. Tuxport의 버그입니다. 의견을 보낼 때 복사한 보고서를 첨부해 주세요.</string>
+    <string name="stall_ended_title">Tuxport 커널이 일시적으로 멈췄었습니다</string>
+    <string name="stall_ended_text">Tuxport 커널의 한 작업에 %1$d초가 걸렸으며 모든 프로그램이 완료를 기다렸습니다. Tuxport의 버그입니다. 의견을 보낼 때 복사한 보고서를 첨부해 주세요.</string>
+
+    <plurals name="boot_failed_title">
+        <item quantity="other">서비스 %d개 시작 실패</item>
+    </plurals>
+    <string name="boot_failed_text">%1$s. 부팅 출력은 /var/log/boot.log에 있습니다.</string>
+
+    <string name="copy_report">보고서 복사</string>
+    <string name="report_copied">보고서를 복사했습니다</string>
+
+</resources>

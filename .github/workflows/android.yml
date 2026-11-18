@@ -1,0 +1,130 @@
+name: Android
+
+# The APK build, on pushes that change what goes into it: the Rust workspace's core and Android
+# host, the app, and the scripts that fetch the rootfs and libghostty-vt. Changes to tests,
+# the command-line host or documentation do not run it.
+on:
+  push:
+    paths:
+      - "core/**"
+      - "hosts/android/**"
+      - "android/**"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - "rust-toolchain.toml"
+      - "scripts/fetch-rootfs"
+      - "scripts/fetch-ghostty"
+      - ".github/workflows/android.yml"
+  pull_request:
+    paths:
+      - "core/**"
+      - "hosts/android/**"
+      - "android/**"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - "rust-toolchain.toml"
+      - "scripts/fetch-rootfs"
+      - "scripts/fetch-ghostty"
+      - ".github/workflows/android.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# A newer push to the same branch replaces the run in progress
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  android:
+    name: Android APK
+    # Google provides aapt2 for Linux only on x86_64, so the native library is cross-compiled on
+    # x86_64
+    runs-on: ubuntu-24.04
+    env:
+      NDK_VERSION: 29.0.14206865
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install toolchain from rust-toolchain.toml and the Android target
+        run: |
+          rustup toolchain install
+          rustup target add aarch64-linux-android
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Install cargo-ndk
+        run: cargo install cargo-ndk --locked
+
+      # Cache the dependencies and Gradle distributions under ~/.gradle: without the cache every run
+      # downloads them, and the configuration phase takes about a minute
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: gradle
+          cache-dependency-path: |
+            android/**/*.gradle*
+            android/gradle/wrapper/gradle-wrapper.properties
+
+      - name: Install the NDK
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "ndk;$NDK_VERSION"
+          # The runner's preset ANDROID_NDK_ROOT points at another version; change both so cargo-ndk
+          # does not warn
+          echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/$NDK_VERSION" >> "$GITHUB_ENV"
+          echo "ANDROID_NDK_ROOT=$ANDROID_HOME/ndk/$NDK_VERSION" >> "$GITHUB_ENV"
+
+      - uses: actions/cache@v6
+        with:
+          path: target/rootfs
+          key: rootfs-${{ hashFiles('scripts/fetch-rootfs') }}
+
+      - name: Fetch rootfs
+        run: scripts/fetch-rootfs
+
+      # The terminal, libghostty-vt, is built with Zig from the source release and the Zig packages
+      # that scripts/fetch-ghostty downloads (the android/native map). The version and sha256 are
+      # those of ziglang.org/download/index.json
+      - name: Install Zig
+        env:
+          ZIG_VERSION: 0.17.0
+          ZIG_SHA256: 1cbe9df9f27e6b78d14ccbca43b6703a404ef79ef1c463de901d7f088d4e2026
+        run: |
+          curl -fsSL --retry 3 -o "$RUNNER_TEMP/zig.tar.xz" \
+            "https://ziglang.org/download/$ZIG_VERSION/zig-x86_64-linux-$ZIG_VERSION.tar.xz"
+          echo "$ZIG_SHA256  $RUNNER_TEMP/zig.tar.xz" | sha256sum -c -
+          mkdir -p "$RUNNER_TEMP/zig"
+          tar -xJf "$RUNNER_TEMP/zig.tar.xz" -C "$RUNNER_TEMP/zig" --strip-components 1
+          echo "$RUNNER_TEMP/zig" >> "$GITHUB_PATH"
+
+      # The release tarballs, unpacked, with the Zig caches the build keeps in the source
+      - uses: actions/cache@v6
+        with:
+          path: target/ghostty
+          key: libghostty-vt-${{ hashFiles('scripts/fetch-ghostty') }}
+
+      - name: Fetch libghostty-vt
+        run: scripts/fetch-ghostty
+
+      # The NDK's clang also compiles the C engine here, so clang-specific warnings show up too
+      - name: Clippy for Android
+        env:
+          CARGO_TARGET_DIR: target/android
+        run: cargo ndk -t arm64-v8a --platform 30 clippy --release -p tuxport-android -p tuxport-kernel -- -D warnings
+
+      # The instrumentation tests that run on an emulator (app/src/androidTest) need KVM, so they
+      # run locally
+      - name: Build and lint
+        working-directory: android
+        run: ./gradlew assembleDebug lintDebug --console=plain
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: tuxport-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk

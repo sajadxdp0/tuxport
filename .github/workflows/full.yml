@@ -1,0 +1,175 @@
+name: Full tests
+
+# The slow suites, kept off every push (ci.yml has the quick checks): the differential tests
+# against native Linux (including Fuchsia Starnix's and gVisor's syscall tests), the extended
+# lockstep run, the network test and the engine built with clang. They run
+# every night on develop when it has new commits, on pushes to master, and on demand
+# (`gh workflow run full.yml --ref <branch>`).
+on:
+  schedule:
+    # 02:00 in China (UTC+8)
+    - cron: "0 18 * * *"
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  # The nightly run tests develop, and only when develop changed in the last day
+  changed:
+    name: Anything new
+    runs-on: ubuntu-24.04
+    outputs:
+      run: ${{ steps.check.outputs.run }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event_name == 'schedule' && 'develop' || github.ref }}
+      - id: check
+        run: |
+          if [ "${{ github.event_name }}" != schedule ] ||
+              [ $(( $(date +%s) - $(git log -1 --format=%ct) )) -lt 90000 ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  linux-arm64:
+    name: Linux arm64
+    needs: changed
+    if: needs.changed.outputs.run == 'true'
+    # Design doc §13.3: lockstep uses real arm64 hardware as the reference answer
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event_name == 'schedule' && 'develop' || github.ref }}
+
+      - name: Install rustup
+        run: |
+          if ! command -v rustup >/dev/null; then
+            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
+              | sh -s -- -y --profile minimal --default-toolchain none
+            echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
+          fi
+
+      - name: Install toolchain from rust-toolchain.toml
+        run: rustup toolchain install
+
+      # llvm-mc for the lockstep whitelist check, musl-gcc for the guest test programs
+      - name: Install llvm and musl
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends llvm musl-tools
+
+      - uses: Swatinem/rust-cache@v2
+
+      - uses: actions/cache@v6
+        with:
+          path: target/rootfs
+          key: rootfs-${{ hashFiles('scripts/fetch-rootfs') }}
+
+      - name: Fetch rootfs
+        run: scripts/fetch-rootfs
+
+      # M4's exit criterion: apk installs git and python3 from an Alpine mirror, and git clones a
+      # repository over HTTPS. It depends on the internet, so it is a separate step, which makes it
+      # easy to tell a network problem from a kernel one when it fails
+      - name: Network (apk add, git clone)
+        env:
+          TUXPORT_REQUIRE_ROOTFS: "1"
+          TUXPORT_NETWORK_TESTS: "1"
+        run: cargo test -p tuxport-run --test rootfs_programs -- --exact apk_installs_packages_and_git_clones_over_https
+
+      - name: Lockstep (extended)
+        run: cargo run --release -p tuxport-lockstep -- --iterations 200000
+
+      # Fuchsia Starnix's syscall tests, which the starnix-* differential cases run (without them those
+      # cases only print that they are missing). The Fuchsia commit and googletest version are fixed
+      # in the script, so its hash keys the cache, and a miss rebuilds them (about four minutes).
+      # This cache and gVisor's are restored and saved in steps of their own: actions/cache saves
+      # only when the whole job succeeds, so a later failure would leave them never saved
+      - id: starnix-cache
+        uses: actions/cache/restore@v6
+        with:
+          path: target/starnix-tests
+          key: starnix-tests-${{ hashFiles('scripts/build-starnix-tests', 'tests/starnix/compat/**') }}
+
+      - name: Build Starnix's syscall tests
+        run: scripts/build-starnix-tests
+
+      - if: steps.starnix-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: target/starnix-tests
+          key: ${{ steps.starnix-cache.outputs.cache-primary-key }}
+
+      # gVisor's syscall tests, for the gvisor-* cases: only the programs those cases name are
+      # built, so the list is part of the key (abseil and the test library make a miss take about
+      # ten minutes)
+      - name: List gVisor's test programs
+        id: gvisor
+        run: echo "programs=$(scripts/build-gvisor-tests --list | sha256sum | cut -c1-16)" >> "$GITHUB_OUTPUT"
+
+      - id: gvisor-cache
+        uses: actions/cache/restore@v6
+        with:
+          path: target/gvisor-tests
+          key: gvisor-tests-${{ hashFiles('scripts/build-gvisor-tests', 'tests/gvisor/**') }}-${{ steps.gvisor.outputs.programs }}
+
+      - name: Build gVisor's syscall tests
+        run: scripts/build-gvisor-tests
+
+      - if: steps.gvisor-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: target/gvisor-tests
+          key: ${{ steps.gvisor-cache.outputs.cache-primary-key }}
+
+      # scripts/difftest does not build: it runs target/release/tuxport-run, which no other step builds
+      - name: Build tuxport-run
+        run: cargo build --release -p tuxport-run
+
+      # M7's exit criterion: the same scripts give the same output on Tuxport (Tier 1) and on native
+      # Alpine in docker. The first run installs the packages the test cases need with apk, which
+      # depends on the internet. Tuxport turns the guest's raw ICMP sockets into host ping sockets:
+      # Ubuntu does not let regular users create those by default (ping_group_range is "1 0"), while
+      # Android and the Docker container on the native side both allow all groups. rust-cache caches
+      # the whole target/ and would restore part of a store left by an earlier run, so the store is
+      # created afresh each time and deleted after the run, so that it is not saved into the cache
+      # again. vmstat samples the runner every 10 s meanwhile: Tuxport's side of some cases has
+      # taken tens of times its usual time on some runs only. -R runs a failed group once more, so
+      # a group that fails only sometimes is reported as flaky instead of failing the run
+      - name: Differential tests
+        run: |
+          sudo sysctl -w net.ipv4.ping_group_range="0 2147483647"
+          rm -rf target/difftest
+          vmstat -t 10 > target/vmstat.log 2>&1 &
+          trap "kill $!" EXIT
+          scripts/difftest -R
+
+      # Every case's tuxport-run stderr (internal errors, BKL watchdog reports), the outputs of
+      # failed cases and the vmstat samples, whether the cases passed or not
+      - if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: difftest
+          path: |
+            target/difftest/*.tuxport.err
+            target/difftest/failed/
+            target/vmstat.log
+          if-no-files-found: ignore
+
+      - name: Remove the differential tests' store
+        if: always()
+        run: rm -rf target/difftest target/vmstat.log
+
+      # The Android NDK compiles the C engine with clang: run its tests built that way too
+      - name: Engine and oracle with clang
+        env:
+          CC: clang
+          CARGO_TARGET_DIR: target/clang
+        run: cargo test -p tuxport-engine -p tuxport-lockstep

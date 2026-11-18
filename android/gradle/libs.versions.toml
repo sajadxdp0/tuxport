@@ -1,0 +1,21 @@
+[versions]
+biometric = "1.1.0"
+browser = "1.10.0"
+core = "1.19.1"
+junit = "1.3.0"
+material = "1.14.0"
+preference = "1.2.1"
+recyclerview = "1.2.1"
+runner = "1.7.0"
+webkit = "1.18.0"
+
+[libraries]
+androidx-biometric = { group = "androidx.biometric", name = "biometric", version.ref = "biometric" }
+androidx-browser = { group = "androidx.browser", name = "browser", version.ref = "browser" }
+androidx-core = { group = "androidx.core", name = "core", version.ref = "core" }
+androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junit" }
+androidx-preference = { group = "androidx.preference", name = "preference", version.ref = "preference" }
+androidx-recyclerview = { group = "androidx.recyclerview", name = "recyclerview", version.ref = "recyclerview" }
+androidx-runner = { group = "androidx.test", name = "runner", version.ref = "runner" }
+androidx-webkit = { group = "androidx.webkit", name = "webkit", version.ref = "webkit" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }

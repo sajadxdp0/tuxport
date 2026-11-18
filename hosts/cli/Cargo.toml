@@ -1,0 +1,21 @@
+[package]
+name = "tuxport-run"
+description = "Run a guest program from the host terminal (development front end)"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+tuxport-hal.workspace = true
+tuxport-kernel.workspace = true
+
+[features]
+# Differential tests, LTP and the survey all use this front end's release build, so by default they
+# check borrows too (the tuxport-kernel feature of the same name)
+default = ["borrow-check"]
+borrow-check = ["tuxport-kernel/borrow-check"]
+
+[dev-dependencies]
+tuxport-bench.workspace = true

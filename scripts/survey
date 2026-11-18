@@ -1,0 +1,139 @@
+#!/bin/sh
+# Workload survey (docs/rounds/62-workload-survey.md): runs common services and tools inside Tuxport
+# and collects failures and the kernel layer's logs. Run on a host with docker:
+#
+#   scripts/survey [-t tier] [-s store directory] [-n image] [workload name…]
+#
+# Workloads are tests/survey/<name>.sh (names may include subdirectories), copied into the store and
+# run by the guest's /bin/sh (stdin is /dev/null), with TUXPORT_LOG=1. stdout is written to
+# target/survey/<name>.out and stderr (including the kernel layer's logs) to <name>.err; at the end
+# there is one line per workload: the exit code, the time, the number of internal errors reported by
+# the kernel layer (kernel bugs, kernel objects borrowed while the BKL is released), the
+# unimplemented syscalls and the other unimplemented paths reached (prctl options, fcntl commands,
+# ioctl requests, madvise advice, futex commands, names missing under /proc, /sys and /dev, devices
+# without a driver; core/kernel/src/stub.rs).
+# The output is for people to read: the script only prints results and does not compare with native.
+# Without names, the scripts directly under tests/survey/ run (the container-engine ones too, which
+# need a store of their own: -s target/survey/docker or podman); those in subdirectories (glibc/,
+# suites/, ai/) run only by name. Each workload runs for at most SURVEY_TIMEOUT seconds (1500 by
+# default).
+#
+# -n image: run the same workloads natively in this docker image for comparison, with the output in
+# <name>.native.out and .native.err. The environment variable SURVEY_DOCKER_OPTS is added to the
+# native container (such as `--cap-add SYS_ADMIN --security-opt apparmor=unconfined` for sandboxes).
+# The image can be exported from the store (docs/rounds/70-survey-suites.md):
+#
+#   tuxport-run --rootfs <store> --no-pty -- /bin/tar -C / -cf - --exclude ./proc \
+#       --exclude ./sys --exclude ./dev --exclude ./tmp . > store.tar
+#   docker import --platform linux/arm64 store.tar <image>
+#
+# The store is target/survey/store by default; when it does not exist the minirootfs is imported
+# (run scripts/fetch-rootfs first) and then the needed packages are installed with apk, which needs
+# the network (using the host's or docker's proxy), about 1 GB.
+set -eu
+
+root=$(cd "$(dirname "$0")/.." && pwd)
+cd "$root"
+tier=1
+store=target/survey/store
+packages="openssh-server openssh-client tmux postgresql18 postgresql18-client postgresql18-contrib
+    redis valkey valkey-cli mariadb mariadb-client cargo rust gcc musl-dev dotnet10-sdk php85
+    ruby nginx curl neovim htop btop fish zsh rsync git git-daemon mosh zig python3 py3-pip socat nmap nmap-nselibs nmap-scripts"
+
+native=""
+while getopts t:s:n: opt; do
+    case $opt in
+    t) tier=$OPTARG ;;
+    s) store=$OPTARG ;;
+    n) native=$OPTARG ;;
+    *) exit 2 ;;
+    esac
+done
+shift $((OPTIND - 1))
+
+limit=${SURVEY_TIMEOUT:-1500}
+out=target/survey
+if [ -n "$native" ]; then
+    # Native comparison: use docker directly on the host, with the docker daemon's proxy (as in
+    # scripts/dev)
+    IFS='|' read -r http https <<EOF
+$(docker info --format '{{.HTTPProxy}}|{{.HTTPSProxy}}' 2>/dev/null || true)
+EOF
+    [ $# -gt 0 ] || set -- $(cd tests/survey && ls *.sh | sed 's/\.sh$//')
+    for name in "$@"; do
+        mkdir -p "$(dirname "$out/$name")"
+        start=$(date +%s)
+        set +e
+        # shellcheck disable=SC2086 # the options must be split on whitespace
+        # --init: the sh that busybox's timeout runs must not be process 1 in the container, which
+        # ignores the SIGTERM on timeout, so a stuck workload would never end
+        docker run --rm -i --init --platform linux/arm64 --ulimit nice=40:40 ${SURVEY_DOCKER_OPTS:-} \
+            -e http_proxy="$http" -e https_proxy="$https" -e no_proxy=127.0.0.1,localhost \
+            -e PATH=/usr/sbin:/usr/bin:/sbin:/bin -e HOME=/root -e TERM=xterm "$native" \
+            timeout "$limit" /bin/sh -c 'mkdir -p /tmp && chmod 1777 /tmp && cat > /tmp/survey.sh && exec sh /tmp/survey.sh </dev/null' \
+            <"tests/survey/$name.sh" >"$out/$name.native.out" 2>"$out/$name.native.err"
+        code=$?
+        set -e
+        printf '%-10s exit %-3s %4ss  (native)\n' "$name" "$code" "$(($(date +%s) - start))"
+    done
+    exit 0
+fi
+
+# Run directly on Linux arm64; on other hosts the whole script is rerun through scripts/dev
+if [ "$(uname -sm)" != "Linux aarch64" ]; then
+    exec scripts/dev env SURVEY_TIMEOUT="$limit" scripts/survey -t "$tier" -s "$store" "$@"
+fi
+run=${TUXPORT_RUN:-target/linux-arm64/release/tuxport-run}
+[ -x "$run" ] || run=target/release/tuxport-run
+proxy() {
+    for kv in "http_proxy=${http_proxy:-}" "https_proxy=${https_proxy:-}"; do
+        [ -n "${kv#*=}" ] && printf -- '--env %s ' "$kv"
+    done
+    printf -- '--env no_proxy=127.0.0.1,localhost'
+}
+
+# A store whose creation did not finish (the import or apk add failed, or the run was stopped) is
+# marked by $store.partial and made again
+if [ -e "$store.partial" ]; then
+    echo "removing the unfinished $store"
+    rm -rf "$store"
+fi
+if [ ! -d "$store" ]; then
+    tarball=$(ls target/rootfs/alpine-minirootfs-*-aarch64.tar.gz 2>/dev/null | sort -V | tail -n 1)
+    [ -n "$tarball" ] || {
+        echo "survey: no minirootfs; run scripts/fetch-rootfs" >&2
+        exit 1
+    }
+    echo "creating $store"
+    touch "$store.partial"
+    "$run" --rootfs "$store" --import "$tarball" >/dev/null
+    # shellcheck disable=SC2046
+    "$run" --tier 1 --rootfs "$store" --env PATH=/usr/sbin:/usr/bin:/sbin:/bin $(proxy) \
+        -- /bin/sh -c "apk add -q $(echo $packages)"
+    rm -f "$store.partial"
+fi
+
+mkdir -p "$out"
+if [ $# -eq 0 ]; then
+    set -- $(cd tests/survey && ls *.sh | sed 's/\.sh$//')
+fi
+for name in "$@"; do
+    mkdir -p "$(dirname "$out/$name")"
+    start=$(date +%s)
+    set +e
+    # shellcheck disable=SC2046
+    TUXPORT_LOG=1 timeout "$limit" "$run" --tier "$tier" --rootfs "$store" \
+        --env PATH=/usr/sbin:/usr/bin:/sbin:/bin --env HOME=/root --env TERM=xterm $(proxy) \
+        -- /bin/sh -c 'cat > /tmp/survey.sh && exec sh /tmp/survey.sh </dev/null' \
+        <"tests/survey/$name.sh" >"$out/$name.out" 2>"$out/$name.err"
+    code=$?
+    set -e
+    # The kernel layer writes one line the first time each path is reached
+    paths=$(sed -n 's/^tuxport: unimplemented \(.*\), first by .*/\1/p' "$out/$name.err")
+    enosys=$(printf '%s\n' "$paths" | sed -n 's/^syscall //p' | sort -nu | tr '\n' ' ')
+    stubs=$(printf '%s\n' "$paths" | grep -v '^syscall ' | grep . | sort -u | paste -sd ';' - || true)
+    bugs=$(grep -c '^tuxport: internal error' "$out/$name.err" || true)
+    [ "$bugs" != 0 ] || bugs=""
+    printf '%-10s exit %-3s %4ss  %s%s%s\n' "$name" "$code" "$(($(date +%s) - start))" \
+        "${bugs:+INTERNAL ERRORS: $bugs  }" "${enosys:+ENOSYS: $enosys }" "${stubs:+UNIMPLEMENTED: $stubs}"
+done

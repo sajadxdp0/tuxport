@@ -1,0 +1,53 @@
+#!/bin/sh
+# Runs a command in a Linux arm64 container, for example:
+#
+#   scripts/dev cargo test --workspace
+#
+# Design doc §13.3: the main development and test host is Linux arm64. On macOS the arm64 Linux VM
+# comes from colima, OrbStack or Docker Desktop. Without arguments, enters a shell in the container.
+set -eu
+
+root=$(cd "$(dirname "$0")/.." && pwd)
+image=tuxport-dev
+
+# When the Docker daemon has a proxy configured, the image build and cargo/rustup in the container
+# use the same proxy
+proxy_build=""
+proxy_run=""
+IFS='|' read -r http https no <<EOF
+$(docker info --format '{{.HTTPProxy}}|{{.HTTPSProxy}}|{{.NoProxy}}' 2>/dev/null || true)
+EOF
+for kv in "http_proxy=$http" "https_proxy=$https" "no_proxy=$no"; do
+    if [ -n "${kv#*=}" ]; then
+        proxy_build="$proxy_build --build-arg $kv"
+        proxy_run="$proxy_run -e $kv"
+    fi
+done
+
+# shellcheck disable=SC2086 # these variables must vanish when empty rather than become empty
+# arguments
+docker build --quiet --platform linux/arm64 -t "$image" $proxy_build \
+    -f "$root/scripts/dev.Dockerfile" "$root/scripts" >/dev/null
+
+# Test switches passed into the container: TUXPORT_DBT_REGS makes every program use one of Tier 1's
+# register sets (loader.rs)
+env_run=""
+[ -z "${TUXPORT_DBT_REGS:-}" ] || env_run="-e TUXPORT_DBT_REGS"
+
+tty_flags=""
+if [ -t 0 ] && [ -t 1 ]; then
+    tty_flags="-it"
+fi
+
+# --ulimit nice: as with Android's init.rc (setrlimit nice 40 40), threads can lower their nice
+# value to -20 without privileges; Tuxport sets the nice values of guest threads on host threads.
+# /ltp is a docker volume local to the VM, where scripts/ltp keeps its store (not going through
+# virtiofs)
+# shellcheck disable=SC2086
+exec docker run --rm $tty_flags $proxy_run $env_run --platform linux/arm64 \
+    --ulimit nice=40:40 \
+    -v "$root:/work" -w /work \
+    -v tuxport-cargo-registry:/usr/local/cargo/registry \
+    -v tuxport-ltp:/ltp \
+    -e CARGO_TARGET_DIR=/work/target/linux-arm64 \
+    "$image" "$@"

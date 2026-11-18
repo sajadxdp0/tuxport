@@ -1,0 +1,64 @@
+#!/bin/sh
+# Downloads and verifies the libghostty-vt source release that the terminal of the app's tabs is
+# built from (android/build and android/vtcore maps), with the release's dependency tarball:
+# the Zig packages its build uses, unpacked in Zig's package layout, which the cargo build
+# (hosts/android/build.rs) passes to `zig build --system` so that it runs offline. The version and
+# both sha256s are fixed here and changed together on upgrades; libghostty-vt 1.0.0 needs Zig
+# 0.17.x. Usage: scripts/fetch-ghostty [output directory], target/ghostty by default; the source
+# ends up in <output directory>/libghostty-vt-<version> and the packages beside it in
+# libghostty-vt-<version>-deps.
+#
+# Only the pinned sha256s are checked here. When upgrading, check the new release's minisign
+# signatures (<url>.minisig, with the key on ghostty.org and in the release's
+# PACKAGING-LIBGHOSTTY.md) once before pinning their sha256s.
+set -eu
+
+version=1.0.0
+src_sha256=4a6ef758be721923e1969e7b81b443dcc92d8dd3fb5a39600c03a8817a753676
+deps_sha256=4d5ea5e448e4c7ea8fb55ccbaa8668f2a97d44f438cee831e2b7ecd162d85c29
+name=libghostty-vt-$version
+base=https://release.files.ghostty.org/libghostty-vt/$version
+
+root=$(cd "$(dirname "$0")/.." && pwd)
+out=${1:-$root/target/ghostty}
+mkdir -p "$out"
+
+# GNU and BSD sha256sum take different arguments, but the first column is the digest in both
+digest() {
+    if command -v sha256sum >/dev/null; then
+        sha256sum "$1"
+    else
+        shasum -a 256 "$1"
+    fi | cut -d' ' -f1
+}
+
+# fetch <file> <sha256>: keeps a copy whose sha256 matches, else downloads and checks one
+fetch() {
+    if ! [ -f "$out/$1" ] || [ "$(digest "$out/$1")" != "$2" ]; then
+        curl -fsSL --retry 3 -o "$out/$1.part" "$base/$1"
+        if [ "$(digest "$out/$1.part")" != "$2" ]; then
+            echo "fetch-ghostty: sha256 mismatch for $base/$1: got $(digest "$out/$1.part")" >&2
+            rm -f "$out/$1.part"
+            exit 1
+        fi
+        mv "$out/$1.part" "$out/$1"
+    fi
+}
+
+# unpack <tarball> <directory it holds>: unpacked beside the tarball and moved into place whole,
+# so a directory that is there was unpacked completely
+unpack() {
+    if ! [ -d "$out/$2" ]; then
+        rm -rf "$out/$2.part"
+        mkdir "$out/$2.part"
+        tar -xzf "$out/$1" -C "$out/$2.part"
+        mv "$out/$2.part/$2" "$out/$2"
+        rm -rf "$out/$2.part"
+    fi
+}
+
+fetch "$name.tar.gz" "$src_sha256"
+fetch "$name-deps.tar.gz" "$deps_sha256"
+unpack "$name.tar.gz" "$name"
+unpack "$name-deps.tar.gz" "$name-deps"
+echo "fetch-ghostty: $out/$name"

@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- Keep section and resource order aligned between locales. -->
+<resources>
+
+    <!-- Application and common actions -->
+    <string name="navigate_up">戻る</string>
+    <string name="close">閉じる</string>
+    <string name="allow">許可</string>
+    <string name="deny">拒否</string>
+
+    <!-- Startup and shutdown -->
+    <string name="starting">起動中…</string>
+    <string name="preparing">%1$sを準備中…</string>
+    <string name="downloading">%1$sをダウンロード中… %2$d / %3$d MB</string>
+    <string name="restarting">再起動中…</string>
+    <string name="stopping">サービスを停止中…</string>
+    <string name="start_failed_title">起動できません</string>
+    <string name="start_failed">起動できません：%1$s</string>
+
+    <!-- Tabs and terminal controls -->
+    <string name="new_tab">新しいタブ</string>
+    <string name="close_tab">タブを閉じる</string>
+    <string name="tab_list">タブ一覧</string>
+    <string name="more_options">その他のオプション</string>
+    <string name="menu_settings">設定</string>
+
+    <string name="close_other_tabs">他のタブを閉じる</string>
+    <string name="close_all_tabs">すべてのタブを閉じる</string>
+    <string name="close_tab_title">このタブを閉じますか？</string>
+    <string name="close_tab_message">閉じるとシェルが切断されます。通常、そのシェルで実行中のプログラムも終了します。</string>
+    <plurals name="close_tabs_title">
+        <item quantity="other">%d個のタブを閉じますか？</item>
+    </plurals>
+    <string name="close_tabs_message">閉じると各タブのシェルが切断されます。通常、それらのシェルで実行中のプログラムも終了します。</string>
+
+    <string name="next_tab">次のタブ</string>
+    <string name="previous_tab">前のタブ</string>
+    <string name="shortcuts_tabs">タブ</string>
+    <string name="shortcuts_terminal">ターミナル</string>
+    <string name="previous_prompt">前のプロンプト</string>
+    <string name="next_prompt">次のプロンプト</string>
+
+    <string name="clear_screen">画面をクリア</string>
+    <string name="reset_terminal">ターミナルをリセット</string>
+    <string name="keep_screen_on">画面をオンに保つ</string>
+    <string name="modifier_locked">%1$sをロックしました</string>
+    <string name="tmux_control_detached">tmuxコントロールモード（tmux -CC）はここでは表示できないため、Tuxportがデタッチしました。セッションは継続しています。tmux attachで再接続できます。</string>
+
+    <string name="tab_number">タブ%1$d</string>
+    <string name="tab_description">タブ%1$d：%2$s</string>
+    <string name="tab_description_status">タブ%1$d：%2$s（%3$s）</string>
+    <string name="tab_ended">%1$s（終了）</string>
+    <string name="close_tab_description">タブ%1$dを閉じる：%2$s</string>
+
+    <!-- Search -->
+    <string name="find">検索</string>
+    <string name="find_previous">前の一致</string>
+    <string name="find_next">次の一致</string>
+    <string name="find_close">検索を閉じる</string>
+
+    <!-- Selection and clipboard -->
+    <string name="select_rectangle">矩形選択</string>
+    <string name="select_lines">行選択</string>
+    <string name="select_output">出力を選択</string>
+
+    <string name="paste_unsafe_title">コマンドが実行される可能性のあるテキストを貼り付けますか？</string>
+    <string name="paste_unsafe">プログラムは各改行をEnterキーの入力として扱うため、貼り付けると各行がすぐにコマンドとして実行される可能性があります：\n\n^1</string>
+    <string name="paste_as_is">そのまま貼り付け</string>
+    <string name="paste_without_trailing_newlines">末尾の改行を削除</string>
+
+    <string name="clipboard_read_title">プログラムによるクリップボードの読み取りを許可しますか？</string>
+    <string name="clipboard_read">このタブのプログラムがクリップボードの内容を要求しています：\n\n%1$s</string>
+    <string name="program_copied">プログラムがテキストをクリップボードにコピーしました</string>
+
+    <!-- Links -->
+    <string name="open_link">リンクを開く</string>
+    <string name="link_no_app">このリンクを開けるアプリがありません</string>
+    <string name="link_remote_file">このファイルは%1$sにあり、Tuxport内にはありません</string>
+    <string name="link_hidden_file">ファイルへのアクセスは無効です。設定で「他のアプリによるファイルへのアクセスを許可」を有効にしてください</string>
+    <string name="link_missing_file">ファイルが見つかりません</string>
+
+    <!-- File import -->
+    <string name="import_files">ファイルをインポート</string>
+    <string name="importing_files">ファイルをインポート中…</string>
+    <string name="import_file_name">インポートしたファイル</string>
+    <string name="import_file_failed">%1$sをインポートできません：%2$s</string>
+    <string name="import_files_saved">ホームディレクトリに保存しました：\n\n^1</string>
+    <string name="import_picker_missing">ファイル選択アプリがありません</string>
+    <string name="copy_paths">パスをコピー</string>
+
+    <!-- Program status and command completion -->
+    <string name="status_percent">%1$s、%2$d%%</string>
+    <string name="status_message">%1$s：%2$s</string>
+    <string name="status_working">処理中</string>
+    <string name="status_idle">待機中</string>
+    <string name="status_blocked">操作待ち</string>
+    <string name="status_permission">承認待ち</string>
+    <string name="status_question">回答待ち</string>
+    <string name="status_auth">認証情報待ち</string>
+    <string name="status_done">完了</string>
+    <string name="status_error">失敗</string>
+    <string name="status_paused">一時停止中</string>
+
+    <string name="command_succeeded">コマンドが成功しました</string>
+    <string name="command_failed">コマンドが失敗しました</string>
+    <string name="command_finished">コマンドが終了しました</string>
+    <string name="command_took">所要時間：%1$s</string>
+    <string name="command_took_code">所要時間：%1$s、終了コード：%2$d</string>
+
+    <!-- Settings: system -->
+    <string name="settings">設定</string>
+    <string name="settings_group_system">システム</string>
+
+    <string name="settings_distro">ディストリビューション</string>
+    <string name="switch_title">%1$sに切り替えますか？</string>
+    <string name="switch_message">すべてのセッションが終了し、/rootを含むrootfs内のすべてのファイルが削除されます。その後、%1$sがインポートされます。</string>
+    <string name="switch_message_download">まず%1$s（%2$d MB）をダウンロードします。その間は現在のシステムを引き続き使用できます。完了後、すべてのセッションが終了し、/rootを含むrootfs内のすべてのファイルが削除されます。</string>
+    <string name="switch_confirm">続行</string>
+    <string name="switch_downloading">%1$sをダウンロード中… %2$d / %3$d MB。タップでキャンセル</string>
+    <string name="cancel_download_title">%1$sのダウンロードを中止しますか？</string>
+    <string name="cancel_download">ダウンロードをキャンセル</string>
+    <string name="keep_downloading">ダウンロードを続行</string>
+    <string name="download_failed">%1$sをダウンロードできません：%2$s</string>
+    <string name="switch_failed">%1$sを準備できません：%2$s\n\n代わりに%3$sを使用します。</string>
+
+    <string name="settings_reset">rootfsをリセット</string>
+    <string name="reset_summary">すべてのファイルを削除してrootfsを再初期化</string>
+    <string name="reset_title">rootfsをリセットしますか？</string>
+
+    <string name="settings_login">ログインアカウント</string>
+    <string name="login_auto_choice">自動（一般ユーザーを優先）</string>
+    <string name="login_auto">自動（%1$s）</string>
+    <string name="login_missing">%1$s（見つからないため、新しいタブではrootでログイン）</string>
+    <string name="login_changed">新しいタブでは%1$sでログインします</string>
+
+    <!-- Settings: Android and screen-off running -->
+    <string name="settings_group_android">Android</string>
+    <string name="settings_notifications">通知を有効にする</string>
+    <string name="settings_notifications_summary">バックグラウンドの動作を確認</string>
+    <string name="settings_battery_usage">アプリのバッテリー使用量</string>
+
+    <string name="settings_run_policy">画面オフ時の動作</string>
+    <string name="allow_sleep">スリープを許可</string>
+    <string name="run_sleep_summary">スリープを許可、プログラムが一時停止する場合あり</string>
+    <string name="run_busy">処理中は実行を継続</string>
+    <string name="run_busy_summary">処理中は実行を継続、待機状態が30秒続くとスリープを許可</string>
+    <string name="run_always">常に実行を継続</string>
+    <string name="run_always_summary">常に実行を継続、電池消費が増加</string>
+
+    <!-- Privacy mode -->
+    <string name="settings_privacy">プライバシーモード</string>
+    <string name="privacy_summary">戻ったときにロック解除が必要</string>
+    <string name="privacy_enable_message">Tuxportを開く際に、生体認証または画面ロックによる認証が必要になります。スクリーンショットは禁止され、通知の詳細は非表示になり、他のアプリからファイルにアクセスできなくなります。バックグラウンドのプログラムは引き続き実行されます。</string>
+    <string name="privacy_file_access">プライバシーモードでは利用できません</string>
+
+    <string name="privacy_locked">Tuxportはロックされています</string>
+    <string name="privacy_unlock">ロック解除</string>
+    <string name="privacy_leave">Tuxportを離れる</string>
+    <string name="privacy_authenticate">生体認証または画面ロックで認証してください</string>
+    <string name="privacy_unavailable">認証を利用できません。Androidの設定で画面ロックを設定するか、しばらくしてから再試行してください。</string>
+
+    <string name="privacy_notification">Tuxportのロックを解除してターミナルを表示</string>
+
+    <!-- File access and document roots -->
+    <string name="settings_file_access">他のアプリによるファイルへのアクセスを許可</string>
+    <string name="file_access_summary">HOMEディレクトリは読み書き可能、その他は読み取り専用</string>
+    <string name="file_access_title">他のアプリによるファイルへのアクセスを許可しますか？</string>
+    <string name="file_access_message">HOMEディレクトリとシステムディレクトリがシステムのファイル選択画面に表示されます。アクセスを許可したアプリは、読み取り専用のファイルからも、SSH秘密鍵やパスワードなどの機密情報を読み取ったりコピーしたりできます。</string>
+    <string name="file_access_enable">有効にする</string>
+
+    <string name="documents_system">システム全体（読み取り専用） · %1$s</string>
+
+    <!-- Settings: terminal -->
+    <string name="settings_group_terminal">ターミナル</string>
+
+    <string name="settings_fill_wide">CJK文字を拡大</string>
+    <string name="fill_wide_on">縦横比を保って2セル幅に拡大</string>
+    <string name="fill_wide_off">元のサイズで2セル内の中央に表示</string>
+
+    <string name="settings_cursor_style">カーソルの形</string>
+    <string name="cursor_block">ブロック</string>
+    <string name="cursor_bar">縦棒</string>
+    <string name="cursor_underline">下線</string>
+
+    <string name="settings_cursor_blink">カーソルの点滅</string>
+    <string name="cursor_blink_on">既定で点滅、プログラム側で変更可能</string>
+    <string name="cursor_blink_off">既定で点滅なし、プログラム側で変更可能</string>
+
+    <string name="settings_volume_keys">音量キーでタブを切り替え</string>
+    <string name="volume_keys_on">上で前のタブ、下で次のタブ、タブが1つなら音量調整</string>
+    <string name="volume_keys_off">通常どおり音量を調整</string>
+
+    <string name="settings_show_tab_list">タブ一覧ボタンを表示</string>
+    <string name="tab_list_on">タブバーの左側に表示</string>
+    <string name="tab_list_off">タブバーに表示しない</string>
+
+    <!-- Settings: debugging and execution mode -->
+    <string name="settings_group_debug">デバッグ</string>
+
+    <string name="settings_tier">実行モード</string>
+    <string name="tier_1">Tier 1：変換実行（既定）</string>
+    <string name="tier_0">Tier 0：インタープリター実行（低速、問題の調査用）</string>
+    <string name="tier_1_summary">変換実行 · Tier 1</string>
+    <string name="tier_0_summary">インタープリター実行 · Tier 0（低速）</string>
+    <string name="restart_title">再起動しますか？</string>
+    <string name="restart_message">すべてのセッションが終了し、新しい実行モードでシステムが再起動します。</string>
+    <string name="restart">再起動</string>
+
+    <!-- Diagnostic log export -->
+    <string name="settings_export_logs">診断ログをエクスポート</string>
+    <string name="export_logs_summary">最近のログと端末情報を保存または共有して問題の調査に活用</string>
+    <string name="export_logs_save">ファイルに保存</string>
+    <string name="export_logs_share">共有</string>
+
+    <string name="export_logs_preparing">診断ログを準備中…</string>
+    <string name="export_logs_saving">診断ログを保存中…</string>
+    <string name="export_logs_saved">診断ログを保存しました</string>
+    <string name="export_logs_failed">ログをエクスポートできません。空き容量を確認して再試行してください。</string>
+    <string name="export_logs_no_picker">保存先を選択できるアプリがありません</string>
+    <string name="export_logs_no_app">ログを共有できるアプリがありません</string>
+
+    <!-- Settings: about and licenses -->
+    <string name="settings_group_about">このアプリについて</string>
+    <string name="settings_project">プロジェクトのウェブサイト</string>
+    <string name="settings_privacy_policy">プライバシーポリシー</string>
+    <string name="settings_version">バージョン</string>
+
+    <string name="settings_licenses">オープンソースライセンス</string>
+    <string name="licenses_summary">GNU AGPL 3.0以降</string>
+    <string name="license_public_domain">パブリックドメイン</string>
+    <plurals name="license_packages">
+        <item quantity="other">%d個のパッケージ · 複数のライセンス</item>
+    </plurals>
+    <string name="license_unavailable">このライセンスを表示できません。戻ってから開き直してください。</string>
+
+    <!-- Notifications and background service -->
+    <string name="notification_prompt">通知を有効にしてバックグラウンドの動作を確認</string>
+    <string name="notification_prompt_dismiss">通知の案内を閉じる</string>
+    <string name="battery_prompt">バックグラウンドのバッテリー使用を制限しない</string>
+    <string name="battery_prompt_dismiss">バッテリー使用量の案内を閉じる</string>
+
+    <string name="channel_sessions">ターミナルセッション</string>
+    <plurals name="sessions_running">
+        <item quantity="other">%d個のセッションが実行中</item>
+    </plurals>
+    <string name="background_running">バックグラウンドで実行中</string>
+    <string name="exit_all">すべて終了</string>
+
+    <string name="channel_terminal">ベル、プログラムからの通知、コマンドの完了</string>
+    <string name="bell_rang">ターミナルのベルが鳴りました</string>
+
+    <string name="channel_network">ネットワークサービス</string>
+    <string name="listening_title">%1$sがポート%2$dで待ち受け中</string>
+    <string name="listening_mapped">他の端末はポート%1$dに接続してください。このスマートフォンのアプリはポート%2$dを使用できないため、Tuxportが接続先を変更しました。</string>
+    <string name="listening_direct">同じネットワーク上の他の端末から接続できます</string>
+
+    <string name="channel_problems">プロセスとサービス</string>
+
+    <!-- Session restoration -->
+    <string name="restored_notice">%1$s（タブの保存日時：%2$s）。実行中だったプログラムは復元されませんでした。</string>
+    <string name="ended_android">Androidがアプリを停止したため、前回のセッションは終了しました</string>
+    <string name="ended_memory">Androidがメモリを解放するためにアプリを停止し、前回のセッションは終了しました</string>
+    <string name="ended_resources">バックグラウンドでのリソース使用量が多すぎたためAndroidがアプリを停止し、前回のセッションは終了しました</string>
+    <string name="ended_user">アプリが強制停止されたため、前回のセッションは終了しました</string>
+    <string name="ended_updated">アプリが更新されたため、前回のセッションは終了しました</string>
+    <string name="ended_crash">Tuxportの不具合によるクラッシュで、前回のセッションは終了しました</string>
+    <string name="ended_anr">Tuxportの不具合で応答がなくなり、前回のセッションは終了しました</string>
+
+    <!-- Problem reports -->
+    <string name="crashed_title">Tuxportがクラッシュしました</string>
+    <string name="crashed_text">%1$sにTuxportがクラッシュし、前回のセッションは終了しました。これはTuxportの不具合です。フィードバックにはコピーしたレポートを添付してください。</string>
+    <string name="anr_title">Tuxportが応答していません</string>
+    <string name="anr_text">%1$sにTuxportが応答しなくなり、前回のセッションは終了しました。これはTuxportの不具合です。フィードバックにはコピーしたレポートを添付してください。</string>
+
+    <string name="killed_title">%1$sが強制終了されました</string>
+    <string name="killed_oom_app">%1$s（pid %2$d）が強制終了されました。アプリのメモリ使用量が上限に達し（使用量%3$s、上限%4$s）、OOM killerがこのプロセスを選びました。</string>
+    <string name="killed_oom_cgroup">%1$s（pid %2$d）が強制終了されました。cgroup %3$sがmemory.maxに達しました（使用量%4$s、上限%5$s）。</string>
+    <string name="killed_bug">%1$s（pid %2$d）がTuxportの内部エラーで終了しました。これはTuxportの不具合です。通知からレポートをコピーするか、dmesgで確認できます。</string>
+
+    <string name="stall_title">Tuxportのカーネルが応答していません</string>
+    <string name="stall_text">Tuxportのカーネル内の処理が%1$d秒間続いており、すべてのプログラムが完了を待っています。これはTuxportの不具合です。フィードバックにはコピーしたレポートを添付してください。</string>
+    <string name="stall_ended_title">Tuxportのカーネルが一時的に応答しなくなっていました</string>
+    <string name="stall_ended_text">Tuxportのカーネル内の処理に%1$d秒かかり、すべてのプログラムが完了を待っていました。これはTuxportの不具合です。フィードバックにはコピーしたレポートを添付してください。</string>
+
+    <plurals name="boot_failed_title">
+        <item quantity="other">%d個のサービスが起動しませんでした</item>
+    </plurals>
+    <string name="boot_failed_text">%1$s。起動時の出力は/var/log/boot.logにあります。</string>
+
+    <string name="copy_report">レポートをコピー</string>
+    <string name="report_copied">レポートをコピーしました</string>
+
+</resources>

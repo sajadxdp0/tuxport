@@ -1,0 +1,123 @@
+#!/bin/sh
+# Downloads and verifies the Alpine minirootfs (design doc §11.4) and the packages bundled with the
+# app (the android/setup map): doas, installed offline when a regular user first becomes the login
+# account (§11.1), and bash, procps-ng and bubblewrap with their missing libraries, installed offline
+# at the first login of a system the app imported. The versions and
+# sha256s are fixed here and changed together on upgrades. Usage:
+# scripts/fetch-rootfs [output directory], target/rootfs by default. Prints the path of each
+# package, then the tarball's last.
+#
+# After downloading, the signature is first verified with Alpine's release key
+# (scripts/alpine-ncopa.asc, Natanael Copa, fingerprint in fingerprint), then the sha256 is
+# compared: the digest is fixed here, and the signature check is for trusting the new digest when
+# upgrading the version. To upgrade, change version, leave sha256 as it is, and run this once: with
+# a valid signature and a different digest it prints the new digest. Without gpg the signature check
+# is skipped.
+set -eu
+
+version=3.24.3
+sha256=4d3f80afaebd447c5591a63a73bde380a149fe8b2d85488cafabb2ff97551f50
+name=alpine-minirootfs-$version-aarch64.tar.gz
+url=https://dl-cdn.alpinelinux.org/alpine/v${version%.*}/releases/aarch64/$name
+fingerprint=0482D84022F52DF1C4E7CD43293ACD0907D9495A
+
+# The bundled packages, from the same branch's main repository, with their sha256s: each package
+# carries Alpine's signature, and apk checks it with the public keys in the rootfs when installing.
+# The branch's mirrors keep only the latest build of each package, so a rebuild (a new -rN) makes
+# the old file disappear and a fresh download fail: then pin the new file
+packages="
+doas-6.8.2-r8.apk 7d35ce1a0a76de43f7621e2099e45bfd83e6d8cf667db657633ab1f374d05f72
+bash-5.3.9-r1.apk 95f4f976bdf2f4ca18ff41c32916eb6d7b12a0dae12504d55d04427460d6542f
+readline-8.3.3-r1.apk 9f0ae0923c02b0d6aba62e9173542b65396ba3f0efefcbf087ea32f1120e7b34
+libncursesw-6.6_p20260516-r0.apk 51a7aa4b3ec40b144d0801c0544e0a9f62e2a41d04b6067bb5e95786040741c6
+ncurses-terminfo-base-6.6_p20260516-r0.apk e0c546b9461bdce206a90bc720cb69aa4628b5a5b8d908c3e5084e00f28f6a9d
+procps-ng-4.0.6-r0.apk 15cd4bc90b35312a82b145a79bacccb2e77cb823922269e60802e16efa53c63a
+libproc2-4.0.6-r0.apk 2dd4249ead21043f3efbab320540df1545b3793ca63bca6e003f262d8b734e15
+libintl-1.0-r0.apk d106a13e3e68103d3a8217406aae6186289baf352d0f3d10fc21938d2dd8adb1
+utmps-libs-0.1.3.3-r0.apk d6487b6f260728969191314f6706d4cc62527370e757ec3ac6f7fee8ed38cf88
+skalibs-libs-2.15.0.0-r0.apk 7ea58fb512067402b519079fcce8a48381eb2b9c690341c4a017aa15f719c198
+bubblewrap-0.12.0-r0.apk f38670cd16e15268ab2588c6b788d380fe219de74d6430f91d102c3df1652e87
+libcap2-2.78-r0.apk e13be383f18b1fcfe895361d816ff7cfd2b3c265e442bb371c4a234b29b0e4a9
+"
+packages_url=https://dl-cdn.alpinelinux.org/alpine/v${version%.*}/main/aarch64
+
+root=$(cd "$(dirname "$0")/.." && pwd)
+out=${1:-$root/target/rootfs}
+mkdir -p "$out"
+file=$out/$name
+
+# Compare only the digest: GNU and BSD sha256sum take different arguments, but the first column of
+# the output is the digest in both
+digest() {
+    if command -v sha256sum >/dev/null; then
+        sha256sum "$1"
+    else
+        shasum -a 256 "$1"
+    fi | cut -d' ' -f1
+}
+
+check() {
+    [ "$(digest "$1")" = "$sha256" ]
+}
+
+# A bundled package: only compared with its fixed sha256 (the signature is inside the package and
+# checked by apk)
+fetch_package() {
+    if ! { [ -f "$out/$1" ] && [ "$(digest "$out/$1")" = "$2" ]; }; then
+        curl -fsSL --retry 3 -o "$out/$1.part" "$packages_url/$1"
+        if [ "$(digest "$out/$1.part")" != "$2" ]; then
+            echo "fetch-rootfs: sha256 mismatch for $packages_url/$1: got $(digest "$out/$1.part")" >&2
+            rm -f "$out/$1.part"
+            exit 1
+        fi
+        mv "$out/$1.part" "$out/$1"
+    fi
+    echo "$out/$1"
+}
+while read -r package package_sha256; do
+    [ -z "$package" ] || fetch_package "$package" "$package_sha256"
+done <<EOF
+$packages
+EOF
+
+if [ -f "$file" ] && check "$file"; then
+    echo "$file"
+    exit 0
+fi
+# Verify the signature with a temporary keyring holding only Alpine's public key (gpgv touches
+# neither the user's keyring nor gpg-agent).
+# Returns 0 for a valid signature, 1 for an invalid one, 2 when gpg is not installed
+verify() {
+    command -v gpg >/dev/null && command -v gpgv >/dev/null || return 2
+    tmp=$(mktemp -d)
+    gpg --dearmor <"$root/scripts/alpine-ncopa.asc" >"$tmp/keyring.gpg"
+    status=1
+    if curl -fsSL --retry 3 -o "$tmp/sig.asc" "$url.asc" &&
+        gpgv --keyring "$tmp/keyring.gpg" --status-fd 1 "$tmp/sig.asc" "$1" 2>/dev/null |
+        grep -q "VALIDSIG $fingerprint"; then
+        status=0
+    fi
+    rm -rf "$tmp"
+    return $status
+}
+
+curl -fsSL --retry 3 -o "$file.part" "$url"
+signed=0
+verify "$file.part" || signed=$?
+if [ $signed = 1 ]; then
+    echo "fetch-rootfs: bad or missing signature for $url" >&2
+    rm -f "$file.part"
+    exit 1
+elif [ $signed = 2 ]; then
+    echo "fetch-rootfs: gpg not found, skipping the signature check (the sha256 is pinned)" >&2
+fi
+if ! check "$file.part"; then
+    echo "fetch-rootfs: sha256 mismatch for $url: got $(digest "$file.part")" >&2
+    if [ $signed = 0 ]; then
+        echo "fetch-rootfs: the signature is valid; when upgrading, set sha256 to the digest above" >&2
+    fi
+    rm -f "$file.part"
+    exit 1
+fi
+mv "$file.part" "$file"
+echo "$file"

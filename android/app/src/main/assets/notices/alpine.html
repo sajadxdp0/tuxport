@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self'">
+<title>Alpine Linux 3.24.3 minirootfs</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="/theme/colors.css">
+</head>
+<body><main>
+<article>
+<p>The app includes the Alpine Linux 3.24.3 minirootfs and imports it on
+first launch. It consists of the packages below. The source code of each
+package is its directory in Alpine&#x27;s aports repository at the commit
+given (the APKBUILD and patches,
+https://gitlab.alpinelinux.org/alpine/aports/-/tree/&lt;commit&gt;/main/&lt;origin&gt;)
+together with the upstream sources that it names, which Alpine mirrors
+at <a href="https://distfiles.alpinelinux.org/distfiles/">https://distfiles.alpinelinux.org/distfiles/</a>. The source code of the
+GPL-licensed packages is also published together with Tuxport&#x27;s source
+code at <a href="https://github.com/sajadxdp0/tuxport">https://github.com/sajadxdp0/tuxport</a>.</p>
+<p class="package">alpine-baselayout 3.7.2-r1
+    License: GPL-2.0-only
+    aports: main/alpine-baselayout at 60a7585bbab2fa0f762504eb617dbca90216e31f</p>
+<p class="package">alpine-baselayout-data 3.7.2-r1
+    License: GPL-2.0-only
+    aports: main/alpine-baselayout at 60a7585bbab2fa0f762504eb617dbca90216e31f</p>
+<p class="package">alpine-keys 2.6-r0
+    License: MIT
+    aports: main/alpine-keys at b9f23becced4d7b3ccc0fa0f28530243ccd314a0</p>
+<p class="package">alpine-release 3.24.3-r0
+    License: MIT
+    aports: main/alpine-base at ee92350c8a4509152dc91c693814215a884c07c3</p>
+<p class="package">apk-tools 3.0.8-r0
+    License: GPL-2.0-only
+    aports: main/apk-tools at 4588b452722bd4800efdc6cce4f6e980e02a997f</p>
+<p class="package">busybox 1.37.0-r31
+    License: GPL-2.0-only
+    aports: main/busybox at c3ef5d10e6ef6528852c51f0564963e2f8c1be19</p>
+<p class="package">busybox-binsh 1.37.0-r31
+    License: GPL-2.0-only
+    aports: main/busybox at c3ef5d10e6ef6528852c51f0564963e2f8c1be19</p>
+<p class="package">ca-certificates-bundle 20261020-r0
+    License: MPL-2.0 AND MIT
+    aports: main/ca-certificates at e78f5987166c6ffbe23f6472e2e8f040298fe2da</p>
+<p class="package">libapk 3.0.8-r0
+    License: GPL-2.0-only
+    aports: main/apk-tools at 4588b452722bd4800efdc6cce4f6e980e02a997f</p>
+<p class="package">libcrypto3 3.5.9-r0
+    License: Apache-2.0
+    aports: main/openssl at 29b9ec24b1b5b39aeef51fa2a044210e2ec5258e</p>
+<p class="package">libssl3 3.5.9-r0
+    License: Apache-2.0
+    aports: main/openssl at 29b9ec24b1b5b39aeef51fa2a044210e2ec5258e</p>
+<p class="package">musl 1.2.6-r3
+    License: MIT
+    aports: main/musl at 8f79d39391b46d6dbf1800fb68b8212a21d5ee2e</p>
+<p class="package">musl-utils 1.2.6-r3
+    License: MIT AND BSD-2-Clause AND GPL-2.0-or-later
+    aports: main/musl at 8f79d39391b46d6dbf1800fb68b8212a21d5ee2e</p>
+<p class="package">scanelf 1.3.9-r1
+    License: GPL-2.0-only
+    aports: main/pax-utils at c61801eeacb3ffcd9c2025b09e402153bb93fb39</p>
+<p class="package">ssl_client 1.37.0-r31
+    License: GPL-2.0-only
+    aports: main/busybox at c3ef5d10e6ef6528852c51f0564963e2f8c1be19</p>
+<p class="package">zlib 1.3.2-r1
+    License: Zlib
+    aports: main/zlib at 0afa2da0e8c8051c6f8f64a7a388e5a259904245</p>
+<p>The app also includes this package, which it installs when a regular
+user first becomes the login account:</p>
+<p class="package">doas 6.8.2-r8
+    License: ISC
+    aports: main/doas at 3a55d7eb7b4b1e865bb0742590c2090e16f25fb9</p>
+<p>And these, which it installs at the first login of a system it imports,
+as bash is the login shell there:</p>
+<p class="package">bash 5.3.9-r1
+    License: GPL-3.0-or-later
+    aports: main/bash at 1522c3193610902d8493f9790a2755c11f21f26d</p>
+<p class="package">libncursesw 6.6_p20260516-r0
+    License: X11
+    aports: main/ncurses at 2cee8a7328d061418336ad327b512d96bcd7bc5e</p>
+<p class="package">ncurses-terminfo-base 6.6_p20260516-r0
+    License: X11
+    aports: main/ncurses at 2cee8a7328d061418336ad327b512d96bcd7bc5e</p>
+<p class="package">readline 8.3.3-r1
+    License: GPL-3.0-or-later
+    aports: main/readline at a854c03acdac188901fb012f7acbee70a36e8041</p>
+<p>And these process monitoring tools and libraries, installed at the first
+login of a new Alpine system (the ncurses libraries listed above are
+shared with bash):</p>
+<p class="package">libintl 1.0-r0
+    License: LGPL-2.1-or-later
+    aports: main/gettext at a0b12dbf67fb047e79a1b76c6dfe6f2904d0d391</p>
+<p class="package">libproc2 4.0.6-r0
+    License: GPL-2.0-or-later AND LGPL-2.1-or-later
+    aports: main/procps-ng at 99d7511b57e55bc8c6def72765dc59cedbe7e9e5</p>
+<p class="package">procps-ng 4.0.6-r0
+    License: GPL-2.0-or-later AND LGPL-2.1-or-later
+    aports: main/procps-ng at 99d7511b57e55bc8c6def72765dc59cedbe7e9e5</p>
+<p class="package">skalibs-libs 2.15.0.0-r0
+    License: ISC
+    aports: main/skalibs at f148233038fa9b35932a7996df29f110b32c2160</p>
+<p class="package">utmps-libs 0.1.3.3-r0
+    License: ISC
+    aports: main/utmps at 900a4ecef77ae677eab8243b99f2c40cbf8ea35b</p>
+<p>And bubblewrap with its capability library, installed at the first login
+of a new Alpine system:</p>
+<p class="package">bubblewrap 0.12.0-r0
+    License: LGPL-2.1-or-later
+    aports: main/bubblewrap at 21ce0edacfd8b359eeb3abc29fbd0b49b023ca1b</p>
+<p class="package">libcap2 2.78-r0
+    License: BSD-3-Clause OR GPL-2.0-only
+    aports: main/libcap at 0c35848136c4c16a1b1672cb812efa88fffef1c2</p>
+<p>The full texts of the GPL 3.0, GPL 2.0, LGPL 2.1, Apache 2.0 and MPL 2.0
+are available through the links below.</p>
+</article>
+<nav aria-label="License texts"><a href="GPL-3.0.html">GPL-3.0</a><a href="GPL-2.0.html">GPL-2.0</a><a href="LGPL-2.1.html">LGPL-2.1</a><a href="Apache-2.0.html">Apache-2.0</a><a href="MPL-2.0.html">MPL-2.0</a></nav>
+</main></body>
+</html>

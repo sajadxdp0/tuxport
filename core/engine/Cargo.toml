@@ -1,0 +1,15 @@
+[package]
+name = "tuxport-engine"
+description = "Tuxport CPU engine (C) and its Rust bindings"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+links = "tuxport_engine"
+
+[build-dependencies]
+cc.workspace = true
+
+[dev-dependencies]
+libc.workspace = true

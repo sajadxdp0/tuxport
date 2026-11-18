@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- Keep section and resource order aligned between locales. -->
+<resources>
+
+    <!-- Application and common actions -->
+    <string name="navigate_up">返回</string>
+    <string name="close">關閉</string>
+    <string name="allow">允許</string>
+    <string name="deny">拒絕</string>
+
+    <!-- Startup and shutdown -->
+    <string name="starting">正在啟動…</string>
+    <string name="preparing">正在準備 %1$s…</string>
+    <string name="downloading">正在下載 %1$s：%2$d / %3$d MB</string>
+    <string name="restarting">正在重新啟動…</string>
+    <string name="stopping">正在停止服務…</string>
+    <string name="start_failed_title">無法啟動</string>
+    <string name="start_failed">無法啟動：%1$s</string>
+
+    <!-- Tabs and terminal controls -->
+    <string name="new_tab">新增分頁</string>
+    <string name="close_tab">關閉分頁</string>
+    <string name="tab_list">分頁清單</string>
+    <string name="more_options">更多選項</string>
+    <string name="menu_settings">設定</string>
+
+    <string name="close_other_tabs">關閉其他分頁</string>
+    <string name="close_all_tabs">關閉所有分頁</string>
+    <string name="close_tab_title">關閉這個分頁？</string>
+    <string name="close_tab_message">關閉後會中斷此分頁的 shell，通常也會結束其中執行的程式。</string>
+    <plurals name="close_tabs_title">
+        <item quantity="other">關閉 %d 個分頁？</item>
+    </plurals>
+    <string name="close_tabs_message">關閉後會中斷這些分頁的 shell，通常也會結束其中執行的程式。</string>
+
+    <string name="next_tab">下一個分頁</string>
+    <string name="previous_tab">上一個分頁</string>
+    <string name="shortcuts_tabs">分頁</string>
+    <string name="shortcuts_terminal">終端機</string>
+    <string name="previous_prompt">上一個提示字元</string>
+    <string name="next_prompt">下一個提示字元</string>
+
+    <string name="clear_screen">清除畫面</string>
+    <string name="reset_terminal">重設終端機</string>
+    <string name="keep_screen_on">保持螢幕開啟</string>
+    <string name="modifier_locked">%1$s 已鎖定</string>
+    <string name="tmux_control_detached">這裡無法顯示 tmux 控制模式（tmux -CC），Tuxport 已將其分離；工作階段仍在執行，可用 tmux attach 重新連接。</string>
+
+    <string name="tab_number">分頁 %1$d</string>
+    <string name="tab_description">分頁 %1$d：%2$s</string>
+    <string name="tab_description_status">分頁 %1$d：%2$s（%3$s）</string>
+    <string name="tab_ended">%1$s（已結束）</string>
+    <string name="close_tab_description">關閉分頁 %1$d：%2$s</string>
+
+    <!-- Search -->
+    <string name="find">尋找</string>
+    <string name="find_previous">上一個符合項目</string>
+    <string name="find_next">下一個符合項目</string>
+    <string name="find_close">關閉尋找</string>
+
+    <!-- Selection and clipboard -->
+    <string name="select_rectangle">矩形選取</string>
+    <string name="select_lines">整行選取</string>
+    <string name="select_output">選取輸出</string>
+
+    <string name="paste_unsafe_title">貼上可能執行指令的文字？</string>
+    <string name="paste_unsafe">程式會將每個換行視為按下 Enter，貼上後可能立即將這些行當作指令執行：\n\n^1</string>
+    <string name="paste_as_is">原樣貼上</string>
+    <string name="paste_without_trailing_newlines">移除結尾換行</string>
+
+    <string name="clipboard_read_title">允許程式讀取剪貼簿？</string>
+    <string name="clipboard_read">此分頁中的程式要求讀取剪貼簿內容：\n\n%1$s</string>
+    <string name="program_copied">程式已將文字複製到剪貼簿</string>
+
+    <!-- Links -->
+    <string name="open_link">開啟連結</string>
+    <string name="link_no_app">沒有可開啟此連結的應用程式</string>
+    <string name="link_remote_file">此檔案位於 %1$s，不在 Tuxport 中</string>
+    <string name="link_hidden_file">檔案存取已停用，請在設定中開啟「允許其他應用程式存取檔案」</string>
+    <string name="link_missing_file">找不到此檔案</string>
+
+    <!-- File import -->
+    <string name="import_files">匯入檔案</string>
+    <string name="importing_files">正在匯入檔案…</string>
+    <string name="import_file_name">匯入的檔案</string>
+    <string name="import_file_failed">無法匯入 %1$s：%2$s</string>
+    <string name="import_files_saved">已儲存至家目錄：\n\n^1</string>
+    <string name="import_picker_missing">沒有可用的檔案選擇器</string>
+    <string name="copy_paths">複製路徑</string>
+
+    <!-- Program status and command completion -->
+    <string name="status_percent">%1$s，%2$d%%</string>
+    <string name="status_message">%1$s：%2$s</string>
+    <string name="status_working">處理中</string>
+    <string name="status_idle">閒置</string>
+    <string name="status_blocked">等待您處理</string>
+    <string name="status_permission">等待您核准</string>
+    <string name="status_question">等待您回答</string>
+    <string name="status_auth">等待您提供憑證</string>
+    <string name="status_done">已完成</string>
+    <string name="status_error">失敗</string>
+    <string name="status_paused">已暫停</string>
+
+    <string name="command_succeeded">指令執行成功</string>
+    <string name="command_failed">指令執行失敗</string>
+    <string name="command_finished">指令已結束</string>
+    <string name="command_took">耗時 %1$s</string>
+    <string name="command_took_code">耗時 %1$s，結束代碼為 %2$d</string>
+
+    <!-- Settings: system -->
+    <string name="settings">設定</string>
+    <string name="settings_group_system">系統</string>
+
+    <string name="settings_distro">發行版</string>
+    <string name="switch_title">切換至 %1$s？</string>
+    <string name="switch_message">所有工作階段都會結束，rootfs 中的所有檔案（包括 /root）都會刪除，然後匯入 %1$s。</string>
+    <string name="switch_message_download">先下載 %1$s（%2$d MB），期間仍可使用目前的系統。下載完成後，所有工作階段都會結束，rootfs 中的所有檔案（包括 /root）都會刪除。</string>
+    <string name="switch_confirm">繼續</string>
+    <string name="switch_downloading">正在下載 %1$s：%2$d / %3$d MB，輕觸即可取消</string>
+    <string name="cancel_download_title">停止下載 %1$s？</string>
+    <string name="cancel_download">取消下載</string>
+    <string name="keep_downloading">繼續下載</string>
+    <string name="download_failed">無法下載 %1$s：%2$s</string>
+    <string name="switch_failed">無法準備 %1$s：%2$s\n\n改用 %3$s。</string>
+
+    <string name="settings_reset">重設 rootfs</string>
+    <string name="reset_summary">刪除所有檔案並重新初始化 rootfs</string>
+    <string name="reset_title">重設 rootfs？</string>
+
+    <string name="settings_login">登入帳號</string>
+    <string name="login_auto_choice">自動（優先使用一般使用者）</string>
+    <string name="login_auto">自動（%1$s）</string>
+    <string name="login_missing">%1$s（找不到此帳號，新分頁將以 root 登入）</string>
+    <string name="login_changed">新分頁將以 %1$s 登入</string>
+
+    <!-- Settings: Android and screen-off running -->
+    <string name="settings_group_android">Android</string>
+    <string name="settings_notifications">開啟通知</string>
+    <string name="settings_notifications_summary">查看背景活動</string>
+    <string name="settings_battery_usage">電池用量</string>
+
+    <string name="settings_run_policy">螢幕關閉時的執行方式</string>
+    <string name="allow_sleep">允許休眠</string>
+    <string name="run_sleep_summary">允許休眠，程式可能暫停</string>
+    <string name="run_busy">忙碌時執行</string>
+    <string name="run_busy_summary">忙碌時持續執行，閒置 30 秒後允許休眠</string>
+    <string name="run_always">持續執行</string>
+    <string name="run_always_summary">持續執行，較耗電</string>
+
+    <!-- Privacy mode -->
+    <string name="settings_privacy">隱私模式</string>
+    <string name="privacy_summary">返回時需要解鎖</string>
+    <string name="privacy_enable_message">開啟 Tuxport 時需要通過生物辨識或螢幕鎖定驗證。啟用後將禁止螢幕截圖、隱藏通知詳情，並停用其他應用程式的檔案存取權限。背景程式會繼續執行。</string>
+    <string name="privacy_file_access">隱私模式下無法使用</string>
+
+    <string name="privacy_locked">Tuxport 已鎖定</string>
+    <string name="privacy_unlock">解鎖</string>
+    <string name="privacy_leave">離開 Tuxport</string>
+    <string name="privacy_authenticate">使用生物辨識或螢幕鎖定驗證</string>
+    <string name="privacy_unavailable">目前無法驗證身分。請在 Android 設定中設定螢幕鎖定，或稍後再試。</string>
+
+    <string name="privacy_notification">解鎖 Tuxport 以查看終端機</string>
+
+    <!-- File access and document roots -->
+    <string name="settings_file_access">允許其他應用程式存取檔案</string>
+    <string name="file_access_summary">HOME 目錄可讀寫，其他目錄唯讀</string>
+    <string name="file_access_title">允許其他應用程式存取檔案？</string>
+    <string name="file_access_message">啟用後，HOME 目錄和系統目錄會顯示在系統檔案選擇器中。獲准存取的應用程式可讀取或複製其中的 SSH 私密金鑰、密碼等敏感資訊，即使檔案為唯讀。</string>
+    <string name="file_access_enable">啟用</string>
+
+    <string name="documents_system">整個系統（唯讀） · %1$s</string>
+
+    <!-- Settings: terminal -->
+    <string name="settings_group_terminal">終端機</string>
+
+    <string name="settings_fill_wide">放大中日韓文字</string>
+    <string name="fill_wide_on">等比例放大至兩格寬</string>
+    <string name="fill_wide_off">原始大小，置中於兩格內</string>
+
+    <string name="settings_cursor_style">游標形狀</string>
+    <string name="cursor_block">方塊</string>
+    <string name="cursor_bar">直線</string>
+    <string name="cursor_underline">底線</string>
+
+    <string name="settings_cursor_blink">游標閃爍</string>
+    <string name="cursor_blink_on">預設閃爍，程式可自行調整</string>
+    <string name="cursor_blink_off">預設不閃爍，程式可自行調整</string>
+
+    <string name="settings_volume_keys">音量鍵切換分頁</string>
+    <string name="volume_keys_on">加鍵切換上一個分頁，減鍵切換下一個分頁，單一分頁時調整音量</string>
+    <string name="volume_keys_off">正常調整音量</string>
+
+    <string name="settings_show_tab_list">顯示分頁清單按鈕</string>
+    <string name="tab_list_on">顯示於分頁列左側</string>
+    <string name="tab_list_off">不顯示於分頁列</string>
+
+    <!-- Settings: debugging and execution mode -->
+    <string name="settings_group_debug">偵錯</string>
+
+    <string name="settings_tier">執行模式</string>
+    <string name="tier_1">Tier 1：翻譯執行（預設）</string>
+    <string name="tier_0">Tier 0：直譯執行（較慢，用於疑難排解）</string>
+    <string name="tier_1_summary">翻譯執行 · Tier 1</string>
+    <string name="tier_0_summary">直譯執行 · Tier 0（較慢）</string>
+    <string name="restart_title">重新啟動？</string>
+    <string name="restart_message">所有工作階段都會結束，系統將以新的執行模式重新啟動。</string>
+    <string name="restart">重新啟動</string>
+
+    <!-- Diagnostic log export -->
+    <string name="settings_export_logs">匯出診斷記錄</string>
+    <string name="export_logs_summary">儲存或分享近期記錄和裝置資訊，以協助排查問題</string>
+    <string name="export_logs_save">儲存至檔案</string>
+    <string name="export_logs_share">分享</string>
+
+    <string name="export_logs_preparing">正在準備診斷記錄…</string>
+    <string name="export_logs_saving">正在儲存診斷記錄…</string>
+    <string name="export_logs_saved">已儲存診斷記錄</string>
+    <string name="export_logs_failed">無法匯出記錄，請檢查可用儲存空間後再試</string>
+    <string name="export_logs_no_picker">沒有可選擇儲存位置的應用程式</string>
+    <string name="export_logs_no_app">沒有可分享記錄的應用程式</string>
+
+    <!-- Settings: about and licenses -->
+    <string name="settings_group_about">關於</string>
+    <string name="settings_project">專案網站</string>
+    <string name="settings_privacy_policy">隱私權政策</string>
+    <string name="settings_version">版本</string>
+
+    <string name="settings_licenses">開放原始碼授權</string>
+    <string name="licenses_summary">GNU AGPL 3.0 或更新版本</string>
+    <string name="license_public_domain">公眾領域</string>
+    <plurals name="license_packages">
+        <item quantity="other">%d 個套件 · 多種授權</item>
+    </plurals>
+    <string name="license_unavailable">無法顯示此授權條款，請返回後重新開啟。</string>
+
+    <!-- Notifications and background service -->
+    <string name="notification_prompt">開啟通知以查看背景活動</string>
+    <string name="notification_prompt_dismiss">關閉通知提示</string>
+    <string name="battery_prompt">允許背景工作不受電池最佳化限制</string>
+    <string name="battery_prompt_dismiss">關閉電池用量提示</string>
+
+    <string name="channel_sessions">終端機工作階段</string>
+    <plurals name="sessions_running">
+        <item quantity="other">%d 個工作階段執行中</item>
+    </plurals>
+    <string name="background_running">正在背景執行</string>
+    <string name="exit_all">全部結束</string>
+
+    <string name="channel_terminal">鈴聲、程式通知與指令完成</string>
+    <string name="bell_rang">終端機響鈴</string>
+
+    <string name="channel_network">網路服務</string>
+    <string name="listening_title">%1$s 正在監聽連接埠 %2$d</string>
+    <string name="listening_mapped">其他裝置請連線至連接埠 %1$d：此手機上的應用程式無法使用連接埠 %2$d，因此 Tuxport 已改用前者。</string>
+    <string name="listening_direct">同一網路上的其他裝置可以連線</string>
+
+    <string name="channel_problems">處理程序與服務</string>
+
+    <!-- Session restoration -->
+    <string name="restored_notice">%1$s（分頁儲存於 %2$s）。先前執行中的程式未還原。</string>
+    <string name="ended_android">上次工作階段因 Android 終止應用程式而結束</string>
+    <string name="ended_memory">Android 為釋放記憶體而終止應用程式，導致上次工作階段結束</string>
+    <string name="ended_resources">上次工作階段因應用程式在背景使用過多資源，被 Android 終止而結束</string>
+    <string name="ended_user">上次工作階段因應用程式被強制停止而結束</string>
+    <string name="ended_updated">上次工作階段因應用程式更新而結束</string>
+    <string name="ended_crash">上次工作階段因 Tuxport 當機而結束，這是 Tuxport 的錯誤</string>
+    <string name="ended_anr">上次工作階段因 Tuxport 沒有回應而結束，這是 Tuxport 的錯誤</string>
+
+    <!-- Problem reports -->
+    <string name="crashed_title">Tuxport 當機</string>
+    <string name="crashed_text">上次工作階段於 %1$s 因 Tuxport 當機而結束。這是 Tuxport 的錯誤，回報時請附上複製的報告。</string>
+    <string name="anr_title">Tuxport 沒有回應</string>
+    <string name="anr_text">上次工作階段於 %1$s 因 Tuxport 沒有回應而結束。這是 Tuxport 的錯誤，回報時請附上複製的報告。</string>
+
+    <string name="killed_title">%1$s 已被終止</string>
+    <string name="killed_oom_app">%1$s（pid %2$d）已被終止：應用程式的記憶體用量達到上限（已用 %3$s，上限 %4$s），OOM killer 選中了它。</string>
+    <string name="killed_oom_cgroup">%1$s（pid %2$d）已被終止：cgroup %3$s 達到 memory.max（已用 %4$s，上限 %5$s）。</string>
+    <string name="killed_bug">%1$s（pid %2$d）因 Tuxport 內部錯誤而被終止。這是 Tuxport 的錯誤，可從通知複製報告，或使用 dmesg 查看。</string>
+
+    <string name="stall_title">Tuxport 核心卡住了</string>
+    <string name="stall_text">Tuxport 核心中的一項操作已執行 %1$d 秒，所有程式都在等待它完成。這是 Tuxport 的錯誤，回報時請附上複製的報告。</string>
+    <string name="stall_ended_title">Tuxport 核心剛才卡住了</string>
+    <string name="stall_ended_text">Tuxport 核心中的一項操作執行了 %1$d 秒，所有程式都等待它完成。這是 Tuxport 的錯誤，回報時請附上複製的報告。</string>
+
+    <plurals name="boot_failed_title">
+        <item quantity="other">%d 個服務未能啟動</item>
+    </plurals>
+    <string name="boot_failed_text">%1$s。啟動輸出位於 /var/log/boot.log。</string>
+
+    <string name="copy_report">複製報告</string>
+    <string name="report_copied">已複製報告</string>
+
+</resources>

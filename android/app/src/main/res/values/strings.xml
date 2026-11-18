@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- Keep section and resource order aligned between locales. -->
+<resources>
+
+    <!-- Application and common actions -->
+    <string name="app_name" translatable="false">Tuxport</string>
+    <string name="navigate_up">Back</string>
+    <string name="close">Close</string>
+    <string name="allow">Allow</string>
+    <string name="deny">Deny</string>
+
+    <!-- Startup and shutdown -->
+    <string name="starting">Starting…</string>
+    <string name="preparing">Preparing %1$s…</string>
+    <string name="downloading">Downloading %1$s… %2$d / %3$d MB</string>
+    <string name="restarting">Restarting…</string>
+    <string name="stopping">Stopping services…</string>
+    <string name="start_failed_title">Cannot start</string>
+    <string name="start_failed">Cannot start: %1$s</string>
+
+    <!-- Tabs and terminal controls -->
+    <string name="new_tab">New tab</string>
+    <string name="close_tab">Close tab</string>
+    <string name="tab_list">Tab list</string>
+    <string name="more_options">More options</string>
+    <string name="menu_settings">Settings</string>
+
+    <string name="close_other_tabs">Close other tabs</string>
+    <string name="close_all_tabs">Close all tabs</string>
+    <string name="close_tab_title">Close this tab?</string>
+    <string name="close_tab_message">Closing it hangs up its shell, which usually ends the programs running in it too.</string>
+    <plurals name="close_tabs_title">
+        <item quantity="one">Close %d tab?</item>
+        <item quantity="other">Close %d tabs?</item>
+    </plurals>
+    <string name="close_tabs_message">Closing them hangs up their shells, which usually ends the programs running in them too.</string>
+
+    <string name="next_tab">Next tab</string>
+    <string name="previous_tab">Previous tab</string>
+    <string name="shortcuts_tabs">Tabs</string>
+    <string name="shortcuts_terminal">Terminal</string>
+    <string name="previous_prompt">Previous prompt</string>
+    <string name="next_prompt">Next prompt</string>
+
+    <string name="clear_screen">Clear screen</string>
+    <string name="reset_terminal">Reset terminal</string>
+    <string name="keep_screen_on">Keep screen on</string>
+    <string name="modifier_locked">%1$s locked</string>
+    <string name="tmux_control_detached">tmux control mode (tmux -CC) cannot be shown here, so Tuxport detached it; its session goes on, and tmux attach brings it back.</string>
+
+    <string name="tab_number">Tab %1$d</string>
+    <string name="tab_description">Tab %1$d: %2$s</string>
+    <string name="tab_description_status">Tab %1$d: %2$s (%3$s)</string>
+    <string name="tab_ended">%1$s (ended)</string>
+    <string name="close_tab_description">Close tab %1$d: %2$s</string>
+
+    <!-- Search -->
+    <string name="find">Find</string>
+    <string name="find_previous">Previous match</string>
+    <string name="find_next">Next match</string>
+    <string name="find_close">Close find</string>
+
+    <!-- Selection and clipboard -->
+    <string name="select_rectangle">Rectangle</string>
+    <string name="select_lines">Lines</string>
+    <string name="select_output">Select output</string>
+
+    <string name="paste_unsafe_title">Paste text that may run commands?</string>
+    <string name="paste_unsafe">The program will see each line break as Enter, so the lines may run as commands as soon as they are pasted:\n\n^1</string>
+    <string name="paste_as_is">Paste as is</string>
+    <string name="paste_without_trailing_newlines">Drop trailing newlines</string>
+
+    <string name="clipboard_read_title">Let the program read the clipboard?</string>
+    <string name="clipboard_read">A program in this tab asks for what the clipboard holds:\n\n%1$s</string>
+    <string name="program_copied">A program copied text to the clipboard</string>
+
+    <!-- Links -->
+    <string name="open_link">Open link</string>
+    <string name="link_no_app">No app can open this link</string>
+    <string name="link_remote_file">This file is on %1$s, not in Tuxport</string>
+    <string name="link_hidden_file">File access is disabled. Enable in Settings: \"Allow other apps to access files\"</string>
+    <string name="link_missing_file">Cannot find this file</string>
+
+    <!-- File import -->
+    <string name="import_files">Import files</string>
+    <string name="importing_files">Importing files…</string>
+    <string name="import_file_name">Imported file</string>
+    <string name="import_file_failed">Could not import %1$s: %2$s</string>
+    <string name="import_files_saved">Saved to your home directory:\n\n^1</string>
+    <string name="import_picker_missing">No file picker is available</string>
+    <string name="copy_paths">Copy paths</string>
+
+    <!-- Program status and command completion -->
+    <string name="status_percent">%1$s, %2$d%%</string>
+    <string name="status_message">%1$s: %2$s</string>
+    <string name="status_working">Working</string>
+    <string name="status_idle">Idle</string>
+    <string name="status_blocked">Waiting for you</string>
+    <string name="status_permission">Waiting for your approval</string>
+    <string name="status_question">Waiting for your answer</string>
+    <string name="status_auth">Waiting for credentials</string>
+    <string name="status_done">Done</string>
+    <string name="status_error">Failed</string>
+    <string name="status_paused">Paused</string>
+
+    <string name="command_succeeded">Command succeeded</string>
+    <string name="command_failed">Command failed</string>
+    <string name="command_finished">Command finished</string>
+    <string name="command_took">Took %1$s</string>
+    <string name="command_took_code">Took %1$s and exited with code %2$d</string>
+
+    <!-- Settings: system -->
+    <string name="settings">Settings</string>
+    <string name="settings_group_system">System</string>
+
+    <string name="settings_distro">Distribution</string>
+    <string name="switch_title">Switch to %1$s?</string>
+    <string name="switch_message">All sessions end and every file in the rootfs, /root included, is deleted. Then %1$s is imported.</string>
+    <string name="switch_message_download">%1$s (%2$d MB) is downloaded first, and you can keep using the current system meanwhile. Then all sessions end and every file in the rootfs, /root included, is deleted.</string>
+    <string name="switch_confirm">Continue</string>
+    <string name="switch_downloading">Downloading %1$s… %2$d / %3$d MB, tap to cancel</string>
+    <string name="cancel_download_title">Stop downloading %1$s?</string>
+    <string name="cancel_download">Cancel download</string>
+    <string name="keep_downloading">Keep downloading</string>
+    <string name="download_failed">Cannot download %1$s: %2$s</string>
+    <string name="switch_failed">Cannot prepare %1$s: %2$s\n\nUsing %3$s instead.</string>
+
+    <string name="settings_reset">Reset rootfs</string>
+    <string name="reset_summary">Delete all files and reinitialize the rootfs</string>
+    <string name="reset_title">Reset the rootfs?</string>
+
+    <string name="settings_login">Login account</string>
+    <string name="login_auto_choice">Automatic (prefer a regular user)</string>
+    <string name="login_auto">Automatic (%1$s)</string>
+    <string name="login_missing">%1$s (not found, so new tabs log in as root)</string>
+    <string name="login_changed">New tabs log in as %1$s</string>
+
+    <!-- Settings: Android and screen-off running -->
+    <string name="settings_group_android">Android</string>
+    <string name="settings_notifications">Enable notifications</string>
+    <string name="settings_notifications_summary">View background activity</string>
+    <string name="settings_battery_usage">App battery usage</string>
+
+    <string name="settings_run_policy">Screen-off running</string>
+    <string name="allow_sleep">Allow sleep</string>
+    <string name="run_sleep_summary">Allow sleep, programs may pause</string>
+    <string name="run_busy">Run while busy</string>
+    <string name="run_busy_summary">Run while busy, allow sleep after 30 seconds idle</string>
+    <string name="run_always">Always run</string>
+    <string name="run_always_summary">Always run, uses more battery</string>
+
+    <!-- Privacy mode -->
+    <string name="settings_privacy">Privacy mode</string>
+    <string name="privacy_summary">Require unlock on return</string>
+    <string name="privacy_enable_message">Require biometrics or your screen lock to open Tuxport. Screenshots and notification details will be hidden, and other apps will lose file access. Background programs will keep running.</string>
+    <string name="privacy_file_access">Unavailable while privacy mode is on</string>
+
+    <string name="privacy_locked">Tuxport is locked</string>
+    <string name="privacy_unlock">Unlock</string>
+    <string name="privacy_leave">Leave Tuxport</string>
+    <string name="privacy_authenticate">Use biometrics or your screen lock</string>
+    <string name="privacy_unavailable">Authentication is unavailable. Set up a screen lock in Android settings, or try again later.</string>
+
+    <string name="privacy_notification">Unlock Tuxport to view the terminal</string>
+
+    <!-- File access and document roots -->
+    <string name="settings_file_access">Allow other apps to access files</string>
+    <string name="file_access_summary">HOME directory is writable, others are read-only</string>
+    <string name="file_access_title">Allow other apps to access files?</string>
+    <string name="file_access_message">Your HOME and system directories will appear in the system file picker. Apps you authorize can read or copy SSH private keys, passwords and other sensitive information stored there, even from read-only files.</string>
+    <string name="file_access_enable">Enable</string>
+
+    <string name="documents_home" translatable="false">%1$s · %2$s</string>
+    <string name="documents_system">The whole system (read-only) · %1$s</string>
+
+    <!-- Settings: terminal -->
+    <string name="settings_group_terminal">Terminal</string>
+
+    <string name="settings_fill_wide">Enlarge CJK characters</string>
+    <string name="fill_wide_on">Scale proportionally to fill two cells</string>
+    <string name="fill_wide_off">Original size, centred in two cells</string>
+
+    <string name="settings_cursor_style">Cursor shape</string>
+    <string name="cursor_block">Block</string>
+    <string name="cursor_bar">Bar</string>
+    <string name="cursor_underline">Underline</string>
+
+    <string name="settings_cursor_blink">Blinking cursor</string>
+    <string name="cursor_blink_on">Blinks by default, programs can override</string>
+    <string name="cursor_blink_off">Steady by default, programs can override</string>
+
+    <string name="settings_volume_keys">Volume keys switch tabs</string>
+    <string name="volume_keys_on">Up to previous tab, down to next tab, adjust volume with one tab</string>
+    <string name="volume_keys_off">Adjust volume as usual</string>
+
+    <string name="settings_show_tab_list">Show tab list button</string>
+    <string name="tab_list_on">Shown on the left of the tab bar</string>
+    <string name="tab_list_off">Hidden from the tab bar</string>
+
+    <!-- Settings: debugging and execution mode -->
+    <string name="settings_group_debug">Debugging</string>
+
+    <string name="settings_tier">Execution mode</string>
+    <string name="tier_1">Tier 1: translated (default)</string>
+    <string name="tier_0">Tier 0: interpreted (slower, for troubleshooting)</string>
+    <string name="tier_1_summary">Translated · Tier 1</string>
+    <string name="tier_0_summary">Interpreted · Tier 0 (slower)</string>
+    <string name="restart_title">Restart?</string>
+    <string name="restart_message">All sessions end and the system restarts with the new execution mode.</string>
+    <string name="restart">Restart</string>
+
+    <!-- Diagnostic log export -->
+    <string name="settings_export_logs">Export diagnostic logs</string>
+    <string name="export_logs_summary">Save or share recent logs and device information to help troubleshoot problems</string>
+    <string name="export_logs_save">Save to file</string>
+    <string name="export_logs_share">Share</string>
+
+    <string name="export_logs_preparing">Preparing diagnostic logs…</string>
+    <string name="export_logs_saving">Saving diagnostic logs…</string>
+    <string name="export_logs_saved">Diagnostic logs saved</string>
+    <string name="export_logs_failed">Could not export logs. Check available storage and try again.</string>
+    <string name="export_logs_no_picker">No app is available to choose a save location</string>
+    <string name="export_logs_no_app">No app is available to share the logs</string>
+
+    <!-- Settings: about and licenses -->
+    <string name="settings_group_about">About</string>
+    <string name="settings_support" translatable="false">Report an issue</string>
+    <string name="settings_project">Project website</string>
+    <string name="settings_privacy_policy">Privacy policy</string>
+    <string name="settings_version">Version</string>
+
+    <string name="settings_licenses">Open source licenses</string>
+    <string name="licenses_summary">GNU AGPL 3.0 or later</string>
+    <string name="license_public_domain">Public domain</string>
+    <plurals name="license_packages">
+        <item quantity="one">%d package · Multiple licenses</item>
+        <item quantity="other">%d packages · Multiple licenses</item>
+    </plurals>
+    <string name="license_unavailable">Cannot display this license. Go back and open it again.</string>
+
+    <!-- Notifications and background service -->
+    <string name="notification_prompt">Enable notifications for background activity</string>
+    <string name="notification_prompt_dismiss">Dismiss notification prompt</string>
+    <string name="battery_prompt">Allow unrestricted battery use for background tasks</string>
+    <string name="battery_prompt_dismiss">Dismiss battery usage prompt</string>
+
+    <string name="channel_sessions">Terminal sessions</string>
+    <plurals name="sessions_running">
+        <item quantity="one">%d session running</item>
+        <item quantity="other">%d sessions running</item>
+    </plurals>
+    <string name="background_running">Running in the background</string>
+    <string name="exit_all">Exit all</string>
+
+    <string name="channel_terminal">Bells, notifications from programs and finished commands</string>
+    <string name="bell_rang">The terminal bell rang</string>
+
+    <string name="channel_network">Network services</string>
+    <string name="listening_title">%1$s is listening on port %2$d</string>
+    <string name="listening_mapped">Other devices connect to port %1$d: apps cannot use port %2$d on this phone, so Tuxport moved it there.</string>
+    <string name="listening_direct">Other devices on the network can connect to it</string>
+
+    <string name="channel_problems">Processes and services</string>
+
+    <!-- Session restoration -->
+    <string name="restored_notice">%1$s (tabs saved %2$s). Programs that were running were not restored.</string>
+    <string name="ended_android">The previous session ended because Android stopped the app</string>
+    <string name="ended_memory">The previous session ended because Android stopped the app to free memory</string>
+    <string name="ended_resources">The previous session ended because Android stopped the app for using too many resources in the background</string>
+    <string name="ended_user">The previous session ended because the app was force-stopped</string>
+    <string name="ended_updated">The previous session ended because the app was updated</string>
+    <string name="ended_crash">The previous session ended because Tuxport crashed, a bug in Tuxport</string>
+    <string name="ended_anr">The previous session ended because Tuxport stopped responding, a bug in Tuxport</string>
+
+    <!-- Problem reports -->
+    <string name="crashed_title">Tuxport crashed</string>
+    <string name="crashed_text">The previous session ended at %1$s because Tuxport crashed. This is a bug in Tuxport; copy the report to include it in your feedback.</string>
+    <string name="anr_title">Tuxport stopped responding</string>
+    <string name="anr_text">The previous session ended at %1$s because Tuxport stopped responding. This is a bug in Tuxport; copy the report to include it in your feedback.</string>
+
+    <string name="killed_title">%1$s was killed</string>
+    <string name="killed_oom_app">%1$s (pid %2$d) was killed: the app\'s memory reached its limit (%3$s of %4$s), and the out-of-memory killer chose it.</string>
+    <string name="killed_oom_cgroup">%1$s (pid %2$d) was killed: cgroup %3$s reached its memory.max (%4$s of %5$s).</string>
+    <string name="killed_bug">%1$s (pid %2$d) was ended by an internal error in Tuxport. This is a bug in Tuxport; copy the report from the notification, or see it with dmesg.</string>
+
+    <string name="stall_title">Tuxport\'s kernel is stuck</string>
+    <string name="stall_text">One operation in Tuxport\'s kernel has been running for %1$d s, and every program waits for it to finish. This is a bug in Tuxport; copy the report to include it in your feedback.</string>
+    <string name="stall_ended_title">Tuxport\'s kernel was stuck</string>
+    <string name="stall_ended_text">One operation in Tuxport\'s kernel ran for %1$d s, and every program waited for it to finish. This is a bug in Tuxport; copy the report to include it in your feedback.</string>
+
+    <plurals name="boot_failed_title">
+        <item quantity="one">%d service did not start</item>
+        <item quantity="other">%d services did not start</item>
+    </plurals>
+    <string name="boot_failed_text">%1$s. The boot output is in /var/log/boot.log.</string>
+
+    <string name="copy_report">Copy report</string>
+    <string name="report_copied">Report copied</string>
+
+</resources>

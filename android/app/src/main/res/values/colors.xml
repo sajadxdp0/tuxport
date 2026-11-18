@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+
+    <!-- Tuxport's Neon Terminal palette: a near-black base, cyan primary and magenta accent. -->
+    <color name="tuxport_base">#0D1117</color>
+    <color name="tuxport_primary">#00E5FF</color>
+    <color name="tuxport_accent">#FF4081</color>
+
+    <!-- Material 3 fallback tokens, used where Dynamic Colors are unavailable. -->
+    <color name="tuxport_on_primary">#0D1117</color>
+    <color name="tuxport_primary_container">#003943</color>
+    <color name="tuxport_on_primary_container">#B3F4FF</color>
+    <color name="tuxport_secondary">#FF4081</color>
+    <color name="tuxport_on_secondary">#0D1117</color>
+    <color name="tuxport_secondary_container">#5E0035</color>
+    <color name="tuxport_on_secondary_container">#FFB3D1</color>
+
+    <color name="ic_foreground_stroke_color">#00E5FF</color>
+
+</resources>

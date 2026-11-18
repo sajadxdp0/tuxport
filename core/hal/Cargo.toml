@@ -1,0 +1,11 @@
+[package]
+name = "tuxport-hal"
+description = "Host abstraction layer for the Tuxport kernel"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+libc.workspace = true

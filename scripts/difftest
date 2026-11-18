@@ -1,0 +1,421 @@
+#!/bin/sh
+# Differential tests (design doc §13.3 layer 4): the same script runs on Tuxport and on real arm64
+# Linux, and the outputs and exit codes are compared. Run on a host with docker:
+#
+#   scripts/difftest [-t tier] [-r] [-s store directory] [-j jobs] [-R] [case name…]
+#
+# -R runs each group that failed once more, alone, after all the others: one that passes then is
+# reported as flaky and does not fail the run (its first outputs stay in target/difftest/failed).
+# -j runs several groups at once (4 by default on macOS, 1 on other hosts): on the native side each
+# runs in its own container; on the Tuxport side each concurrent slot uses a clone of the store
+# (<store>-w<n>; the groups all write files of the same names into the guest's /tmp, so sharing one
+# store would make them overwrite each other), which on macOS is an APFS clonefile (`cp -c`,
+# copy-on-write, taking almost no space) and elsewhere `cp --reflink=auto` (a real copy where
+# unsupported). Clones are remade when missing or with -r (after new packages are installed into the
+# main store, -r is needed anyway to re-export the image). Groups that took long last time start
+# first (recorded in target/difftest/durations-t<tier>.txt). Each group's result is printed as a
+# whole, and the `ok` line carries the times (seconds each for native and Tuxport). -j 1 runs the
+# groups one by one as before.
+# Test cases are tests/diff/<name>.sh, run by the guest's /bin/sh with stderr merged into stdout.
+# The real Linux side is a docker container: the store's root filesystem is first packed inside
+# Tuxport and imported as an image, so both sides run exactly the same files. The image is generated
+# only the first time or with -r; after changing the store, pass -r. The options on a test case's
+# `# docker-run-options: …` line are added to its container (such as CAP_SYS_ADMIN for mount), and
+# those on the `# tuxport-options: …` line to tuxport-run (such as --always-map-low-ports for
+# lowports: the container can bind low ports, so without it the mapping is not exercised). A case
+# with a `# difftest-files: <dir>` line gets the files of tests/diff/<dir> on both sides, unpacked
+# into /tmp/difftest-files/<dir> before the script runs: they travel inside the script itself as a
+# gzipped tar in base64 (neither side has the work tree, and the store stays as it is), so they
+# count towards the 128 KB limit.
+#
+# The starnix-* and gvisor-* cases run Fuchsia Starnix's and gVisor's syscall tests (gtest
+# programs), one process per test, once scripts/build-starnix-tests or scripts/build-gvisor-tests
+# has built them; without them they are reported as SKIP, and a case naming a program the built
+# suite lacks fails.
+#
+# Only one run goes at a time (a lock under target/difftest): a second run waits for the first.
+#
+# Both sides' outputs are written to target/difftest/<name>.native and .tuxport and overwritten on
+# the next run; on a mismatch a copy is also saved as
+# target/difftest/failed/<time>-t<tier>-<name>.*, which can still be inspected after a rerun.
+# tuxport-run's own stderr goes to <name>.tuxport.err: when it contains internal errors reported by
+# the kernel layer (a kernel bug, a kernel object borrowed while the BKL is released), the case
+# fails even if the outputs match.
+#
+# The store is target/difftest/store by default; when it does not exist the minirootfs is imported
+# (run scripts/fetch-rootfs first) and then the packages the test cases need are installed with apk
+# inside Tuxport, which needs the network (using the host's or docker's proxy). The store must be
+# inside the work tree. tuxport-run also runs in a container and sees the same kind of network as the
+# native side (the container's eth0, routes, addresses), so that network test cases are comparable:
+# on a Linux arm64 host it runs in TUXPORT_IMAGE (debian:trixie-slim by default; its glibc must not
+# be older than the one on the host that built tuxport-run), and the environment variable TUXPORT_RUN
+# can name the tuxport-run to use; on other hosts it goes through scripts/dev. The environment
+# variable TUXPORT_DBT_REGS is passed on to tuxport-run as well (with TUXPORT_DBT_REGS=go every program
+# uses the register set Tier 1 has for Go).
+set -eu
+
+root=$(cd "$(dirname "$0")/.." && pwd)
+# The lanes call this script again after the cd below, so a path relative to the caller's directory
+# would no longer lead to it
+self=$root/scripts/$(basename "$0")
+cd "$root"
+tier=1
+rebuild=0
+store=target/difftest/store
+jobs=1
+[ "$(uname)" != Darwin ] || jobs=4
+retry=0
+# When running concurrently, the script calls itself to run one group (-G case name), and then does
+# not prepare the store or the image
+group=
+image=tuxport-difftest
+packages="python3 gcc musl-dev lua5.4 sqlite go nodejs openjdk21-jdk strace gdb uv bubblewrap iproute2 util-linux-misc dmesg iptables nftables fuse3 fuse-overlayfs sshfs openssh-sftp-server rclone"
+env_path=PATH=/usr/sbin:/usr/bin:/sbin:/bin
+
+while getopts t:rs:j:G:R opt; do
+    case $opt in
+    t) tier=$OPTARG ;;
+    r) rebuild=1 ;;
+    s) store=$OPTARG ;;
+    j) jobs=$OPTARG ;;
+    G) group=$OPTARG ;;
+    R) retry=1 ;;
+    *) exit 2 ;;
+    esac
+done
+shift $((OPTIND - 1))
+
+out=target/difftest
+mkdir -p "$out"
+# One run at a time: runs share the per-case outputs, the lane claims and the lane clones (which -r
+# deletes), so a second run waits for the first. The lock is a symbolic link naming the owner's
+# pid, made in one step (earlier versions left a directory holding a pid file, also understood);
+# one left by a run that was killed is taken over. The lanes (-G) run under their parent's lock
+if [ -z "$group" ]; then
+    lock=$out/.lock
+    owner() { readlink "$1" 2>/dev/null || cat "$1/pid" 2>/dev/null || true; }
+    waited=0
+    # (ln -s would make the link inside an earlier version's lock directory, and succeed)
+    while { [ ! -L "$lock" ] && [ -d "$lock" ]; } || ! ln -s "$$" "$lock" 2>/dev/null; do
+        holder=$(owner "$lock")
+        # ps, unlike kill -0, also finds another user's live process
+        if [ -z "$holder" ] || ! ps -p "$holder" >/dev/null 2>&1; then
+            # Taken over by moving it aside first: of several waiters that found the same dead
+            # holder, one that moved away the lock another has just made puts it back
+            if mv "$lock" "$lock.$$" 2>/dev/null; then
+                moved=$(owner "$lock.$$")
+                if [ -n "$moved" ] && [ "$moved" != "$holder" ]; then
+                    ln -s "$moved" "$lock" 2>/dev/null || true
+                fi
+                rm -rf "$lock.$$"
+            fi
+            continue
+        fi
+        if [ "$waited" = 0 ]; then
+            echo "difftest: waiting for the run holding $lock (pid $holder)" >&2
+            waited=1
+        fi
+        sleep 2
+    done
+    trap 'rm -f "$lock"' EXIT
+    trap 'exit 130' INT
+    trap 'exit 143' TERM
+fi
+
+# linux <shell command>: runs in the Linux arm64 environment, where variables like $http_proxy are
+# expanded
+if [ "$(uname -sm)" = "Linux aarch64" ]; then
+    run=${TUXPORT_RUN:-target/linux-arm64/release/tuxport-run}
+    [ -x "$run" ] || run=target/release/tuxport-run
+    case $run in
+    /*) ;;
+    *) run=$root/$run ;;
+    esac
+    linux() { sh -c "$1"; }
+    # Run as the caller, so a newly created store belongs to the caller and linux on the host can
+    # open it too; as in scripts/dev, lift the nice limit (the nice values of guest threads are set
+    # on host threads)
+    tuxport() {
+        docker run --rm --platform linux/arm64 --security-opt seccomp=unconfined \
+            ${TUXPORT_DBT_REGS:+-e TUXPORT_DBT_REGS} \
+            --user "$(id -u):$(id -g)" --ulimit nice=40:40 -v "$root:$root" -w "$root" \
+            "${TUXPORT_IMAGE:-debian:trixie-slim}" "$run" "$@"
+    }
+else
+    run=target/linux-arm64/release/tuxport-run
+    linux() { scripts/dev sh -c "$1"; }
+    tuxport() { scripts/dev "$run" "$@"; }
+fi
+
+if [ -z "$group" ]; then
+if [ ! -d "$store" ]; then
+    tarball=$(ls target/rootfs/alpine-minirootfs-*-aarch64.tar.gz 2>/dev/null | sort -V | tail -n 1)
+    [ -n "$tarball" ] || {
+        echo "difftest: no minirootfs; run scripts/fetch-rootfs" >&2
+        exit 1
+    }
+    echo "creating $store"
+    tuxport --rootfs "$store" --import "$tarball" >/dev/null
+    linux "$run --tier 1 --rootfs $store --env $env_path"' \
+        ${http_proxy:+--env http_proxy=$http_proxy} ${https_proxy:+--env https_proxy=$https_proxy} \
+        -- /bin/sh -c "apk add -q '"$packages"'"'
+    rebuild=1
+fi
+# Checking only that the directory exists is not enough: a store whose install failed midway, or
+# whose cache was only partly restored, makes every test case fail
+if ! tuxport --tier 1 --rootfs "$store" --env "$env_path" -- \
+    /bin/sh -c "for tool in python3 gcc lua5.4 sqlite3 go node java strace gdb uv bwrap iptables nft fusermount3 fuse-overlayfs sshfs rclone; do
+            command -v \"\$tool\" || exit 1
+        done && nsenter --version | grep -q util-linux && dmesg --version | grep -q util-linux" >/dev/null 2>&1; then
+    echo "difftest: $store lacks some of: $packages" >&2
+    echo "difftest: install them with apk add, or delete $store to create it again" >&2
+    exit 1
+fi
+
+# Prebuilt syscall test suites, once built (scripts/build-starnix-tests for Fuchsia Starnix's,
+# scripts/build-gvisor-tests for gVisor's): each is installed into the store at
+# /usr/lib/<suite>-tests whenever the built version differs from the installed one, which also
+# exports the image again; the starnix-* and gvisor-* cases run them
+for suite in starnix gvisor; do
+    tests=$(ls target/$suite-tests/$suite-tests-*.tar 2>/dev/null | tail -n 1)
+    if [ -z "$tests" ]; then
+        continue
+    fi
+    want=$(tar xOf "$tests" ./VERSION)
+    have=$(tuxport --rootfs "$store" -- /bin/cat /usr/lib/$suite-tests/VERSION 2>/dev/null || true)
+    if [ "$want" != "$have" ]; then
+        echo "installing $tests into $store"
+        linux "$run --rootfs $store -- /bin/sh -c 'rm -rf /usr/lib/$suite-tests &&
+            mkdir -p /usr/lib/$suite-tests && tar xf - -C /usr/lib/$suite-tests' <$tests"
+        rebuild=1
+    fi
+    # The image (and with it the lane clones) is checked too: an export that failed after the
+    # install (a full VM disk) leaves the store current and the image without the tests
+    if [ "$rebuild" = 0 ] && [ "$want" != "$(docker run --rm --platform linux/arm64 "$image" \
+        cat /usr/lib/$suite-tests/VERSION 2>/dev/null || true)" ]; then
+        rebuild=1
+    fi
+done
+
+# The store's top-level directories that go into the image (docker provides /dev, /proc and
+# /sys, and each case makes /root and /tmp again), so both sides start from the same files; the
+# image is labelled with the list and exported again when it changes
+exported="bin etc home lib media mnt opt run sbin srv tmp usr var"
+label=$(echo "$exported" | tr ' ' ,)
+if [ "$(docker image inspect --format '{{index .Config.Labels "tuxport.export"}}' "$image" \
+    2>/dev/null)" != "$label" ]; then
+    rebuild=1
+fi
+if [ "$rebuild" = 1 ] || ! docker image inspect "$image" >/dev/null 2>&1; then
+    echo "exporting the root filesystem of $store"
+    # /tmp and /var/tmp need only the directories themselves: what earlier runs left there
+    # (possibly gigabytes) need not go into the image
+    old=$(docker image inspect --format '{{.Id}}' "$image" 2>/dev/null || true)
+    tuxport --tier 1 --rootfs "$store" -- /bin/sh -c "cd / && exec tar -c -f - \
+        --exclude='tmp/*' --exclude='var/tmp/*' \$(ls -d $exported 2>/dev/null)" 2>/dev/null |
+        docker import --platform linux/arm64 --change "LABEL tuxport.export=$label" - \
+            "$image" >/dev/null
+    # The replaced image is left untagged and would keep its gigabytes in the VM until the disk
+    # fills; a container still using it keeps it (rmi refuses)
+    if [ -n "$old" ] && [ "$old" != "$(docker image inspect --format '{{.Id}}' "$image")" ]; then
+        docker rmi "$old" >/dev/null 2>&1 || true
+    fi
+fi
+fi
+
+if [ $# -eq 0 ]; then
+    set -- $(cd tests/diff && ls *.sh | sed 's/\.sh$//')
+fi
+
+# Run one group: run both sides once and compare; return 1 on a mismatch
+run_group() {
+    name=$1
+    # A misspelt name would run an empty script on both sides, whose outputs match
+    if [ ! -f "tests/diff/$name.sh" ]; then
+        echo "FAIL $name: there is no tests/diff/$name.sh"
+        return 1
+    fi
+    # A case running a prebuilt suite (`run.sh <suite> "$SKIP" <program>…`) would print the same
+    # "not installed" line on both sides without it, and a program missing from it lists no tests
+    # on either side: both would pass without running anything
+    suite=$(sed -n 's|.*gtest/run\.sh \([a-z]*\) .*|\1|p' "tests/diff/$name.sh")
+    if [ -n "$suite" ]; then
+        tests=$(ls target/$suite-tests/$suite-tests-*.tar 2>/dev/null | tail -n 1)
+        if [ -z "$tests" ]; then
+            echo "SKIP $name: the $suite tests are not built (scripts/build-$suite-tests)"
+            return 0
+        fi
+        # Programs that fail to build are listed in SKIPPED.txt and expected to be absent
+        absent=$(awk '/\\$/ { line = line substr($0, 1, length($0) - 1); next }
+            { line = line $0; if (sub(/.*run\.sh [a-z]+ "\$SKIP"/, "", line)) print line; line = "" }' \
+            "tests/diff/$name.sh" | tr ' ' '\n' | awk 'NF' | while read -r p; do
+                tar tf "$tests" "./bin/$p" >/dev/null 2>&1 ||
+                    tar xOf "$tests" ./SKIPPED.txt | grep -q "^$p:" || printf ' %s' "$p"
+            done)
+        if [ -n "$absent" ]; then
+            echo "FAIL $name: not in $tests:$absent (run scripts/build-$suite-tests)"
+            return 1
+        fi
+    fi
+    files=$(sed -n 's/^# difftest-files: //p' "tests/diff/$name.sh")
+    unpack=""
+    if [ -n "$files" ]; then
+        if [ ! -d "tests/diff/$files" ]; then
+            echo "FAIL $name: there is no tests/diff/$files for its difftest-files line"
+            return 1
+        fi
+        # ustar and no macOS metadata, so bsdtar and GNU tar make the same kind of archive for
+        # busybox's tar
+        blob=$(cd "tests/diff/$files" && COPYFILE_DISABLE=1 tar --format ustar -cf - . |
+            gzip -9n | base64 | tr -d '\n')
+        dir=/tmp/difftest-files/$files
+        unpack="rm -rf $dir && mkdir -p $dir && echo $blob | base64 -d | tar -xzof - -C $dir && "
+    fi
+    # Both sides start from an empty $HOME and /tmp: the Tuxport store kept what earlier runs left
+    # there (Go's and uv's caches under /root/.cache, files cases made in /tmp)
+    fresh="rm -rf /root /tmp && mkdir -m 700 /root && mkdir -m 1777 /tmp && "
+    script="exec 2>&1; $fresh$unpack$(cat "tests/diff/$name.sh")"
+    # The whole script is handed over as one argument of sh -c, and Linux does not allow a single
+    # argument over 128 KB (MAX_ARG_STRLEN): beyond that neither side can execute it (E2BIG), the
+    # outputs match, and it would count as passed
+    if [ "$(printf '%s' "cd / && $script" | wc -c)" -ge 131072 ]; then
+        echo "FAIL $name: tests/diff/$name.sh is longer than one argument can be (128 KB), split it"
+        return 1
+    fi
+    options=$(sed -n 's/^# docker-run-options: //p' "tests/diff/$name.sh")
+    tuxport_options=$(sed -n 's/^# tuxport-options: //p' "tests/diff/$name.sh")
+    set +e
+    # Docker's default seccomp rules change the results of some syscalls (clone3 returns ENOSYS,
+    # pidfd_getfd returns EPERM); what should be compared is the kernel's own behaviour
+    # shellcheck disable=SC2086 # the options must be split on whitespace
+    t0=$(date +%s)
+    docker run --rm --platform linux/arm64 --security-opt seccomp=unconfined $options \
+        -e "$env_path" -e HOME=/root -w / "$image" \
+        /bin/sh -c "$script" >"$out/$name.native" 2>/dev/null
+    echo "exit $?" >>"$out/$name.native"
+    t1=$(date +%s)
+    # shellcheck disable=SC2086 # the options must be split on whitespace
+    tuxport --tier "$tier" --rootfs "$store" --env "$env_path" --env HOME=/root $tuxport_options -- \
+        /bin/sh -c "cd / && $script" >"$out/$name.tuxport" 2>"$out/$name.tuxport.err"
+    echo "exit $?" >>"$out/$name.tuxport"
+    t2=$(date +%s)
+    set -e
+    bugs=$(grep '^tuxport: internal error' "$out/$name.tuxport.err" || true)
+    if cmp -s "$out/$name.native" "$out/$name.tuxport" && [ -z "$bugs" ]; then
+        echo "ok   $name ($((t1 - t0))s native, $((t2 - t1))s tuxport)"
+    else
+        echo "FAIL $name"
+        diff -u "$out/$name.native" "$out/$name.tuxport" | sed 's/^/    /' || true
+        [ -z "$bugs" ] || printf '%s\n' "$bugs" | sed 's/^/    /'
+        kept=$out/failed/$(date +%Y%m%d-%H%M%S)-t$tier-$name
+        mkdir -p "$out/failed"
+        cp "$out/$name.native" "$kept.native"
+        cp "$out/$name.tuxport" "$kept.tuxport"
+        cp "$out/$name.tuxport.err" "$kept.tuxport.err"
+        echo "    saved as $kept.native, .tuxport, .tuxport.err"
+        return 1
+    fi
+}
+
+# When running concurrently, called by itself: run only the group -G gives, with the store of a free
+# slot
+if [ -n "$group" ]; then
+    slot=""
+    for w in $(seq 1 "$jobs"); do
+        if mkdir "$out/.slot-$w" 2>/dev/null; then
+            slot=$w
+            break
+        fi
+    done
+    [ -n "$slot" ] || {
+        echo "FAIL $group: no free slot"
+        exit 1
+    }
+    store=$store-w$slot
+    # Collect the whole output and write it at once, so groups finishing together do not interleave
+    report=$(run_group "$group" 2>&1) && code=0 || code=1
+    rmdir "$out/.slot-$slot"
+    printf '%s\n' "$report"
+    exit "$code"
+fi
+
+failed=0
+skipped=0
+# The groups that failed, for -R
+failures=""
+if [ "$jobs" -le 1 ]; then
+    for name in "$@"; do
+        report=$(run_group "$name") && code=0 || code=1
+        printf '%s\n' "$report"
+        [ "$code" = 0 ] || {
+            failed=$((failed + 1))
+            failures="$failures $name"
+        }
+        case $report in SKIP*) skipped=$((skipped + 1)) ;; esac
+    done
+else
+    rm -rf "$out"/.slot-*
+    for w in $(seq 1 "$jobs"); do
+        clone=$store-w$w
+        if [ ! -f "$clone/.cloned" ] || [ "$rebuild" = 1 ]; then
+            rm -rf "$clone"
+            if [ "$(uname)" = Darwin ]; then
+                cp -cR "$store" "$clone"
+            else
+                cp -a --reflink=auto "$store" "$clone"
+            fi
+            touch "$clone/.cloned"
+        fi
+    done
+    # Groups that took long last time (native plus Tuxport) start first, so no long group is left to
+    # run alone at the end; groups that never ran go last
+    durations=$out/durations-t$tier.txt
+    touch "$durations"
+    # Each group's result is printed in the order they finish; the number of FAIL lines is the
+    # number of failed groups
+    reports=$out/.reports
+    # awk tells the two files apart by file name: NR == FNR also holds for the second file when the
+    # first one is empty
+    printf '%s\n' "$@" >"$out/.groups"
+    awk 'FILENAME == ARGV[1] { d[$1] = $2; next } { print ($1 in d ? d[$1] : 0), $1 }' \
+        "$durations" "$out/.groups" | sort -s -k1,1 -nr | cut -d' ' -f2 |
+        xargs -P "$jobs" -I '{}' "$self" -t "$tier" -s "$store" -j "$jobs" -G '{}' | tee "$reports" || true
+    failed=$(grep -c '^FAIL ' "$reports" || true)
+    skipped=$(grep -c '^SKIP ' "$reports" || true)
+    # Every group must have reported ok, FAIL or SKIP: one whose lane died (or never started)
+    # printed nothing, and the pipeline above hides xargs' exit status
+    missing=$(awk 'FILENAME == ARGV[1] { if ($1 == "ok" || $1 == "FAIL" || $1 == "SKIP") { sub(/:$/, "", $2); seen[$2] = 1 }; next }
+        !($1 in seen) { print }' "$reports" "$out/.groups")
+    for name in $missing; do
+        echo "FAIL $name: no result (its lane did not finish)"
+        failed=$((failed + 1))
+    done
+    failures="$(sed -n 's/^FAIL \([^ :]*\).*/\1/p' "$reports") $missing"
+    # Record the times of the groups that passed this time; those that did not pass keep last time's
+    sed -n 's/^ok   \([^ ]*\) (\([0-9]*\)s native, \([0-9]*\)s tuxport)$/\1 \2 \3/p' "$reports" \
+        >"$out/.times"
+    awk 'FILENAME == ARGV[1] { d[$1] = $2 + $3; next } !($1 in d) { print } END { for (n in d) print n, d[n] }' \
+        "$out/.times" "$durations" | sort >"$durations.new"
+    mv "$durations.new" "$durations"
+fi
+# -R: each failed group runs once more, alone and with the main store; one that passes now is
+# flaky, and one that fails again keeps both reports
+flaky=0
+if [ "$retry" = 1 ]; then
+    for name in $failures; do
+        echo "retrying $name"
+        if report=$(run_group "$name"); then
+            echo "flaky $name: failed, then passed when run again"
+            flaky=$((flaky + 1))
+            failed=$((failed - 1))
+        else
+            printf '%s\n' "$report"
+        fi
+    done
+fi
+[ "$skipped" = 0 ] || echo "$skipped skipped (their test suites are not built)"
+[ "$flaky" = 0 ] || echo "$flaky flaky (failed, then passed when run again)"
+[ "$failed" = 0 ] || {
+    echo "$failed failed"
+    exit 1
+}

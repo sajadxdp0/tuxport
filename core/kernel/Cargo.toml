@@ -1,0 +1,25 @@
+[package]
+name = "tuxport-kernel"
+description = "Tuxport kernel layer: the Linux user-space ABI implemented in-process"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+tuxport-engine.workspace = true
+tuxport-hal.workspace = true
+flate2.workspace = true
+libc.workspace = true
+rusqlite.workspace = true
+tar.workspace = true
+
+[features]
+# Test hooks (src/bug.rs), compiled into release builds too: the Android debug app uses them to
+# simulate kernel-layer and engine bugs inside the app process. Debug builds always have test hooks
+test-hooks = []
+# Release builds that check no kernel object (src/cell.rs) is borrowed when the BKL is released: on
+# by default in tuxport-run, and app/build.gradle.kts turns it on for the debug app. Debug builds
+# always check
+borrow-check = []

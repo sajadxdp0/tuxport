@@ -1,0 +1,35 @@
+[workspace]
+resolver = "3"
+members = [
+    "core/engine",
+    "core/hal",
+    "core/kernel",
+    "hosts/android",
+    "hosts/cli",
+    "tests/bench",
+    "tests/lockstep",
+]
+
+[workspace.package]
+version = "1.0.0"
+edition = "2024"
+rust-version = "1.90"
+license = "AGPL-3.0-or-later"
+publish = false
+
+[workspace.dependencies]
+tuxport-bench = { path = "tests/bench" }
+tuxport-engine = { path = "core/engine" }
+tuxport-hal = { path = "core/hal" }
+tuxport-kernel = { path = "core/kernel" }
+cc = "1"
+flate2 = "1"
+libc = "0.2"
+rusqlite = { version = "0.40", features = ["bundled", "fallible_uint"] }
+tar = "0.4"
+
+# Only the Android release APK pays the cost of linking across crates.
+[profile.android-release]
+inherits = "release"
+lto = true
+codegen-units = 1

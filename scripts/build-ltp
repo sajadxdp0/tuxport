@@ -1,0 +1,57 @@
+#!/bin/sh
+# Builds LTP's syscall tests (design doc §13.3 layer 2) into target/ltp/ltp-<version>.tar, which is
+# unpacked at /opt/ltp in the guest. Building LTP from source inside Tuxport takes several hours, so
+# it is built in a native Alpine arm64 container: it is the same Alpine version as the rootfs, so
+# the programs it builds run directly in Tuxport. The version and sha256 are fixed here and changed
+# together on upgrades.
+set -eu
+
+version=20260930
+sha256=b9837481134fa6eabce91c2fba57d96695f81360468f83e11e6982584ad4d29d
+url=https://github.com/linux-test-project/ltp/releases/download/$version/ltp-full-$version.tar.xz
+
+root=$(cd "$(dirname "$0")/.." && pwd)
+out=$root/target/ltp
+tarball=$out/ltp-$version.tar
+if [ -f "$tarball" ]; then
+    echo "$tarball"
+    exit 0
+fi
+mkdir -p "$out"
+
+# When the Docker daemon has a proxy configured, downloads in the container use the same proxy
+proxy=""
+for kv in "http_proxy=$(docker info --format '{{.HTTPProxy}}' 2>/dev/null || true)" \
+    "https_proxy=$(docker info --format '{{.HTTPSProxy}}' 2>/dev/null || true)"; do
+    if [ -n "${kv#*=}" ]; then
+        proxy="$proxy -e $kv"
+    fi
+done
+
+# shellcheck disable=SC2086 # proxy must vanish when empty
+docker run --rm --platform linux/arm64 $proxy -v "$out:/out" \
+    -e "version=$version" -e "sha256=$sha256" -e "url=$url" alpine:3.24 sh -euc '
+    apk add -q build-base linux-headers curl xz pkgconf
+    cd /tmp
+    curl -fsSL --retry 3 -o ltp.tar.xz "$url"
+    echo "$sha256  ltp.tar.xz" | sha256sum -c -
+    tar xJf ltp.tar.xz
+    cd "ltp-full-$version"
+    ./configure --prefix=/opt/ltp >/dev/null
+    make -s -C lib -j"$(nproc)"
+    make -s -C libs -j"$(nproc)"
+    # A few tests do not compile on musl: build directory by directory, skip the failures, and
+    # install the rest as usual (the top-level Makefile of LTP stops at the first failing
+    # subdirectory)
+    for dir in testcases/kernel/syscalls/*/; do
+        make -s -k -C "$dir" -j"$(nproc)" >/dev/null 2>&1 || echo "skipped: $dir"
+        make -s -k -C "$dir" install >/dev/null 2>&1 || true
+    done
+    cp -r runtest /opt/ltp/
+    # The test programs are statically linked with debug information, and much smaller once it is
+    # stripped
+    find /opt/ltp/testcases/bin -type f -exec strip {} + 2>/dev/null || true
+    tar cf "/out/ltp-$version.tar.part" -C / opt/ltp
+    mv "/out/ltp-$version.tar.part" "/out/ltp-$version.tar"
+'
+echo "$tarball"

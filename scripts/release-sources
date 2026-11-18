@@ -1,0 +1,143 @@
+#!/bin/sh
+# Sources to publish together with the app (design doc §13.4), placed in <output directory>
+# (target/release-sources by default):
+#
+#   scripts/release-sources [output directory]
+#
+#   tuxport-<commit>.tar.gz            Tuxport itself (git archive HEAD; an error when the work tree
+#                                     has changes)
+#   tuxport-<commit>-vendor.tar.gz     cargo vendor: the crates statically linked into the app
+#   alpine-<version>-gpl-sources.tar  the GPL packages of the Alpine minirootfs in the APK and of
+#                                     the packages bundled beside it (bash, readline, procps-ng,
+#                                     libintl, bubblewrap, libcap2): each one's
+#                                     directory at its aports commit (APKBUILD, patches) and the
+#                                     upstream sources
+#   libghostty-vt-<version>.tar.gz    the libghostty-vt source release the terminal is built
+#                                     from, as published (sha256 checked by fetch-ghostty)
+#   libghostty-vt-<version>-deps.tar.gz
+#                                     the release's Zig packages its build takes (uucode, Highway,
+#                                     Wuffs, translate-c and aro), as published
+#
+# The Alpine part: packages, versions, licenses, and the aports origins and commits come from
+# lib/apk/db/installed in the tarball (the open-source licenses page lists them too), and packages
+# whose license includes GPL are deduplicated by origin. The aports directories are downloaded from
+# GitLab by commit and subdirectory; the upstream sources are the files listed in the APKBUILD's
+# sha512sums but missing from the directory, downloaded by file name from Alpine's distfiles
+# mirror and checked against the SHA-512 there. The APKBUILD is not executed (source= has
+# variables, and executing it would mean running downloaded code).
+set -eu
+
+root=$(cd "$(dirname "$0")/.." && pwd)
+out=${1:-$root/target/release-sources}
+mkdir -p "$out"
+out=$(cd "$out" && pwd)
+aports=https://gitlab.alpinelinux.org/alpine/aports/-/archive
+distfiles=https://distfiles.alpinelinux.org/distfiles
+
+sha512() {
+    if command -v sha512sum >/dev/null; then
+        sha512sum "$1"
+    else
+        shasum -a 512 "$1"
+    fi | cut -d' ' -f1
+}
+
+# ---- Tuxport itself ----
+cd "$root"
+if [ -n "$(git status --porcelain --untracked-files=no)" ]; then
+    echo "release-sources: the work tree has changes; commit them first" >&2
+    exit 1
+fi
+rev=$(git rev-parse --short=12 HEAD)
+git archive --format=tar.gz --prefix="tuxport-$rev/" -o "$out/tuxport-$rev.tar.gz" HEAD
+echo "$out/tuxport-$rev.tar.gz"
+
+work=$(mktemp -d)
+trap 'rm -rf "$work"' EXIT
+cargo vendor --locked --quiet "$work/vendor" >/dev/null
+tar -czf "$out/tuxport-$rev-vendor.tar.gz" -C "$work" vendor
+rm -rf "$work/vendor"
+echo "$out/tuxport-$rev-vendor.tar.gz"
+
+# ---- libghostty-vt: the source release and its Zig packages, both as published ----
+src=$("$root/scripts/fetch-ghostty" | sed -n 's/^fetch-ghostty: //p')
+for tarball in "$src.tar.gz" "$src-deps.tar.gz"; do
+    cp "$tarball" "$out/"
+    echo "$out/$(basename "$tarball")"
+done
+
+# ---- The GPL packages in the Alpine minirootfs and among the packages bundled beside it ----
+# fetch-rootfs prints the bundled packages, then the tarball
+fetched=$("$root/scripts/fetch-rootfs")
+tarball=$(printf '%s\n' "$fetched" | tail -n 1)
+version=$(basename "$tarball" | sed -n 's/^alpine-minirootfs-\([0-9.]*\)-.*/\1/p')
+branch=v${version%.*}
+name=alpine-$version-gpl-sources
+dir=$work/$name
+mkdir -p "$dir"
+# One line per package: package version origin commit license
+tar -xzOf "$tarball" lib/apk/db/installed | awk -F: '
+    /^P:/ { p = substr($0, 3) } /^V:/ { v = substr($0, 3) } /^L:/ { l = substr($0, 3) }
+    /^o:/ { o = substr($0, 3) } /^c:/ { c = substr($0, 3) }
+    /^$/ { if (p != "") print p, v, o, c, l; p = "" }
+    END { if (p != "") print p, v, o, c, l }' >"$work/packages"
+# The bundled packages, from each one's .PKGINFO (in the second of its three concatenated gzip
+# parts: signature, control information, data)
+printf '%s\n' "$fetched" | grep '\.apk$' | while read -r apk; do
+    tar -xzOf "$apk" .PKGINFO | awk -F' = ' '
+        $1 == "pkgname" { p = $2 } $1 == "pkgver" { v = $2 } $1 == "license" { l = $2 }
+        $1 == "origin" { o = $2 } $1 == "commit" { c = $2 }
+        END { print p, v, o, c, l }'
+done >>"$work/packages"
+grep 'GPL' "$work/packages" >"$work/gpl" || true
+if [ ! -s "$work/gpl" ]; then
+    echo "release-sources: no GPL packages in $tarball?" >&2
+    exit 1
+fi
+{
+    echo "Source code of the GPL-licensed packages in the Alpine Linux $version minirootfs"
+    echo "that the Tuxport app bundles ($(basename "$tarball")) and among the Alpine"
+    echo "packages it bundles beside it, which it installs in the system. Each directory"
+    echo "holds the package's directory in Alpine's aports repository at the given commit"
+    echo "(the APKBUILD and patches) and the upstream sources that the APKBUILD names,"
+    echo "checked against its sha512sums."
+    echo
+    echo "package version origin aports-commit license"
+    cat "$work/gpl"
+} >"$dir/README"
+
+awk '{ print $3, $4 }' "$work/gpl" | sort -u | while read -r origin commit; do
+    dest=$dir/$origin
+    mkdir -p "$dest"
+    curl -fsSL --retry 3 -o "$work/aports.tar.gz" \
+        "$aports/$commit/aports-$commit.tar.gz?path=main/$origin"
+    tar -xzf "$work/aports.tar.gz" -C "$dest" --strip-components 3
+    rm "$work/aports.tar.gz"
+    [ -f "$dest/APKBUILD" ] || { echo "release-sources: no APKBUILD for main/$origin at $commit" >&2; exit 1; }
+    # sha512sums="<digest>  <file>…": the quotes may be single or double, and the first entry
+    # may be on the same line as sha512sums=
+    awk '/^sha512sums=/ { f = 1; sub(/^sha512sums=["'\'']/, "") }
+         f { line = $0; done = sub(/["'\'']$/, "", line); n = split(line, a, " ");
+             if (n == 2) print a[1], a[2]; if (done) exit }' "$dest/APKBUILD" >"$work/sums"
+    [ -s "$work/sums" ] || { echo "release-sources: no sha512sums in main/$origin/APKBUILD" >&2; exit 1; }
+    while read -r want file; do
+        if [ -e "$dest/$file" ]; then
+            got=$(sha512 "$dest/$file")
+        else
+            curl -fsSL --retry 3 -o "$dest/$file" "$distfiles/$branch/$file" ||
+                curl -fsSL --retry 3 -o "$dest/$file" "$distfiles/edge/$file" || {
+                echo "release-sources: $file (main/$origin) is not on $distfiles" >&2
+                exit 1
+            }
+            got=$(sha512 "$dest/$file")
+        fi
+        if [ "$got" != "$want" ]; then
+            echo "release-sources: sha512 mismatch for $file (main/$origin)" >&2
+            exit 1
+        fi
+    done <"$work/sums"
+    echo "main/$origin at $commit: $(wc -l <"$work/sums" | tr -d ' ') files"
+done
+
+tar -cf "$out/$name.tar" -C "$work" "$name"
+echo "$out/$name.tar"

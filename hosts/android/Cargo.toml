@@ -1,0 +1,25 @@
+[package]
+name = "tuxport-android"
+description = "Tuxport's native library for the Android app (JNI)"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lib]
+name = "tuxport"
+crate-type = ["cdylib"]
+
+[dependencies]
+tuxport-kernel.workspace = true
+jni = "0.21.1"
+libc.workspace = true
+
+[build-dependencies]
+cc.workspace = true
+
+[features]
+# See tuxport-kernel's features of the same names; app/build.gradle.kts enables them in the debug app
+test-hooks = ["tuxport-kernel/test-hooks"]
+borrow-check = ["tuxport-kernel/borrow-check"]

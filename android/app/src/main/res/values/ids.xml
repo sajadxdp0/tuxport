@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+
+    <item name="license_list" type="id" />
+    <item name="license_reader" type="id" />
+
+</resources>

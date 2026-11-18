@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+
+    <!-- Settings and the license pages: Material 3, light or dark with the system, with the
+         wallpaper's colours from Android 12 on (DynamicColors in their onCreate) -->
+    <style name="Theme.Tuxport" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:windowBackground">?attr/colorSurface</item>
+        <!-- Neon Terminal fallback; Dynamic Colors still take over on Android 12+. -->
+        <item name="colorPrimary">@color/tuxport_primary</item>
+        <item name="colorOnPrimary">@color/tuxport_on_primary</item>
+        <item name="colorPrimaryContainer">@color/tuxport_primary_container</item>
+        <item name="colorOnPrimaryContainer">@color/tuxport_on_primary_container</item>
+        <item name="colorSecondary">@color/tuxport_secondary</item>
+        <item name="colorOnSecondary">@color/tuxport_on_secondary</item>
+        <item name="colorSecondaryContainer">@color/tuxport_secondary_container</item>
+        <item name="colorOnSecondaryContainer">@color/tuxport_on_secondary_container</item>
+        <item name="android:colorAccent">@color/tuxport_primary</item>
+    </style>
+
+    <!-- The terminal: Material 3 but always dark, on the Neon Terminal base, with the wallpaper's colours from
+         Android 12 on (its dialogs, menus and the list of tabs; DynamicColors in onCreate). The
+         system bars stay black, as with the framework theme before, where they are coloured at
+         all (up to Android 14) -->
+    <style name="Theme.Tuxport.Terminal" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="android:statusBarColor">@android:color/black</item>
+        <item name="android:navigationBarColor">@android:color/black</item>
+        <item name="android:windowBackground">@color/tuxport_base</item>
+        <item name="colorPrimary">@color/tuxport_primary</item>
+        <item name="colorOnPrimary">@color/tuxport_on_primary</item>
+        <item name="colorPrimaryContainer">@color/tuxport_primary_container</item>
+        <item name="colorOnPrimaryContainer">@color/tuxport_on_primary_container</item>
+        <item name="colorSecondary">@color/tuxport_secondary</item>
+        <item name="colorOnSecondary">@color/tuxport_on_secondary</item>
+        <item name="colorSecondaryContainer">@color/tuxport_secondary_container</item>
+        <item name="colorOnSecondaryContainer">@color/tuxport_on_secondary_container</item>
+        <item name="android:colorAccent">@color/tuxport_primary</item>
+        <!-- Keep CJK and other fallback glyphs from changing line height in controls and tooltips. -->
+        <item name="android:fallbackLineSpacing">false</item>
+    </style>
+
+    <!-- The menu row handles presses; its checkbox needs no separate ripple background. -->
+    <style name="ThemeOverlay.Tuxport.CheckPopup" parent="">
+        <item name="controlBackground">@android:color/transparent</item>
+        <item name="android:checkboxStyle">@style/Widget.Tuxport.CheckPopup</item>
+    </style>
+    <style name="Widget.Tuxport.CheckPopup" parent="android:Widget.Material.CompoundButton.CheckBox">
+        <item name="android:background">@android:color/transparent</item>
+    </style>
+
+    <!-- The tab bar's ⋮ menu, placed like a toolbar's overflow menu (actionOverflowMenuStyle): over
+         the button (overlapAnchor), its top at the bar's and its end at the button's (Gravity.END
+         in MainActivity.showMenu), which is the screen's; then moved down 4 dp and left 3.5 dp. A
+         positive horizontal offset would change nothing, as the popup is kept on the screen. The
+         app is left to right only (no supportsRtl), so the offset is absolute -->
+    <style name="Widget.Tuxport.MorePopup" parent="@style/Widget.Material3.PopupMenu.Overflow">
+        <item name="android:dropDownHorizontalOffset">-3.5dp</item>
+        <item name="android:dropDownVerticalOffset">4dp</item>
+    </style>
+
+</resources>

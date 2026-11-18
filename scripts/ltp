@@ -1,0 +1,175 @@
+#!/bin/sh
+# Runs LTP's syscall tests inside Tuxport (design doc §13.3 layer 2). Build LTP with
+# scripts/build-ltp first. Runs on Linux arm64; on macOS through scripts/dev:
+#
+#   scripts/dev scripts/ltp [-a] [-j jobs] [-t tier] [regex matching the whole test name]
+#
+# Each test runs in a new tuxport-run process; the results go to target/ltp/results.txt, one line
+# each, "<name> <PASS|CONF|FAIL|TIMEOUT|BUG|SKIP> <exit code> <seconds>", the output to
+# target/ltp/logs/<name>.log, and the previous run's output stays in <name>.prev.log (rerunning a
+# failure alone does not wipe out the failed run). BUG means the kernel layer reported an
+# internal error (a kernel bug, a kernel object borrowed while the BKL is released), whatever the
+# exit code.
+# LTP's exit code is the bitwise OR of the results: 0 means everything passed, 32 (TCONF) means
+# skipped as not applicable.
+#
+# In scripts/dev's container the test store is on a docker volume local to the VM (/ltp/store),
+# elsewhere it is target/ltp/store; LTP_STORE can point somewhere else. On macOS target/ goes
+# through virtiofs, so every file operation has to go to the host: with eight jobs writing the same
+# store's SQLite at once, operations that waited over 10 seconds for the write lock got EIO, and
+# every full run had a few to a few dozen tests fail because of it; on the local volume a full run
+# went from over two minutes to one. sendfile09 needs 5 GB free.
+#
+# The tests in skip below are not run and are recorded as SKIP (exit code -); with -a they run as
+# usual:
+# - sigtimedwait01, sigwaitinfo01: the first item waits for "an empty set interrupted by a signal
+#   returns EINTR"; musl's sigtimedwait and sigwaitinfo retry on EINTR by themselves, with no
+#   timeout, so every run hits LTP's 10-minute timeout; the same happens on native Alpine, and the
+#   kernel side is right (docs/rounds/17-compat.md).
+set -eu
+
+root=$(cd "$(dirname "$0")/.." && pwd)
+out=$root/target/ltp
+store=$out/store
+[ ! -d /ltp ] || store=/ltp/store
+store=${LTP_STORE:-$store}
+run=${TUXPORT_RUN:-$root/target/linux-arm64/release/tuxport-run}
+
+# xargs calls this once per test: scripts/ltp --one <tier> <name> <command line…>
+if [ "${1:-}" = --one ]; then
+    tier=$2
+    name=$3
+    shift 3
+    log=$out/logs/$name.log
+    [ -f "$log" ] && mv "$log" "$out/logs/$name.prev.log"
+    start=$(date +%s.%N)
+    set +e
+    # LTP judges timeouts by its own timer; Tuxport is slower than native, so allow 5 times as long
+    # (at least 2.5 minutes per test). The factor also multiplies TST_RETRY_FUNC's backoff limit: at
+    # 20 times, system calls that always fail (the bpf ones) would be retried for 33 seconds. Race
+    # tests that run for a set duration (inotify09, timerfd_settime02 and so on, fuzzy sync) run
+    # only a tenth of it: they look for races in Linux itself, and one alone used to take 1–2
+    # minutes. Tests that need a device get a loop device over a file in /tmp, as on Linux;
+    # Tuxport has no disk filesystems, so the device's filesystem is tmpfs (LTP then skips mkfs
+    # and mounts a tmpfs instead, as Starnix runs LTP), and tests that need a particular one
+    # report TCONF
+    timeout 900 "$run" --tier "$tier" --rootfs "$store" \
+        --env PATH=/opt/ltp/testcases/bin:/usr/sbin:/usr/bin:/sbin:/bin \
+        --env LTPROOT=/opt/ltp --env TMPDIR=/tmp --env LTP_TIMEOUT_MUL=5 --env LTP_RUNTIME_MUL=0.1 \
+        --env LTP_COLORIZE_OUTPUT=0 --env KCONFIG_PATH=/opt/ltp/tuxport.config \
+        --env LTP_DEV_FS_TYPE=tmpfs \
+        -- /bin/sh -c "cd /tmp && exec $*" </dev/null >"$log" 2>&1
+    code=$?
+    case $code in
+    0) result=PASS ;;
+    32) result=CONF ;;
+    124) result=TIMEOUT ;;
+    *) result=FAIL ;;
+    esac
+    ! grep -q '^tuxport: internal error' "$log" || result=BUG
+    echo "$name $result $code $(echo "$(date +%s.%N) $start" | awk '{printf "%.1f", $1 - $2}')"
+    exit 0
+fi
+
+skip='sigtimedwait01|sigwaitinfo01'
+jobs=8
+tier=1
+while getopts aj:t: opt; do
+    case $opt in
+    a) skip= ;;
+    j) jobs=$OPTARG ;;
+    t) tier=$OPTARG ;;
+    *) exit 2 ;;
+    esac
+done
+shift $((OPTIND - 1))
+pattern=${1:-[^[:space:]]+}
+
+ltp=$(ls "$out"/ltp-*.tar 2>/dev/null | tail -n 1)
+rootfs=$(ls "$root"/target/rootfs/alpine-minirootfs-*-aarch64.tar.gz 2>/dev/null | sort -V | tail -n 1)
+if [ -z "$ltp" ] || [ -z "$rootfs" ]; then
+    echo "ltp: run scripts/build-ltp and scripts/fetch-rootfs first" >&2
+    exit 1
+fi
+# Build the tuxport-run that is run (an existing one may be older than the source), into the target
+# directory it is run from (scripts/dev's, also outside the container); TUXPORT_RUN names one to
+# use as it is
+if [ -z "${TUXPORT_RUN:-}" ]; then
+    (cd "$root" && CARGO_TARGET_DIR=$root/target/linux-arm64 cargo build --release -q -p tuxport-run)
+fi
+if [ ! -x "$run" ]; then
+    echo "ltp: no tuxport-run at $run" >&2
+    exit 1
+fi
+
+# A store with LTP installed, made again whenever the LTP tarball or the rootfs changes (the stamp
+# records their names, sizes and times)
+stamp=$(stat -c '%n %s %Y' "$ltp" "$rootfs")
+if [ "$(cat "$store/.ltp" 2>/dev/null)" != "$stamp" ]; then
+    rm -rf "$store"
+    "$run" --rootfs "$store" --import "$rootfs" >/dev/null
+    "$run" --tier 1 --rootfs "$store" -- /bin/tar xf - -C / <"$ltp"
+    printf '%s\n' "$stamp" >"$store/.ltp"
+fi
+
+# Tests decide whether to run by the kernel configuration (.needs_kconfigs): list the features
+# Tuxport implements; anything not listed counts as absent
+"$run" --rootfs "$store" -- /bin/sh -c 'cat >/opt/ltp/tuxport.config' <<'EOF'
+CONFIG_64BIT=y
+CONFIG_ARM64=y
+CONFIG_MMU=y
+CONFIG_MULTIUSER=y
+CONFIG_FILE_LOCKING=y
+CONFIG_PROC_FS=y
+CONFIG_EXT4_FS=y
+CONFIG_BLOCK=y
+CONFIG_BLK_DEV_LOOP=y
+CONFIG_UNIX=y
+CONFIG_INET=y
+CONFIG_IPV6=y
+CONFIG_FUTEX=y
+CONFIG_EPOLL=y
+CONFIG_EVENTFD=y
+CONFIG_TIMERFD=y
+CONFIG_SHMEM=y
+CONFIG_MEMFD_CREATE=y
+CONFIG_HIGH_RES_TIMERS=y
+CONFIG_AIO=y
+CONFIG_SECCOMP=y
+CONFIG_SECCOMP_FILTER=y
+CONFIG_NAMESPACES=y
+CONFIG_USER_NS=y
+CONFIG_PID_NS=y
+CONFIG_UTS_NS=y
+CONFIG_IPC_NS=y
+CONFIG_NET_NS=y
+EOF
+
+mkdir -p "$out/logs"
+"$run" --rootfs "$store" -- /bin/cat /opt/ltp/runtest/syscalls |
+    grep -v '^#' | grep -E "^($pattern)[[:space:]]" >"$out/tests.txt" || true
+if [ -n "$skip" ]; then
+    grep -Ev "^($skip)[[:space:]]" "$out/tests.txt" >"$out/run.txt" || true
+else
+    cp "$out/tests.txt" "$out/run.txt"
+fi
+# Longest first (by the previous durations recorded in durations.txt; tests never recorded count as
+# 1 second): long tests run in parallel with others from the start instead of trailing at the end.
+# awk tells the two files apart by file name: NR == FNR also holds for the second file when the
+# first one is empty
+if [ -f "$out/durations.txt" ]; then
+    awk 'FILENAME == ARGV[1] { d[$1] = $2; next } { print ($1 in d ? d[$1] : 1), $0 }' \
+        "$out/durations.txt" "$out/run.txt" | sort -s -k1,1 -gr | cut -d' ' -f2- >"$out/run.sorted"
+    mv "$out/run.sorted" "$out/run.txt"
+fi
+{
+    xargs -r -P "$jobs" -L 1 "$0" --one "$tier" <"$out/run.txt"
+    [ -z "$skip" ] || grep -E "^($skip)[[:space:]]" "$out/tests.txt" | awk '{print $1, "SKIP - -"}'
+} | sort >"$out/results.txt"
+# Record the durations of the tests run this time (rerunning a few tests alone updates only theirs)
+touch "$out/durations.txt"
+awk 'FILENAME == ARGV[1] { if ($4 != "-") d[$1] = $4; next } !($1 in d) { print } END { for (n in d) print n, d[n] }' \
+    "$out/results.txt" "$out/durations.txt" | sort >"$out/durations.new"
+mv "$out/durations.new" "$out/durations.txt"
+awk '{n[$2]++} END {for (r in n) printf "%s %d\n", r, n[r]}' "$out/results.txt" | sort
+echo "results: $out/results.txt"

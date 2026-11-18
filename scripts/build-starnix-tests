@@ -1,0 +1,98 @@
+#!/bin/sh
+# Builds the syscall tests of Fuchsia's Starnix (src/starnix/tests/syscalls/cpp: gtest programs
+# that Starnix also runs against Linux as their reference) into target/starnix-tests/
+# starnix-tests-<commit>.tar, which scripts/difftest installs into its store at
+# /usr/lib/starnix-tests. They are built in an Alpine arm64 container of the rootfs's version,
+# with clang (as Fuchsia builds them), statically against musl and a pinned googletest and stripped,
+# so the same binaries run on both difftest sides. The Fuchsia commit and the googletest version and sha256 are fixed here and changed
+# together on upgrades; Fuchsia's sources are fetched by commit (a sparse checkout of the few
+# directories needed), and git checks them by their hash.
+#
+# The tests are used unchanged. What musl lacks is supplied from tests/starnix/compat: glibc's
+# TEMP_FAILURE_RETRY (included before every source), a <linux/prctl.h> that defers to musl's
+# <sys/prctl.h>, and Android's copy of <linux/bpf.h> pointing at the kernel's. Tests that still do not build (Fuchsia-only devices, glibc-only interfaces) are
+# skipped and listed in SKIPPED.txt inside the tarball, with their first error.
+set -eu
+
+commit=86962cb40d56e1a2bc033ead5b4c89bb02c34ca2
+gtest_version=1.17.0
+gtest_sha256=65fab701d9829d38cb77c14acdc431d2108bfdbf8979e40eb8ae567edf10b27c
+
+root=$(cd "$(dirname "$0")/.." && pwd)
+out=$root/target/starnix-tests
+tarball=$out/starnix-tests-$(echo "$commit" | cut -c1-12).tar
+if [ -f "$tarball" ]; then
+    echo "$tarball"
+    exit 0
+fi
+mkdir -p "$out"
+
+# When the Docker daemon has a proxy configured, downloads in the container use the same proxy
+proxy=""
+for kv in "http_proxy=$(docker info --format '{{.HTTPProxy}}' 2>/dev/null || true)" \
+    "https_proxy=$(docker info --format '{{.HTTPSProxy}}' 2>/dev/null || true)"; do
+    if [ -n "${kv#*=}" ]; then
+        proxy="$proxy -e $kv"
+    fi
+done
+
+# shellcheck disable=SC2086 # proxy must vanish when empty
+docker run --rm --platform linux/arm64 $proxy -v "$out:/out" \
+    -v "$root/tests/starnix/compat:/compat:ro" -e "commit=$commit" \
+    -e "gtest_version=$gtest_version" -e "gtest_sha256=$gtest_sha256" alpine:3.24 sh -euc '
+    apk add -q clang g++ make cmake linux-headers git curl >/dev/null
+
+    cd /tmp
+    curl -fsSL --retry 3 -o gtest.tar.gz \
+        "https://github.com/google/googletest/releases/download/v$gtest_version/googletest-$gtest_version.tar.gz"
+    echo "$gtest_sha256  gtest.tar.gz" | sha256sum -c -
+    tar xzf gtest.tar.gz
+    cmake -S "googletest-$gtest_version" -B gtest-build -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_CXX_COMPILER=clang++ -DBUILD_SHARED_LIBS=OFF >/dev/null
+    cmake --build gtest-build -j "$(nproc)" >/dev/null
+    cmake --install gtest-build --prefix /opt/gtest >/dev/null
+
+    mkdir /fuchsia && cd /fuchsia
+    git init -q
+    git remote add origin https://fuchsia.googlesource.com/fuchsia
+    git sparse-checkout set --no-cone /LICENSE /src/starnix/tests/syscalls/cpp/ \
+        /sdk/lib/fit/include/ /sdk/lib/stdcompat/include/ /sdk/lib/utf-utils/ \
+        /zircon/system/ulib/fbl/include/ /src/lib/files/ /src/lib/fxl/fxl_export.h \
+        /src/lib/fxl/build_config.h /src/lib/fxl/macros.h /src/lib/fxl/strings/
+    git fetch -q --depth 1 --filter=blob:none origin "$commit"
+    git checkout -q FETCH_HEAD
+
+    flags="-std=c++20 -O1 -w -D_LARGEFILE64_SOURCE -I/compat -include linux-compat.h -I. -Isdk"
+    flags="$flags -Isdk/lib/fit/include -Isdk/lib/stdcompat/include"
+    flags="$flags -Izircon/system/ulib/fbl/include -I/opt/gtest/include"
+    export flags
+    # The helpers every test links: test_helper and its capability helpers, and the files, fxl
+    # string and utf-utils libraries they use (fxl utf_codecs needs ICU and nothing uses it)
+    mkdir /tmp/obj
+    for src in src/starnix/tests/syscalls/cpp/test_helper.cc \
+        src/starnix/tests/syscalls/cpp/capabilities_helper.cc src/lib/files/file.cc \
+        src/lib/files/path.cc src/lib/files/directory.cc src/lib/files/file_descriptor.cc \
+        sdk/lib/utf-utils/utf-utils.cc sdk/lib/utf-utils/internal/scalar.cc \
+        $(ls src/lib/fxl/strings/*.cc | grep -v -e _unittest -e utf_codecs); do
+        clang++ $flags -c -o "/tmp/obj/$(echo "$src" | tr / _).o" "$src"
+    done
+    ar rcs /tmp/libstarnix_test.a /tmp/obj/*.o
+
+    mkdir -p /tmp/stage/bin /tmp/errors
+    cat >/tmp/one.sh <<"EOS"
+name=$(basename "$1" .cc)
+if ! clang++ $flags -o "/tmp/stage/bin/$name" "$1" /tmp/libstarnix_test.a -static -s \
+    -L/opt/gtest/lib -lgmock -lgtest_main -lgtest -pthread >"/tmp/errors/$name" 2>&1; then
+    echo "$name: $(grep -m1 -E "error|undefined" "/tmp/errors/$name")"
+fi
+EOS
+    ls src/starnix/tests/syscalls/cpp/*_test.cc | xargs -P "$(nproc)" -n 1 sh /tmp/one.sh |
+        sort >/tmp/stage/SKIPPED.txt
+    (cd /tmp/stage/bin && ls) >/tmp/stage/BUILT.txt
+    echo "$commit" >/tmp/stage/VERSION
+    cp LICENSE /tmp/stage/LICENSE.fuchsia
+    cp "/tmp/googletest-$gtest_version/LICENSE" /tmp/stage/LICENSE.googletest
+    tar -C /tmp/stage -cf "/out/starnix-tests-$(echo "$commit" | cut -c1-12).tar" .
+    echo "built $(wc -l </tmp/stage/BUILT.txt), skipped $(wc -l </tmp/stage/SKIPPED.txt)"
+'
+echo "$tarball"

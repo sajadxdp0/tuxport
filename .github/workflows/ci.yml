@@ -1,0 +1,80 @@
+name: CI
+
+# The quick checks every push gets: formatting, clippy, and the cargo tests (the lockstep oracle,
+# the guest programs and the rootfs tests). The Android build is android.yml; the slow suites
+# (differential tests with Starnix's and gVisor's tests, extended lockstep, network, the engine
+# built with clang) are full.yml, which runs nightly on develop, on pushes to master and on
+# demand.
+on:
+  push:
+    paths-ignore:
+      - "docs/**"
+      - ".agents/**"
+      - "**.md"
+      - "android/**"
+  pull_request:
+    paths-ignore:
+      - "docs/**"
+      - ".agents/**"
+      - "**.md"
+      - "android/**"
+
+permissions:
+  contents: read
+
+# A newer push to the same branch replaces the run in progress
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  linux-arm64:
+    name: Linux arm64
+    # Design doc §13.3: lockstep uses real arm64 hardware as the reference answer
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install rustup
+        run: |
+          if ! command -v rustup >/dev/null; then
+            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
+              | sh -s -- -y --profile minimal --default-toolchain none
+            echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
+          fi
+
+      - name: Install toolchain from rust-toolchain.toml
+        run: rustup toolchain install
+
+      # llvm-mc independently checks the interpreter's instruction whitelist
+      # (tests/lockstep/tests/whitelist.rs); musl-gcc compiles the guest test programs linked with
+      # musl (tests/guest/*.c)
+      - name: Install llvm and musl
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends llvm musl-tools
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Format
+        run: cargo fmt --all --check
+
+      - name: Clippy
+        run: cargo clippy --workspace --all-targets -- -D warnings
+
+      # M1b's end-to-end tests run busybox in the Alpine minirootfs; the version and sha256 are
+      # fixed in the script
+      - uses: actions/cache@v6
+        with:
+          path: target/rootfs
+          key: rootfs-${{ hashFiles('scripts/fetch-rootfs') }}
+
+      - name: Fetch rootfs
+        run: scripts/fetch-rootfs
+
+      - name: Test (includes lockstep, guest programs and busybox in the rootfs)
+        env:
+          TUXPORT_REQUIRE_ROOTFS: "1"
+          TUXPORT_REQUIRE_MUSL: "1"
+        run: cargo test --workspace

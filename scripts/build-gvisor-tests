@@ -1,0 +1,93 @@
+#!/bin/sh
+# Builds gVisor's syscall tests (test/syscalls/linux: gtest programs that gVisor also runs against
+# Linux as their reference, Apache-2.0) for the gvisor-* differential cases:
+#
+#   scripts/build-gvisor-tests          the programs the cases run, into target/gvisor-tests/
+#   scripts/build-gvisor-tests --list   only print those programs
+#   scripts/build-gvisor-tests --all    every program, into target/gvisor-tests/all/ (for a full
+#                                       run by hand; difftest does not install it)
+#
+# The programs are the ones named after `run.sh gvisor "$SKIP"` in tests/diff/gvisor-*.sh, plus
+# every helper the tests run (targets not ending in _test); the tarball's name and its VERSION
+# carry a hash of that list, so a case naming another program makes a new tarball, which
+# scripts/difftest then installs into its store at /usr/lib/gvisor-tests (older tarballs are
+# removed). They are built in an Alpine arm64 container of the rootfs's version with clang,
+# statically against musl and the pinned abseil, googletest and google benchmark that gVisor's
+# MODULE.bazel uses, and stripped, so the same binaries run on both difftest sides. The versions
+# and sha256s are fixed here and changed together on upgrades; gVisor's sources are fetched by
+# commit (a sparse checkout of test/syscalls/linux and test/util), and git checks them by their
+# hash.
+#
+# Bazel is not used: tests/gvisor/parse-build.awk reads each program's sources and local
+# libraries from the BUILD file, and tests/gvisor/build.sh compiles and links them. The tests are
+# used unchanged; tests/gvisor/compat supplies what musl lacks (included before every source) and
+# a RunfilePath that finds helper programs next to the tests. Programs that do not build are
+# listed in SKIPPED.txt inside the tarball, with their first error.
+set -eu
+
+commit=9ee2906f518e1d0f9fd109e9e1feb2812096418b
+absl_version=20260817.0
+absl_sha256=f7e05179df39c45434cad433f5783840bb3788ef322976f9138bc6b72b3a107d
+gtest_version=1.18.0
+gtest_sha256=6e3191c1455468b3fc35a417fb565c1c5071aee1b7e7f85e30cf48a98d37d8b5
+benchmark_version=1.10.0
+benchmark_sha256=acc5c7c0fbed855c4aaa2d7c3c36fb82b0c15c28f4e151e3f679c2fc0aa404af
+
+root=$(cd "$(dirname "$0")/.." && pwd)
+# The programs after `run.sh gvisor "$SKIP"`, across continuation lines
+programs=$(cat "$root"/tests/diff/gvisor-*.sh | awk '
+    /\\$/ { line = line substr($0, 1, length($0) - 1); next }
+    { line = line $0; if (sub(/.*run\.sh gvisor "\$SKIP"/, "", line)) print line; line = "" }' |
+    tr ' ' '\n' | awk 'NF' | sort -u | tr '\n' ' ')
+case ${1:-} in
+--list)
+    echo "$programs" | tr ' ' '\n' | awk 'NF'
+    exit 0
+    ;;
+--all)
+    programs=""
+    version=$commit
+    out=$root/target/gvisor-tests/all
+    tarball=gvisor-tests-all-$(echo "$commit" | cut -c1-12).tar
+    ;;
+"")
+    hash=$(echo "$programs" | sha256sum 2>/dev/null || echo "$programs" | shasum -a 256)
+    hash=$(echo "$hash" | cut -c1-8)
+    version="$commit $hash"
+    out=$root/target/gvisor-tests
+    tarball=gvisor-tests-$(echo "$commit" | cut -c1-12)-$hash.tar
+    ;;
+*)
+    echo "usage: $0 [--list | --all]" >&2
+    exit 2
+    ;;
+esac
+if [ -f "$out/$tarball" ]; then
+    echo "$out/$tarball"
+    exit 0
+fi
+mkdir -p "$out"
+
+# When the Docker daemon has a proxy configured, downloads in the container use the same proxy
+proxy=""
+for kv in "http_proxy=$(docker info --format '{{.HTTPProxy}}' 2>/dev/null || true)" \
+    "https_proxy=$(docker info --format '{{.HTTPSProxy}}' 2>/dev/null || true)"; do
+    if [ -n "${kv#*=}" ]; then
+        proxy="$proxy -e $kv"
+    fi
+done
+
+# shellcheck disable=SC2086 # proxy must vanish when empty
+docker run --rm --platform linux/arm64 $proxy -v "$out:/out" -v "$root/tests/gvisor:/gvisor:ro" \
+    -e "commit=$commit" -e "absl_version=$absl_version" -e "absl_sha256=$absl_sha256" \
+    -e "gtest_version=$gtest_version" -e "gtest_sha256=$gtest_sha256" \
+    -e "benchmark_version=$benchmark_version" -e "benchmark_sha256=$benchmark_sha256" \
+    -e "programs=$programs" -e "version=$version" -e "tarball=$tarball" \
+    alpine:3.24 sh /gvisor/build.sh
+# Only the tarball for the current list stays, so difftest installs that one
+if [ -n "${hash:-}" ]; then
+    for f in "$out"/gvisor-tests-*.tar; do
+        [ "$f" = "$out/$tarball" ] || rm -f "$f"
+    done
+fi
+echo "$out/$tarball"
