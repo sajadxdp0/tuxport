@@ -1,10 +1,12 @@
 # Tuxport website
 
 A single page in `dist/index.html` links to the English privacy policy in
-`dist/privacy.html`, with the app screenshot `dist/terminal.png` as the hero.
-The pages use inline CSS and a local SVG favicon with no JavaScript, remote
-assets, dependencies or compilation step, on the app's own dark palette:
-an ink-dark base, one cyan accent and quiet hairlines.
+`dist/privacy.html`. The page is a quiet, dark one-pager in a small-site
+style: the app's prompt mark as the logo, a terminal transcript captured
+from the running app as the only content moment, lowercase labels and
+hairline rows. Inline CSS, a local SVG favicon, no JavaScript, no remote
+assets, no dependencies, no compilation step. The palette is near-black
+`#0c0c0d` with one cyan accent.
 
 `dist/` contains the directly maintained website source and is committed to Git.
 It is also the directory uploaded for deployment; no generation or copying is needed.
@@ -27,13 +29,12 @@ Pages artifact and deploys it. The site is served at
 About → Privacy policy link opens. The workflow runs when `website/**` changes
 and can also be dispatched by hand.
 
-## Screenshot and demo
+## Screenshot
 
-`dist/terminal-demo.gif` is a screen recording of the running app captured
-from the debug build on an emulator and cropped to the terminal: the session
-boots, types `uname -a`, `ls` and `top`. `docs/screenshots/terminal-demo.gif`
-is the same recording for the README. When the app's look changes, replace
-them with a fresh capture of the same session.
+`docs/screenshots/terminal.png` is a capture of the running app from the
+debug build on an emulator, shown in the project README. When the app's look
+changes, replace it with a fresh capture of the same session. The site
+itself shows a terminal transcript instead of an image.
 
 ## Favicon
 

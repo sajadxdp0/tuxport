@@ -4,17 +4,20 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Tuxport runs a complete Linux terminal on unrooted Android phones. Alpine Linux is bundled with the app.">
-    <title>Tuxport</title>
+    <meta name="theme-color" content="#0c0c0d">
+    <meta property="og:title" content="tuxport">
+    <meta property="og:description" content="Run Linux on your phone. Alpine Linux is bundled with the app.">
+    <meta property="og:type" content="website">
+    <title>tuxport</title>
     <link rel="icon" href="favicon.svg" type="image/svg+xml" sizes="any">
     <style>
       :root {
-        --bg: #0b0d14;
-        --card: #11141c;
-        --raised: #1a1e28;
-        --hairline: rgba(238, 240, 245, 0.08);
-        --text: #eef0f5;
-        --text-2: #a3a9b8;
-        --text-3: #7a8296;
+        --bg: #0c0c0d;
+        --surface: #131316;
+        --hairline: rgba(237, 237, 237, 0.08);
+        --text: #ededed;
+        --muted: #8b8b90;
+        --faint: #626266;
         --accent: #00e5ff;
         --sans: system-ui, -apple-system, "Segoe UI", sans-serif;
         --mono: ui-monospace, "JetBrains Mono", "Cascadia Mono", Menlo, Consolas, monospace;
@@ -32,149 +35,199 @@
         line-height: 22px;
       }
 
-      .wrap { max-width: 68rem; margin: 0 auto; padding: 0 24px; }
+      .wrap { max-width: 60rem; margin: 0 auto; padding: 0 24px; }
 
-      a { color: var(--accent); text-decoration: none; transition: color 150ms cubic-bezier(0.22, 1, 0.36, 1); }
-      a:hover { color: var(--text); }
+      a { color: var(--text); text-decoration: none; transition: color 150ms cubic-bezier(0.22, 1, 0.36, 1); }
+      a:hover { color: var(--accent); }
       a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+      .ext::after { content: " \2197"; color: var(--faint); }
+      a:hover.ext::after { color: var(--accent); }
+
+      .skip-link { position: absolute; left: -9999px; }
+      .skip-link:focus { left: 16px; top: 16px; z-index: 10; background: var(--surface); padding: 8px 16px; border: 1px solid var(--hairline); }
 
       header {
         display: flex; align-items: center; justify-content: space-between;
         height: 64px;
+        font-family: var(--mono); font-size: 14px;
       }
-      .wordmark { display: flex; align-items: center; gap: 10px; color: var(--text); font-size: 16px; font-weight: 500; }
-      .wordmark svg { display: block; }
-      header nav { display: flex; align-items: center; gap: 24px; font-size: 14px; }
-      .navbtn {
-        display: inline-flex; align-items: center;
-        height: 32px; padding: 0 16px;
-        border-radius: 8px;
-        background: var(--raised); border: 1px solid var(--hairline);
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
-        color: var(--text);
-        transition: color 150ms cubic-bezier(0.22, 1, 0.36, 1);
-      }
-      .navbtn:hover { color: var(--accent); }
+      .brand { display: flex; align-items: center; gap: 10px; }
+      .brand svg { display: block; }
+      header nav { display: flex; align-items: center; gap: 24px; }
+      header nav a { color: var(--muted); }
+      header nav a:hover { color: var(--accent); }
 
-      .hero {
-        display: grid;
-        grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-        gap: 64px;
-        align-items: center;
-        padding: 96px 0 128px;
-      }
-      .kicker { font-family: var(--mono); font-size: 13px; color: var(--text-3); margin: 0 0 24px; }
-      .kicker b { color: var(--accent); font-weight: 400; }
+      .intro { padding: 96px 0 72px; display: flex; gap: 40px; align-items: flex-start; flex-wrap: wrap; }
+      .mark svg { display: block; }
+      .intro-copy { max-width: 34rem; }
+      .kicker { font-family: var(--mono); font-size: 13px; color: var(--faint); margin: 0 0 16px; }
       h1 {
-        margin: 0;
-        font-size: 56px;
-        line-height: 1.04;
+        margin: 0 0 20px;
+        font-family: var(--mono);
+        font-size: 40px;
+        line-height: 1.1;
         font-weight: 400;
-        letter-spacing: -0.02em;
-        max-width: 14ch;
+        letter-spacing: -0.01em;
       }
-      .sub { margin: 24px 0 32px; color: var(--text-2); font-size: 18px; line-height: 28px; max-width: 34rem; }
-      .actions { display: flex; gap: 12px; flex-wrap: wrap; }
-
-      .btn {
-        display: inline-flex; align-items: center; justify-content: center;
-        height: 44px; padding: 0 20px;
-        border-radius: 10px;
-        font-size: 14px; font-weight: 500;
-        color: var(--text);
-        background: var(--raised);
-        border: 1px solid var(--hairline);
+      .hello { margin: 0 0 28px; color: var(--muted); font-size: 16px; line-height: 24px; }
+      .actions { display: flex; align-items: center; gap: 24px; font-family: var(--mono); font-size: 14px; }
+      .get {
+        display: inline-flex; align-items: center;
+        height: 36px; padding: 0 18px;
+        background: var(--text); color: var(--bg);
+        border-radius: 8px;
         box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
-        transition: background 150ms cubic-bezier(0.22, 1, 0.36, 1), color 150ms cubic-bezier(0.22, 1, 0.36, 1);
       }
-      .btn:hover { color: var(--accent); }
-      .btn.primary { background: var(--text); color: var(--bg); border-color: var(--text); }
+      .get:hover { color: var(--accent); }
+      .actions > a.plain { color: var(--muted); }
+      .actions > a.plain:hover { color: var(--accent); }
 
-      .shot { margin: 0; }
-      .shot img {
-        display: block; width: 100%; height: auto;
+      .terminal {
+        margin: 0 0 96px;
+        background: var(--surface);
         border: 1px solid var(--hairline);
-        border-radius: 16px;
-        background: var(--card);
+        border-radius: 12px;
+        padding: 20px 24px;
+        font-family: var(--mono);
+        font-size: 13px;
+        line-height: 21px;
+        overflow-x: auto;
       }
-      .shot figcaption { margin-top: 12px; font-family: var(--mono); font-size: 12px; color: var(--text-3); }
+      .terminal .p { color: var(--faint); }
+      .terminal .cmd { color: var(--text); }
+      .terminal .out { color: var(--muted); }
+      .terminal .cursor { color: var(--accent); }
+      .terminal .note { color: var(--faint); display: block; margin-top: 12px; }
 
-      section { border-top: 1px solid var(--hairline); padding: 64px 0; }
-      section h2 { margin: 0 0 24px; font-size: 20px; font-weight: 500; }
-      .facts { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0 64px; }
-      .fact { display: grid; grid-template-columns: 128px minmax(0, 1fr); gap: 16px; padding: 12px 0; border-bottom: 1px solid var(--hairline); }
-      .fact dt { margin: 0; font-family: var(--mono); font-size: 12px; color: var(--text-3); align-self: baseline; }
-      .fact dd { margin: 0; color: var(--text-2); }
+      section { border-top: 1px solid var(--hairline); padding: 56px 0; }
+      .label {
+        display: flex; align-items: baseline; justify-content: space-between;
+        font-family: var(--mono); font-size: 14px;
+        margin: 0 0 24px;
+      }
+      .label h2 { margin: 0; font-weight: 400; font-size: 14px; }
+      .label h2 .marker { color: var(--accent); margin-right: 8px; }
+      .label span { color: var(--faint); font-size: 13px; }
+
+      .rows { display: grid; grid-template-columns: 160px minmax(0, 1fr); }
+      .row-label { font-family: var(--mono); font-size: 13px; color: var(--faint); padding: 12px 0; }
+      .row-text { color: var(--muted); padding: 12px 0; }
+      .row-label, .row-text { border-bottom: 1px solid var(--hairline); }
+      .rows > .row-label:last-of-type, .rows > .row-text:last-of-type { border-bottom: 0; }
+
+      .facts { display: grid; grid-template-columns: 140px minmax(0, 1fr); row-gap: 0; column-gap: 16px; }
+      .facts dt { font-family: var(--mono); font-size: 12px; color: var(--faint); padding: 12px 0; border-bottom: 1px solid var(--hairline); }
+      .facts dd { margin: 0; color: var(--muted); padding: 12px 0; border-bottom: 1px solid var(--hairline); }
+      .facts dt:last-of-type, .facts dd:last-of-type { border-bottom: 0; }
 
       footer {
         border-top: 1px solid var(--hairline);
-        padding: 32px 0 48px;
-        display: flex; flex-wrap: wrap; gap: 8px 24px; align-items: baseline;
-        font-family: var(--mono); font-size: 12px; color: var(--text-3);
+        padding: 40px 0 56px;
+        font-family: var(--mono); font-size: 13px; color: var(--faint);
       }
-      footer a { margin-right: 16px; }
+      footer nav { display: flex; flex-wrap: wrap; gap: 8px 24px; margin-bottom: 24px; }
+      footer nav a { color: var(--muted); }
+      footer nav a:hover { color: var(--accent); }
 
-      @media (max-width: 800px) {
-        .hero { grid-template-columns: minmax(0, 1fr); gap: 48px; padding: 64px 0 80px; }
-        h1 { font-size: 38px; }
-        .sub { font-size: 16px; line-height: 24px; }
+      @media (max-width: 720px) {
+        .intro { padding: 64px 0 48px; gap: 32px; }
+        h1 { font-size: 30px; }
+        .rows { grid-template-columns: minmax(0, 1fr); }
+        .row-label { border-bottom: 0; padding-bottom: 4px; }
         .facts { grid-template-columns: minmax(0, 1fr); }
+        .facts dt { border-bottom: 0; padding-bottom: 4px; }
       }
     </style>
   </head>
   <body>
+    <a class="skip-link" href="#main">skip to content</a>
     <div class="wrap">
       <header>
-        <a class="wordmark" href="/" aria-label="Tuxport">
-          <svg width="18" height="18" viewBox="26 25 56 56" aria-hidden="true">
-            <rect x="26" y="25" width="56" height="56" rx="12" fill="#11141c"/>
-            <path fill="#eef0f5" d="M 37 41 L 58 54 L 37 67 L 45.5 67 L 49.5 54 L 45.5 41 Z"/>
-            <path fill="#eef0f5" d="M 60.5 60.5 H 71.5 V 67.5 H 60.5 Z"/>
+        <a class="brand" href="/" aria-label="tuxport home">
+          <svg width="22" height="22" viewBox="26 25 56 56" aria-hidden="true">
+            <rect x="26.5" y="25.5" width="55" height="55" rx="11.5" fill="#131316" stroke="rgba(237,237,237,0.08)"/>
+            <path fill="#ededed" d="M 37 41 L 58 54 L 37 67 L 45.5 67 L 49.5 54 L 45.5 41 Z"/>
+            <path fill="#ededed" d="M 60.5 60.5 H 71.5 V 67.5 H 60.5 Z"/>
           </svg>
-          Tuxport
+          <span>tuxport</span>
         </a>
-        <nav>
-          <a href="https://github.com/sajadxdp0/tuxport">GitHub</a>
-          <a class="navbtn" href="https://github.com/sajadxdp0/tuxport/releases">Download</a>
+        <nav aria-label="site">
+          <a class="ext" href="https://github.com/sajadxdp0/tuxport/releases">download</a>
+          <a class="ext" href="https://github.com/sajadxdp0/tuxport">source</a>
+          <a href="privacy.html">privacy</a>
         </nav>
       </header>
 
-      <main>
-        <div class="hero">
-          <div>
-            <p class="kicker"><b>$</b> tuxport</p>
-            <h1>Run Linux on your Android phone</h1>
-            <p class="sub">A full terminal with Alpine Linux bundled. Install the app and you are at a shell. No root, no setup.</p>
+      <main id="main">
+        <div class="intro">
+          <div class="mark" aria-hidden="true">
+            <svg width="112" height="112" viewBox="26 25 56 56">
+              <rect x="27" y="26" width="54" height="54" rx="11" fill="#131316" stroke="rgba(237,237,237,0.10)"/>
+              <path fill="#ededed" d="M 37 41 L 58 54 L 37 67 L 45.5 67 L 49.5 54 L 45.5 41 Z"/>
+              <path fill="#ededed" d="M 60.5 60.5 H 71.5 V 67.5 H 60.5 Z"/>
+            </svg>
+          </div>
+          <div class="intro-copy">
+            <p class="kicker">a linux terminal for android</p>
+            <h1>run linux on your phone</h1>
+            <p class="hello">Tuxport is a high-performance Linux terminal for Android phones and tablets. Alpine Linux ships inside the app, so the first launch opens a root shell. No root access, no setup.</p>
             <div class="actions">
-              <a class="btn primary" href="https://github.com/sajadxdp0/tuxport/releases">Download</a>
-              <a class="btn" href="https://github.com/sajadxdp0/tuxport">View source</a>
+              <a class="get" href="https://github.com/sajadxdp0/tuxport/releases">download</a>
+              <a class="plain ext" href="https://github.com/sajadxdp0/tuxport">view source</a>
             </div>
           </div>
-          <figure class="shot">
-            <img src="terminal-demo.gif" width="540" height="740" loading="lazy"
-                 alt="Tuxport booting an Alpine Linux shell on an Android phone, then running uname, ls and top.">
-            <figcaption>Alpine Linux 3.24 · bundled with the app</figcaption>
-          </figure>
         </div>
 
+        <div class="terminal" role="img" aria-label="A Tuxport session running uname -a on the Alpine system, reporting Linux localhost 6.1.0-tuxport on aarch64.">
+          <span class="p">$</span> <span class="cmd">uname -a</span>
+          <span class="out">Linux localhost 6.1.0-tuxport #1 SMP PREEMPT tuxport aarch64 Linux</span>
+          <span class="p">$</span> <span class="cursor">&#9608;</span>
+          <span class="note">captured from the running app</span>
+        </div>
+
+        <section aria-labelledby="what">
+          <div class="label">
+            <h2 id="what"><span class="marker">&gt;</span> what you get</h2>
+            <span>everything in the app, as shipped</span>
+          </div>
+          <div class="rows">
+            <div class="row-label">bundled alpine</div>
+            <div class="row-text">Alpine Linux 3.24 comes inside the APK. The first launch opens a root shell, and a Debian system is available from Settings.</div>
+            <div class="row-label">packages</div>
+            <div class="row-text">apk installs from the Alpine repositories over the phone's network. Python, Node.js, Go, Rust, tmux and Vim run as unmodified ARM64 binaries.</div>
+            <div class="row-label">terminal</div>
+            <div class="row-text">Ghostty's libghostty-vt with multiple tabs, an extra keys row, scrollback find, rectangle and line selection, and safe paste confirmation.</div>
+            <div class="row-label">background</div>
+            <div class="row-text">Sessions keep running with the screen off. Notifications report finished commands, bells and listening ports.</div>
+            <div class="row-label">privacy</div>
+            <div class="row-text">A lock requires biometrics to reopen the app, and a diagnostic log exporter helps with problems.</div>
+          </div>
+        </section>
+
         <section aria-labelledby="details">
-          <h2 id="details">Details</h2>
+          <div class="label">
+            <h2 id="details"><span class="marker">&gt;</span> details</h2>
+            <span>the facts, short</span>
+          </div>
           <dl class="facts">
-            <div class="fact"><dt>Distribution</dt><dd>Alpine Linux 3.24 bundled, Debian from Settings</dd></div>
-            <div class="fact"><dt>Requirements</dt><dd>Android 11 or later, 64-bit ARM device</dd></div>
-            <div class="fact"><dt>Terminal</dt><dd>Ghostty's libghostty-vt, tabs, extra keys, scrollback find</dd></div>
-            <div class="fact"><dt>Programs</dt><dd>Unmodified ARM64 binaries: apk, Python, Node.js, Go, Rust, tmux</dd></div>
-            <div class="fact"><dt>License</dt><dd>GNU AGPL 3.0 or later, source on GitHub</dd></div>
-            <div class="fact"><dt>Support</dt><dd><a href="https://github.com/sajadxdp0/tuxport/issues">github.com/sajadxdp0/tuxport/issues</a></dd></div>
+            <dt>distribution</dt><dd>alpine linux 3.24 bundled, debian from settings</dd>
+            <dt>requirements</dt><dd>android 11 or later, 64-bit arm device</dd>
+            <dt>execution</dt><dd>guest instructions translated for speed, with an interpreter mode for troubleshooting</dd>
+            <dt>kernel</dt><dd>a user-space kernel runs unmodified arm64 linux binaries inside the app process</dd>
+            <dt>license</dt><dd>gnu agpl 3.0 or later, source on github</dd>
+            <dt>support</dt><dd><a class="ext" href="https://github.com/sajadxdp0/tuxport/issues">github.com/sajadxdp0/tuxport/issues</a></dd>
           </dl>
         </section>
       </main>
 
       <footer>
-        <span>Tuxport · AGPL-3.0-or-later</span>
-        <a href="privacy.html">Privacy policy</a>
-        <a href="https://github.com/sajadxdp0/tuxport">Source</a>
-        <a href="https://github.com/sajadxdp0/tuxport/releases">Releases</a>
+        <nav aria-label="footer">
+          <a class="ext" href="https://github.com/sajadxdp0/tuxport">source</a>
+          <a class="ext" href="https://github.com/sajadxdp0/tuxport/releases">releases</a>
+          <a href="privacy.html">privacy policy</a>
+        </nav>
+        <p>tuxport is free software under the gnu agpl 3.0 or later.</p>
+        <p>&copy; 2026 sajad</p>
       </footer>
     </div>
   </body>

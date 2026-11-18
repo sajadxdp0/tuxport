@@ -16,7 +16,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/screenshots/terminal-demo.gif" width="360" alt="Tuxport booting Alpine Linux, running uname, ls and top on an Android phone">
+  <img src="docs/screenshots/terminal.png" width="270" alt="Tuxport running an Alpine Linux shell on Android">
 </p>
 
 ## What Tuxport does
