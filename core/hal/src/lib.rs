@@ -338,8 +338,8 @@ pub fn has_private_pages(ptr: *const u8, len: usize) -> Option<bool> {
     let last = (ptr as usize + len).div_ceil(page);
     let mut raw = vec![0u8; (last - first) * 8];
     pagemap.read_exact_at(&mut raw, first as u64 * 8).ok()?;
-    Some(raw.chunks_exact(8).any(|e| {
-        let entry = u64::from_le_bytes(e.try_into().unwrap());
+    Some(raw.as_chunks::<8>().0.iter().any(|e| {
+        let entry = u64::from_le_bytes(*e);
         let (present, swapped, file) = (entry >> 63 & 1, entry >> 62 & 1, entry >> 61 & 1);
         present == 1 && file == 0 || swapped == 1
     }))

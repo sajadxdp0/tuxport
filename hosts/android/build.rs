@@ -59,7 +59,11 @@ fn main() {
         .unwrap_or_else(|e| panic!("cannot read {}: {e}", src.join("LIB_VERSION").display()))
         .trim()
         .to_string();
-    assert!(!version.is_empty(), "empty LIB_VERSION in {}", src.display());
+    assert!(
+        !version.is_empty(),
+        "empty LIB_VERSION in {}",
+        src.display()
+    );
 
     let target = match env::var("CARGO_CFG_TARGET_ARCH").as_deref() {
         Ok("aarch64") => "aarch64-linux-android",
