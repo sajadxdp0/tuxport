@@ -5,7 +5,7 @@
 >
 > Verified: 2026-11-17 (three source-research concerns and nine independently checked claims; static checks passed, external release and visual checks remain below)
 >
-> Maintained: 2026-11-19 (targeted verification only since the full mapping; latest change: responsive modern-CSS rebuild of both pages on the app palette, with structure and invariants updated)
+> Maintained: 2026-11-19 (targeted verification only since the full mapping; latest change: keyboard-focus verification closed the last locally checkable To-verify residual)
 
 ## Responsibilities
 
@@ -136,8 +136,9 @@ None currently recorded.
 - HTML structure, permission coverage and local HTTP delivery passed checks earlier;
   permission coverage was not rechecked against the merged manifest for this rebuild.
   The rebuilt pages passed tag-balance, DOM-structure, no-script/no-remote-asset,
-  long-word-wrap and no-overflow checks in headless Chromium at 320–1280px, and the
-  policy's print emulation rendered white with the site header hidden. Keyboard-focus
-  traversal, visual appearance at those widths and other browsers' favicon rendering
-  (last inspected for the earlier transparent mark, not the current white-on-tile
-  prompt) remain unverified.
+  long-word-wrap and no-overflow checks in headless Chromium at 320–1280px, the
+  policy's print emulation rendered white with the site header hidden, and Tab
+  traversal revealed the skip link and drew the accent focus outline on every
+  tabbable link of both pages. Visual appearance at those widths and other
+  browsers' favicon rendering (last inspected for the earlier transparent mark,
+  not the current white-on-tile prompt) remain unverified.
