@@ -1,0 +1,62 @@
+name: Difftest
+
+# A focused differential run: Tuxport against native ARM64 Linux, one case or
+# a regex of cases at a time, instead of the whole nightly corpus in full.yml.
+
+on:
+  workflow_dispatch:
+    inputs:
+      cases:
+        description: "Case name or extended regex passed to scripts/difftest (empty runs all)"
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  linux-arm64:
+    name: Linux arm64
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install rustup
+        run: |
+          if ! command -v rustup >/dev/null; then
+            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
+              | sh -s -- -y --profile minimal --default-toolchain none
+            echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
+          fi
+
+      - name: Install toolchain from rust-toolchain.toml
+        run: rustup toolchain install
+
+      - name: Install llvm and musl
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends llvm musl-tools
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Fetch rootfs
+        run: scripts/fetch-rootfs
+
+      - name: Build tuxport-run
+        run: cargo build --release -p tuxport-run
+
+      - name: Differential tests
+        run: scripts/difftest ${{ inputs.cases }}
+
+      - name: Save the failures
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: difftest
+          path: |
+            target/difftest/*.tuxport.err
+            target/difftest/failed/
+          if-no-files-found: ignore
+          compression-level: 6
