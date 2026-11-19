@@ -3,10 +3,13 @@
 A single page in `dist/index.html` links to the English privacy policy in
 `dist/privacy.html`. The page is a minimal dark one-pager in a small-site
 style: the app's own `favicon.svg` as the logo in the header and the hero,
-a terminal transcript captured from the running app, and three quiet fact
+a terminal transcript captured from the running app, and four quiet fact
 lines. Inline CSS, a local SVG favicon, no JavaScript, no remote assets,
-no dependencies, no compilation step. The palette is near-black `#0c0c0d`
-with one cyan accent.
+no dependencies, no compilation step. Both pages share the app's palette,
+near-black `#0d1117` with one cyan accent, written in modern plain CSS:
+custom properties, grid and flex layout, `clamp()` fluid type and spacing,
+and mobile-first responsive breakpoints. The terminal cursor blinks unless
+`prefers-reduced-motion` is set.
 
 `dist/` contains the directly maintained website source and is committed to Git.
 It is also the directory uploaded for deployment; no generation or copying is needed.

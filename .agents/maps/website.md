@@ -5,7 +5,7 @@
 >
 > Verified: 2026-11-17 (three source-research concerns and nine independently checked claims; static checks passed, external release and visual checks remain below)
 >
-> Maintained: 2026-11-18 (targeted verification only since the full mapping; latest change: documented the Settings About policy link and removed the missing-entry debt)
+> Maintained: 2026-11-19 (targeted verification only since the full mapping; latest change: responsive modern-CSS rebuild of both pages on the app palette, with structure and invariants updated)
 
 ## Responsibilities
 
@@ -18,7 +18,14 @@ policy; changing this page does not change permission enforcement or data handli
 No runtime classes or application state. `dist/index.html` contains the homepage and
 `dist/privacy.html` contains the policy, each with inline CSS; `README.md` explains
 preview, content maintenance and publication. `dist/favicon.svg` is a directly maintained
-asset adapted from the Android launcher foreground and colors.
+asset adapted from the Android launcher foreground and colors. Both pages share one set
+of inline design tokens taken from the app palette (base `#0d1117`, surface `#161b22`,
+text `#e6edf3`, cyan `#00e5ff`) and modern plain CSS: custom properties, `color-mix()`
+hairlines, `clamp()` fluid type and spacing, grid/flex layout and mobile-first
+breakpoints, still with no JavaScript or remote assets. The homepage stacks a two-column
+hero grid, a `figure`+`figcaption` transcript card (lines preserved by `pre` formatting,
+blinking cursor only without `prefers-reduced-motion`) and a `dl` fact table; the policy
+page adds a site header linking home and keeps its ten sections verbatim.
 
 ## Public entry points
 
@@ -49,10 +56,9 @@ Direct Upload takes that directory; Git integration uses root `website`, output
 The current project uses Direct Upload via Wrangler with production branch `main`;
 local edits require another deployment and are not automatically published from Git.
 
-The favicon retains the Android foreground paths, exterior clip and colors, with
-no background. The body's two facial
-cutout contours are also drawn in solid black over the white even-odd body. A
-fixed `26 25 56 56` viewBox removes adaptive-icon padding. Maintainers edit the SVG
+The favicon mirrors the Android launcher foreground: the terminal prompt as solid white
+geometry (a mitered chevron and an underscore bar) on a `#0d1117` rounded tile, with a
+fixed `26 25 56 56` viewBox that removes adaptive-icon padding. Maintainers edit the SVG
 directly; serving and deployment need neither Python nor Android.
 
 The ten policy sections cover local processing, diagnostics and support, network
@@ -83,11 +89,18 @@ user-directed sharing and network traffic from guest programs.
 ## Invariants and gotchas
 
 - Keep the English language attribute and one main heading per page, and the policy's
-  section label references. Both pages use a 42rem reading column, narrow-screen
-  spacing, long-word wrapping and visible link focus; the policy has print adjustments.
+  section label references. The policy keeps a 42rem reading column and the homepage a
+  48rem content column (34rem hero copy); both use fluid narrow-screen spacing,
+  long-word wrapping (the transcript and fact values break anywhere) and visible link
+  focus; the policy has print adjustments.
 - Keep `dist/` in Git: it contains maintained source files, not generated output.
-- Preserve the `email_off` comments around the public contact link; Cloudflare's
-  default email obfuscation otherwise rewrites it and injects a decoding script.
+- The public contact link is the project's GitHub issues URL and no email address
+  appears on either page, so Cloudflare's default email obfuscation has nothing to
+  rewrite; if an email link is ever added, wrap it in `email_off` comments to keep
+  Cloudflare from injecting a decoding script.
+- Use site-relative links for internal navigation: the Pages project site serves the
+  pages under `/tuxport/`, so the brand links use `./` rather than `/`, which would
+  escape to the user-site root.
 - Review `dist/favicon.svg` after Android launcher changes and update it directly as
   needed; check the fixed crop and appearance at small sizes when geometry changes.
 - Review dependency-added permissions in the merged release manifest, including
@@ -120,8 +133,11 @@ None currently recorded.
   declarations have not been verified.
 - The existing merged release manifest was inspected, not rebuilt. Verify the final
   release artifact and its SDK behavior against the policy before submission.
-- HTML structure, permission coverage and local HTTP delivery passed checks. Favicon
-  source geometry checks passed; the transparent icon and black
-  facial details were inspected at 16, 32 and 128px on light, dark and checkerboard
-  backgrounds in desktop Chrome. Other browsers' favicon rendering and mobile,
-  keyboard-focus and print layouts remain unverified.
+- HTML structure, permission coverage and local HTTP delivery passed checks earlier;
+  permission coverage was not rechecked against the merged manifest for this rebuild.
+  The rebuilt pages passed tag-balance, DOM-structure, no-script/no-remote-asset,
+  long-word-wrap and no-overflow checks in headless Chromium at 320–1280px, and the
+  policy's print emulation rendered white with the site header hidden. Keyboard-focus
+  traversal, visual appearance at those widths and other browsers' favicon rendering
+  (last inspected for the earlier transparent mark, not the current white-on-tile
+  prompt) remain unverified.
