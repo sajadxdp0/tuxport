@@ -85,13 +85,33 @@ android {
         buildConfig = true
     }
 
+    // The release signing key, from local.properties (gitignored). Without the entries the
+    // release build falls back to the debug key, so builds on machines without the key keep
+    // working; see the README's Development section.
+    val signingProps = Properties().apply {
+        rootProject.file("local.properties").let { if (it.isFile) it.inputStream().use(::load) }
+    }
+    val releaseKeystore = signingProps.getProperty("signing.storeFile")
+
+    signingConfigs {
+        if (releaseKeystore != null) {
+            create("release") {
+                storeFile = rootProject.file(releaseKeystore)
+                storePassword = signingProps.getProperty("signing.storePassword")
+                keyAlias = signingProps.getProperty("signing.keyAlias")
+                keyPassword = signingProps.getProperty("signing.keyPassword")
+            }
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-            // Installed locally only: signed with the debug key
-            signingConfig = signingConfigs.getByName("debug")
+            // With the release key installed: the release signature; otherwise the debug key
+            signingConfig = if (releaseKeystore != null) signingConfigs.getByName("release")
+                else signingConfigs.getByName("debug")
         }
     }
 

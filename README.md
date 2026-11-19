@@ -74,6 +74,21 @@ cd android
 ./gradlew connectedDebugAndroidTest   # instrumentation tests on a device
 ```
 
+Release signing: create a keystore and point the build at it through
+`android/local.properties` (gitignored):
+
+```properties
+signing.storeFile=/absolute/path/tuxport-release.keystore
+signing.storePassword=...
+signing.keyAlias=tuxport
+signing.keyPassword=...
+```
+
+Without these entries the release build falls back to the debug key, so
+builds on machines without the keystore keep working. Keep the keystore
+and its password private and backed up: it is what future releases must
+be signed with to install over this one.
+
 The Rust workspace tests need an ARM64 Linux host or container.
 `scripts/dev cargo test --workspace` runs them in the project container.
 
