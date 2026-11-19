@@ -77,6 +77,17 @@ cd android
 The Rust workspace tests need an ARM64 Linux host or container.
 `scripts/dev cargo test --workspace` runs them in the project container.
 
+`scripts/fetch-rootfs` from the repository root brings in the Alpine
+minirootfs and the bundled packages. `scripts/difftest <case>` reruns one
+differential case; the `Difftest` workflow does it on a runner.
+
+Two of the checks are environment-sensitive. The kernel's
+`resets_and_dead_listeners_do_not_spin` test is timing-based and can fail
+once on a loaded runner, passing on rerun. The differential suite in
+`Full tests` compares sysctl state with the host kernel, which changes
+with runner image updates, so a nightly failure there is worth a rerun
+of the single case first; `Difftest` above does that on demand.
+
 ## Documentation
 
 - [Architecture overview](docs/design/README.md) and the
