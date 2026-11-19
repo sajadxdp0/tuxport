@@ -5,7 +5,7 @@
 >
 > Verified: 2026-11-15 (split out of the android/native full mapping of 2026-11-10; the boundary was checked against the source at the split)
 >
-> Maintained: 2026-11-17 (targeted verification only since the full mapping; latest change: release shrinking, JNI keep rules and the Android release Cargo profile)
+> Maintained: 2026-11-19 (targeted verification only since the full mapping; latest change: the Zig build passes the lib's LIB_VERSION as -Dversion-string; release signing and version facts refreshed)
 
 ## Responsibilities
 
@@ -56,10 +56,15 @@ fetch/provisioning `android/setup`. CI orchestration remains `harness`.
   tracking; both tasks declare the selected executable as an input.
 - On an Android target `build.rs` asserts the libghostty-vt source (`build.zig` in
   `target/ghostty/libghostty-vt-1.0.0`, or `TUXPORT_GHOSTTY_SRC`) and the release's Zig packages
-  beside it (the same path with `-deps`), panics on any architecture but aarch64, and runs `$ZIG`
+  beside it (the same path with `-deps`), reads the release's `LIB_VERSION`, panics on any
+  architecture but aarch64, and runs `$ZIG`
   (or `zig` on `PATH`) `build -Demit-lib-vt -Dcpu=baseline -Doptimize=ReleaseFast
-  -Dtarget=aarch64-linux-android --system <deps>` into `OUT_DIR`, so Zig takes the packages from
-  that directory and never fetches. Its global cache is the source's `.zig-global-cache`, beside
+  -Dtarget=aarch64-linux-android -Dversion-string=<LIB_VERSION> --system <deps>` into `OUT_DIR`,
+  so Zig takes the packages from that directory and never fetches. The version flag is passed
+  because libghostty-vt otherwise derives its version from git, and the unpacked source sits
+  inside this repository's work tree, so that reads this repository's state: on a tagged
+  checkout the lib's check that the checked-out tag matches its version panics on the
+  repository's own tag (v1.1.0's CI failed this way; reproduced locally at the tag). Its global cache is the source's `.zig-global-cache`, beside
   Zig's local `.zig-cache` there, so builds of every profile (Gradle's, clippy's) share both. It
   then compiles `src/vt.c` (C11, extra warnings) with `cc`, against the installed headers and
   Wuffs's single-file header among the packages (`<deps>/<hash>/release/c`, the hash read from the
@@ -97,7 +102,9 @@ fetch/provisioning `android/setup`. CI orchestration remains `harness`.
   included) treats compiler warnings as errors, and lint treats its warnings as errors, except
   `GradleDependency`, `AndroidGradlePluginVersion`, `OldTargetApi`, `ExpiringTargetSdkVersion` and
   `OutdatedLibrary`, which follow data outside the repository and are informational.
-- Release: signed with the debug key, versionCode 1 and versionName 1.0.0. R8 uses the
+- Release: signed with the release keystore when `android/local.properties` (gitignored)
+  carries the `signing.*` entries, else the debug key, so CI and keyless machines keep
+  building; versionCode 2 and versionName 1.1.0. R8 uses the
   optimized Android defaults and shrinks unused resources. `app/proguard-rules.pro` keeps app
   JNI declarations and the public void `VtSession.on*` callbacks looked up by the native pump;
   callbacks outside that pattern need a matching keep rule. The release mapping is under
@@ -203,6 +210,10 @@ fetch/provisioning `android/setup`. CI orchestration remains `harness`.
   gives the source a cache of its own, which nothing fetches into.
 - `build.rs` reruns only when `vt.c`, the source's `LIB_VERSION` or `build.zig.zon`,
   `TUXPORT_GHOSTTY_SRC` or `ZIG` change, not for other libghostty-vt files or `ANDROID_NDK_HOME`.
+- The Zig build must keep passing the lib's version (`-Dversion-string`) or otherwise avoid
+  git: the source is unpacked inside this repository, so libghostty-vt's git detection reads
+  the repository's tags, and a release-tag checkout would panic its version check
+  (`v1.1.0` does not match the lib's `v1.0.0`).
 - vt.c's Wuffs header is found through the release's layout: the dependency named `wuffs` in
   `pkg/wuffs/build.zig.zon`, the dependency tarball's `<hash>` directories and the file
   `wuffs-v0.4.c`. An upgrade that changes any of them fails the build ("no Wuffs …" or no hash)
@@ -216,8 +227,7 @@ fetch/provisioning `android/setup`. CI orchestration remains `harness`.
 
 ## Confirmed bugs / technical debt
 
-- The release build is signed with the debug key; the Alpine tarball's checksum
-  is checked only in `scripts/fetch-rootfs`.
+- The Alpine tarball's checksum is checked only in `scripts/fetch-rootfs`.
 - `scripts/fetch-ghostty` checks only the pinned sha256s; the release's minisign signatures are to
   be checked by hand once when upgrading, before pinning the new sha256s.
 - `scripts/release-sources` takes the Alpine sources from `fetch-rootfs`'s pinned tarball and

@@ -51,6 +51,16 @@ fn main() {
         src.join("build.zig.zon").display()
     );
 
+    // The release's own version, passed to the Zig build so it never derives one from git: the
+    // unpacked source sits inside this repository's work tree, and libghostty-vt's git-based
+    // detection reads that state; on a tagged checkout its check that the checked-out tag
+    // matches the lib's version would panic on the repository's own tag.
+    let version = fs::read_to_string(src.join("LIB_VERSION"))
+        .unwrap_or_else(|e| panic!("cannot read {}: {e}", src.join("LIB_VERSION").display()))
+        .trim()
+        .to_string();
+    assert!(!version.is_empty(), "empty LIB_VERSION in {}", src.display());
+
     let target = match env::var("CARGO_CFG_TARGET_ARCH").as_deref() {
         Ok("aarch64") => "aarch64-linux-android",
         other => panic!("libghostty-vt: unsupported Android architecture {other:?}"),
@@ -71,6 +81,7 @@ fn main() {
             "-Doptimize=ReleaseFast",
         ])
         .arg(format!("-Dtarget={target}"))
+        .arg(format!("-Dversion-string={version}"))
         .arg("--system")
         .arg(&deps)
         .arg("--prefix")
