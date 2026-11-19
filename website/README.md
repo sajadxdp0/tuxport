@@ -2,14 +2,15 @@
 
 A single page in `dist/index.html` links to the English privacy policy in
 `dist/privacy.html`. The page is a minimal dark one-pager in a small-site
-style: the app's own `favicon.svg` as the logo in the header and the hero,
-a terminal transcript captured from the running app, and four quiet fact
-lines. Inline CSS, a local SVG favicon, no JavaScript, no remote assets,
-no dependencies, no compilation step. Both pages share the app's palette,
+style: the app's own `favicon.svg` as the prompt mark in the header and
+the hero, a short headline with two actions, and four quiet fact lines.
+Inline CSS, a local SVG favicon, no JavaScript, no remote assets, no
+dependencies, no compilation step. Both pages share the app's palette,
 near-black `#0d1117` with one cyan accent, written in modern plain CSS:
-custom properties, grid and flex layout, `clamp()` fluid type and spacing,
-and mobile-first responsive breakpoints. The terminal cursor blinks unless
-`prefers-reduced-motion` is set.
+custom properties, `color-mix()` hairlines, grid and flex layout, and
+`clamp()` fluid type and spacing. The homepage is one left-aligned fluid
+column with no layout breakpoints; the policy keeps a 42rem reading
+column and print styles.
 
 `dist/` contains the directly maintained website source and is committed to Git.
 It is also the directory uploaded for deployment; no generation or copying is needed.
@@ -37,7 +38,7 @@ and can also be dispatched by hand.
 `docs/screenshots/terminal.png` is a capture of the running app from the
 debug build on an emulator, shown in the project README. When the app's look
 changes, replace it with a fresh capture of the same session. The site
-itself shows a terminal transcript instead of an image.
+itself shows no image: the prompt mark is its only visual.
 
 ## Favicon
 

@@ -5,7 +5,7 @@
 >
 > Verified: 2026-11-17 (three source-research concerns and nine independently checked claims; static checks passed, external release and visual checks remain below)
 >
-> Maintained: 2026-11-19 (targeted verification only since the full mapping; latest change: keyboard-focus verification closed the last locally checkable To-verify residual)
+> Maintained: 2026-11-19 (targeted verification only since the full mapping; latest change: dropped the transcript card for a single fluid left-aligned column with the prompt mark as the only visual)
 
 ## Responsibilities
 
@@ -18,20 +18,20 @@ policy; changing this page does not change permission enforcement or data handli
 No runtime classes or application state. `dist/index.html` contains the homepage and
 `dist/privacy.html` contains the policy, each with inline CSS; `README.md` explains
 preview, content maintenance and publication. `dist/favicon.svg` is a directly maintained
-asset adapted from the Android launcher foreground and colors. Both pages share one set
-of inline design tokens taken from the app palette (base `#0d1117`, surface `#161b22`,
-text `#e6edf3`, cyan `#00e5ff`) and modern plain CSS: custom properties, `color-mix()`
-hairlines, `clamp()` fluid type and spacing, grid/flex layout and mobile-first
-breakpoints, still with no JavaScript or remote assets. The homepage stacks a two-column
-hero grid, a `figure`+`figcaption` transcript card (lines preserved by `pre` formatting,
-blinking cursor only without `prefers-reduced-motion`) and a `dl` fact table; the policy
-page adds a site header linking home and keeps its ten sections verbatim.
+asset adapted from the Android launcher foreground and colors. Both pages share inline
+design tokens taken from the app palette (base `#0d1117`, text `#e6edf3`, cyan `#00e5ff`;
+the policy page adds a `#161b22` surface tone for its code chips) and modern plain CSS:
+custom properties, `color-mix()` hairlines, `clamp()` fluid type and spacing, and grid/flex
+layout, still with no JavaScript or remote assets. The homepage is one left-aligned fluid
+column with no layout breakpoints: the prompt mark as its only visual, a short headline
+with two actions, and a `dl` fact table, all on a single placement axis; the policy page
+adds a site header linking home and keeps its ten sections verbatim.
 
 ## Public entry points
 
 - `dist/index.html`, opened directly or served as the static site's index; its
-  hero carries the app's own favicon as the logo and a terminal transcript
-  captured from the running app.
+  hero carries the app's own favicon as the prompt mark, the page's only
+  visual.
 - `dist/privacy.html`, reached through the homepage's relative Privacy Policy link or
   opened directly.
 - Both pages reference the local `favicon.svg` with an SVG icon link and share the
@@ -90,8 +90,8 @@ user-directed sharing and network traffic from guest programs.
 
 - Keep the English language attribute and one main heading per page, and the policy's
   section label references. The policy keeps a 42rem reading column and the homepage a
-  48rem content column (34rem hero copy); both use fluid narrow-screen spacing,
-  long-word wrapping (the transcript and fact values break anywhere) and visible link
+  44rem content column (34rem lede measure) with no layout breakpoints; both use fluid
+  narrow-screen spacing, long-word wrapping (fact values break anywhere) and visible link
   focus; the policy has print adjustments.
 - Keep `dist/` in Git: it contains maintained source files, not generated output.
 - The public contact link is the project's GitHub issues URL and no email address

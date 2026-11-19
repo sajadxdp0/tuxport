@@ -13,7 +13,6 @@
     <style>
       :root {
         --bg: #0d1117;
-        --surface: #161b22;
         --text: #e6edf3;
         --muted: #8b949e;
         --faint: #7d8590;
@@ -23,9 +22,7 @@
         --sans: system-ui, -apple-system, "Segoe UI", sans-serif;
         --mono: ui-monospace, "JetBrains Mono", "Cascadia Mono", Menlo, Consolas, monospace;
         --pad: clamp(1rem, 4vw, 1.5rem);
-        --gap: clamp(3rem, 2.5rem + 3vw, 4.5rem);
         --radius-s: 8px;
-        --radius-m: 12px;
         color-scheme: dark;
         font-synthesis: none;
         text-rendering: optimizeLegibility;
@@ -42,7 +39,7 @@
         line-height: 1.6;
       }
 
-      .col { max-width: 48rem; margin-inline: auto; padding-inline: var(--pad); }
+      .col { max-width: 44rem; margin-inline: auto; padding-inline: var(--pad); }
 
       a { color: inherit; transition: color 150ms ease; }
       a:hover { color: var(--accent); }
@@ -59,7 +56,7 @@
         inset-inline-start: -100vw;
         z-index: 10;
         padding: 0.5rem 1rem;
-        background: var(--surface);
+        background: var(--bg);
         border: 1px solid var(--hairline);
         border-radius: var(--radius-s);
         font-family: var(--mono);
@@ -83,12 +80,14 @@
       .site-header nav { display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; }
       .site-header nav a { color: var(--muted); }
 
-      .hero {
-        display: grid;
-        gap: 1.5rem;
-        padding-block: clamp(3.5rem, 3rem + 4vw, 5.5rem) clamp(2rem, 1.5rem + 3vw, 3.5rem);
+      main { padding-block-start: clamp(4rem, 3.25rem + 5vw, 7rem); }
+
+      .mark {
+        display: block;
+        width: clamp(5.5rem, 4rem + 6vw, 7rem);
+        height: auto;
+        margin-block-end: 2.5rem;
       }
-      .hero-logo { display: block; width: clamp(5.5rem, 4rem + 6vw, 7rem); height: auto; }
       .kicker { margin: 0 0 1rem; font-family: var(--mono); font-size: 0.8125rem; color: var(--faint); }
       h1 {
         margin: 0 0 1.25rem;
@@ -128,28 +127,11 @@
       .get:hover { color: var(--accent-ink); }
       .actions > a:not(.get) { color: var(--muted); }
 
-      .terminal {
-        margin-inline: 0;
-        margin-block-end: var(--gap);
-        padding: 1.25rem clamp(1rem, 4vw, 1.5rem);
-        background: var(--surface);
-        border: 1px solid var(--hairline);
-        border-radius: var(--radius-m);
-        font-family: var(--mono);
-        font-size: 0.8125rem;
-        line-height: 1.65;
-      }
-      .session { margin: 0; font: inherit; white-space: pre-wrap; overflow-wrap: anywhere; }
-      .session .p { color: var(--faint); }
-      .session .out { color: var(--muted); }
-      .session .cursor { color: var(--accent); }
-      .terminal figcaption { margin-block-start: 0.75rem; color: var(--faint); font-size: 0.75rem; }
-
       .facts {
         display: grid;
         grid-template-columns: max-content minmax(0, 1fr);
         column-gap: 1.5rem;
-        margin-block-end: var(--gap);
+        margin-block-start: clamp(3.5rem, 3rem + 3vw, 5.5rem);
         border-block-start: 1px solid var(--hairline);
         font-family: var(--mono);
         font-size: 0.8125rem;
@@ -170,15 +152,6 @@
       .site-footer nav { display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; margin-block-end: 1rem; }
       .site-footer nav a { color: var(--muted); }
       .site-footer p { margin: 0; }
-
-      @media (prefers-reduced-motion: no-preference) {
-        .session .cursor { animation: blink 1.1s steps(1) infinite; }
-      }
-      @keyframes blink { 50% { opacity: 0; } }
-
-      @media (min-width: 40rem) {
-        .hero { grid-template-columns: auto minmax(0, 34rem); align-items: start; column-gap: 2.5rem; }
-      }
     </style>
   </head>
   <body>
@@ -197,25 +170,14 @@
     </header>
 
     <main id="main" class="col">
-      <div class="hero">
-        <img class="hero-logo" src="favicon.svg" alt="Tuxport logo" width="112" height="112">
-        <div>
-          <p class="kicker">a linux terminal for android</p>
-          <h1>run linux on your phone</h1>
-          <p class="lede">Alpine Linux ships inside the app, so the first launch opens a root shell. No root access, no setup.</p>
-          <div class="actions">
-            <a class="get" href="https://github.com/sajadxdp0/tuxport/releases">download</a>
-            <a class="ext" href="https://github.com/sajadxdp0/tuxport">view source</a>
-          </div>
-        </div>
+      <img class="mark" src="favicon.svg" alt="Tuxport logo" width="112" height="112">
+      <p class="kicker">a linux terminal for android</p>
+      <h1>run linux on your phone</h1>
+      <p class="lede">Alpine Linux ships inside the app, so the first launch opens a root shell. No root access, no setup.</p>
+      <div class="actions">
+        <a class="get" href="https://github.com/sajadxdp0/tuxport/releases">download</a>
+        <a class="ext" href="https://github.com/sajadxdp0/tuxport">view source</a>
       </div>
-
-      <figure class="terminal">
-        <pre class="session" role="img" aria-label="A Tuxport session running uname -a on the Alpine system, reporting Linux localhost 6.1.0-tuxport on aarch64."><span class="p">$</span> uname -a
-<span class="out">Linux localhost 6.1.0-tuxport #1 SMP PREEMPT tuxport aarch64 Linux</span>
-<span class="p">$</span> <span class="cursor">&#9608;</span></pre>
-        <figcaption>captured from the running app</figcaption>
-      </figure>
 
       <dl class="facts">
         <dt>distribution</dt>
