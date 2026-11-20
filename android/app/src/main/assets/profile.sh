@@ -15,6 +15,31 @@
 # submitted command before execution; ash has no preexec hook. A program can replace the title
 # with OSC 0/2 until the next prompt. Control characters in paths and commands are replaced by ?.
 
+# The app's mark, the chevron and underscore of its logo, drawn with half blocks, centered above
+# the motd when the terminal is wide enough for it. Padded with shell arithmetic: a half block is
+# three bytes, and awk's length, which centers the motd, may count bytes or characters depending
+# on the build, while the shell pads by the mark's one known width.
+if [ -t 1 ]; then
+    mcols=$(stty size </dev/tty 2>/dev/null | cut -d' ' -f2)
+    case "$mcols" in
+        ''|*[!0-9]*) ;;
+        *) if [ "$mcols" -ge 35 ]; then
+               mpad=$(( (mcols - 31) / 2 ))
+               while IFS= read -r mline; do
+                   printf '%*s%s\n' "$mpad" '' "$mline"
+               done <<'EOF'
+▀▀███▄▄
+    ▄▄███▄▄
+        ▄▄███▄▄
+            █████▄
+        ▄▄███▄▄
+    ▄▄███▄▄         ███████████
+▄▄███▄▄             ███████████
+EOF
+               echo
+           fi ;;
+    esac
+fi
 # The motd, centered on the live terminal width when a terminal and awk exist; plain cat otherwise.
 # The awk pads only when a line is shorter than the width (n > 0), so any width is safe.
 if [ -r /etc/motd ]; then

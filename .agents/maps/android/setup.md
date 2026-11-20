@@ -67,7 +67,8 @@ session consuming their state and events (`android/vt`).
 - `profile.sh` — copied verbatim, comments included, into the guest as
   `/etc/profile.d/tuxport.sh`; `Rootfs` keeps the texts of the versions without prompt marks
   (`OLD_PROFILE`, `UNMARKED_PROFILE`) and the sha256s of the later ones (`REPLACED_PROFILES`) to
-  recognise them.
+  recognise them. At a login on a terminal at least 35 columns wide it prints the app's mark, the
+  chevron and underscore of the logo drawn with half blocks, centered above the motd.
 - `ashrc.sh` — copied verbatim into the guest as `/etc/profile.d/tuxport.ashrc` (not `.sh`, so
   `/etc/profile` does not read it): ash's prompt marks, read through `ENV`.
 - `bashrc.sh` — copied verbatim into the guest as `/etc/profile.d/tuxport.bashrc`: bash's prompt
@@ -147,7 +148,7 @@ session consuming their state and events (`android/vt`).
     http for trixie, -updates, -security), `hostname` (`localhost`), `motd`, and
     `/etc/profile.d/tuxport.ashrc`, `/etc/profile.d/tuxport.bashrc`, `/etc/profile.d/tuxport.zshrc`, on Alpine
     `/etc/bash/tuxport.sh`, and then `/etc/profile.d/tuxport.sh` (the assets' `ashrc.sh`,
-    `bashrc.sh`, `zshrc.sh` and `profile.sh`: motd, `TERM`, `LANG`, `NMAP_UNPRIVILEGED`, the browser default below,
+    `bashrc.sh`, `zshrc.sh` and `profile.sh`: the mark, the motd, `TERM`, `LANG`, `NMAP_UNPRIVILEGED`, the browser default below,
     `ENV` naming the ash file unless one is set or the file is unreadable, and for bash, busybox ash and zsh only a
     coloured prompt with prompt marks, below; other shells keep the distro's prompt);
   - Alpine: `hosts` only when absent (the minirootfs ships one, so nothing is written), and no
@@ -256,7 +257,7 @@ session consuming their state and events (`android/vt`).
   (but bash on Alpine, above; a nested bash on Debian has none) and
   other shells get no marks from it (fish and nushell send their own, android/vtcore), and shells that
   do not read it still have `TERM`, `LANG` and `NMAP_UNPRIVILEGED` from the console's fixed login
-  environment (android/vt), but show no motd.
+  environment (android/vt), but show neither the mark nor the motd.
 - The shared profile contains no zsh array syntax; only zsh sources `tuxport.zshrc`. The companion
   uses an anonymous function with `emulate -L zsh` for registration, so Alpine's sh emulation
   does not change array filtering or indexing and the caller's options are restored afterwards.
@@ -472,6 +473,9 @@ session consuming their state and events (`android/vt`).
   so a change to any companion alone reaches no existing store (change `profile.sh` with it); and
   the motd is written at import and refreshed on startup by `Rootfs.updateMotd`, which replaces
   only the known old text (the one whose example installed the Codex CLI), leaving an edited one.
+- The profile centers its mark with shell arithmetic, not the awk that centers the motd: busybox
+  awk counts `length` in bytes, and a half block is three, so lines would each skew by their
+  block count. Below 35 columns the mark is skipped; the awk pads any width, so the motd never is.
 - apk takes its database lock without waiting unless given `--wait` (which apk 3 accepts though
   its help does not list it): hence the install lock and the retry with `--wait`; a tab whose login
   waits for an apk the user runs shows only that line until the apk ends or Ctrl-C. apt 3's
@@ -512,6 +516,9 @@ session consuming their state and events (`android/vt`).
 - Should a failed optional per-start write (the network, containers, doas package or profile file,
   for example through a directory the user replaced with a symlink, which `writeFile` refuses) fail
   the whole start rather than be logged?
+- The first tab's frame right after a fresh import was once seen two rows past the mark's top;
+  every observation so far also dismissed the first-run prompts first, so whether an untouched
+  first launch clips the mark's top rows is unverified (new tabs opened later show it complete).
 - Should a Debian tarball left in the cache after its import failed and fell back to Alpine be
   deleted?
 
@@ -525,8 +532,9 @@ session consuming their state and events (`android/vt`).
 
 - Browser defaults passed interactive `su -` checks for root and a regular user with Alpine
   ash/bash and Debian dash/bash in container PTYs, including launcher invocation with an intact
-  URL, custom/empty values and a non-executable launcher. Debug assembly passed. The updated
-  profile and Codex authorization flow have not been retested on Android; existing stores receive
+  URL, custom/empty values and a non-executable launcher. Debug assembly passed. The profile-update
+  path is now device-verified: a store from the prior release took the new profile at relaunch and
+  showed its output, checked pixel by pixel (the mark and the centered motd); existing stores receive
   the change at kernel restart only when their old Tuxport profile is recognized and unedited.
 
 - Notification authorization passed debug assembly, lint and API 34 checks: visibility after
