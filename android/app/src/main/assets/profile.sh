@@ -14,7 +14,27 @@
 # Before each primary prompt the title returns to the current directory. bash and zsh report the
 # submitted command before execution; ash has no preexec hook. A program can replace the title
 # with OSC 0/2 until the next prompt. Control characters in paths and commands are replaced by ?.
-cat /etc/motd 2>/dev/null
+
+# The motd, centered on the live terminal width when a terminal and awk exist; plain cat otherwise.
+# The awk pads only when a line is shorter than the width (n > 0), so any width is safe.
+if [ -r /etc/motd ]; then
+    if [ -t 1 ] && command -v awk >/dev/null 2>&1; then
+        cols=$(stty size </dev/tty 2>/dev/null | cut -d' ' -f2)
+        case "$cols" in
+            ''|*[!0-9]*) cat /etc/motd ;;
+            *) awk -v c="$cols" 'BEGIN {
+                    sp = "                                                                                                                    "
+                } {
+                    if (length($0) == 0) { print; next }
+                    n = int((c - length($0)) / 2)
+                    if (n > 0) printf "%s", substr(sp, 1, n)
+                    print
+                }' /etc/motd ;;
+        esac
+    else
+        cat /etc/motd
+    fi
+fi
 export TERM=xterm-256color
 export LANG=C.UTF-8
 export NMAP_UNPRIVILEGED=1

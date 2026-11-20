@@ -214,32 +214,43 @@ internal object Rootfs {
             write(store, "/etc/resolv.conf", "nameserver 127.0.0.53\n")
         }
         writeProfile(context, store, distro)
+        writeMotd(store, distro)
+    }
+
+    /**
+     * `/etc/motd`, the welcome the profile centers on the terminal width at login. Written at
+     * import and refreshed by [updateMotd] on upgrades, when the store still has the version an
+     * earlier app wrote.
+     */
+    private fun writeMotd(store: String, distro: Distro) {
         val (packages, install) = when (distro) {
             Distro.ALPINE -> "apk" to "apk add"
             Distro.DEBIAN -> "apt" to "apt install"
         }
-        write(
-            store, "/etc/motd",
-            """
-            Welcome to Tuxport!
-            ${distro.label}, running on Android.
-
-            Working with packages:
-            - Update index:     $packages update
-            - Search packages:  $packages search <package>
-            - Install packages: $install <package>
-            - Show help:        $packages --help
-
-            For example, install Codex:
-            $packages update
-            $install nodejs npm
-            npm install -g @openai/codex
-
-            Report issues at:
-            https://github.com/sajadxdp0/tuxport/issues
-            """.trimIndent(),
-        )
+        // OpenCode's musl build links the C++ runtime dynamically, which Alpine's base does not
+        // include (its installer does not install it either); Debian's base carries libstdc++6
+        val opencodePackages = if (distro == Distro.ALPINE) "nodejs npm libstdc++" else "nodejs npm"
+        write(store, "/etc/motd", motdText(distro.label, packages, install, opencodePackages))
     }
+
+    private fun motdText(label: String, packages: String, install: String, opencodePackages: String) = """
+        Welcome to Tuxport!
+        $label, running on Android.
+
+        Working with packages:
+        - Update index:     $packages update
+        - Search packages:  $packages search <package>
+        - Install packages: $install <package>
+        - Show help:        $packages --help
+
+        For example, install the OpenCode CLI:
+        $packages update
+        $install $opencodePackages
+        npm install -g @opencode/cli
+
+        Report issues at:
+        https://github.com/sajadxdp0/tuxport/issues
+        """.trimIndent()
 
     /** The package manager's sources: which file they are written in and what the content is. */
     private fun sources(distro: Distro, mirror: String): Pair<String, String> = when (distro) {
@@ -554,6 +565,7 @@ netns = "host"
         "2085a60332217920354a7979b98becad8a114e413724c1180954e3424d7157c5",
         "921a9cbb766e8427950aa5ff7a55e253f7e62b3b25997fcad6410beabb62643c",
         "3257013eafeb90230ae0d6772e73d8af87be62f8d6f74460dd4189ea56271021",
+        "6a8510a9e25a4820db044c8f7e1a1461daf01cf1bbbcaae34831510cdbbdc8c3",
     )
 
     /**
@@ -570,6 +582,20 @@ netns = "host"
         val earlier = String(old) in listOf(OLD_PROFILE, UNMARKED_PROFILE) ||
             hex(MessageDigest.getInstance("SHA-256").digest(old)) in REPLACED_PROFILES
         if (earlier) writeProfile(context, store, installed(context) ?: Distro.ALPINE)
+    }
+
+    /**
+     * Replaces the motd an earlier app version wrote (the one whose example installed the Codex
+     * CLI) with the current one ([writeMotd]), which shows the OpenCode CLI instead. A motd the
+     * user edited is left alone: only the known old text is replaced.
+     */
+    @Throws(IOException::class)
+    fun updateMotd(context: Context) {
+        val store = store(context).path
+        val old = runCatching { Native.readFile(store, "/etc/motd") }.getOrNull() ?: return
+        val text = String(old)
+        if ("For example, install Codex:" !in text || "@openai/codex" !in text) return
+        writeMotd(store, installed(context) ?: Distro.ALPINE)
     }
 
     /**

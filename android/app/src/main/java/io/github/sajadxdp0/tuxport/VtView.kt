@@ -117,7 +117,7 @@ internal class VtView(context: Context, private val host: Host) : View(context) 
     private val renderer = VtRenderer(context, screen, images)
 
     /** The font size in pixels; [MainActivity] keeps it across starts. */
-    private var fontPx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 12f, resources.displayMetrics)
+    private var fontPx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 14f, resources.displayMetrics)
 
     /** Whether glyphs in wide cells are enlarged to fill them ([setFillWide]). */
     private var fillWide = true

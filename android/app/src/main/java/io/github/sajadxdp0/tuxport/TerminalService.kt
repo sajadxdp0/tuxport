@@ -565,6 +565,7 @@ class TerminalService : Service() {
                 bridge = browser
                 Rootfs.ensureBrowser(this, browser.configuration)
                 Rootfs.updateProfile(this)
+                Rootfs.updateMotd(this)
                 // The kernel must be the only user of the store when it opens it (a separate
                 // opening by the DocumentsProvider does not count, see Rootfs.access)
                 Rootfs.access.write { Native.start(Rootfs.store(this).path, tier) }

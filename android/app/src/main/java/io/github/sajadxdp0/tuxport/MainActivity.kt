@@ -855,7 +855,7 @@ class MainActivity : FragmentActivity(), TerminalService.Listener, Privacy.Liste
         private const val PREF_DISMISSED_BATTERY_PROMPT = "dismissed_battery_prompt"
         private const val PREF_DISMISSED_NOTIFICATION_PROMPT = "dismissed_notification_prompt"
 
-        private const val DEFAULT_FONT_DP = 12f
+        private const val DEFAULT_FONT_DP = 14f
 
         /**
          * Characters of the clipboard shown when asking whether a program may read it, as many as

@@ -469,7 +469,9 @@ session consuming their state and events (`android/vt`).
   `UNMARKED_PROFILE` by text, later ones by sha256 in `REPLACED_PROFILES`): changing `profile.sh`
   must add the sha256 of the text it replaces (the committed asset, byte for byte), or stores keep
   the version they have; `ashrc.sh`, `bashrc.sh` and `zshrc.sh` are written only with the profile,
-  so a change to any companion alone reaches no existing store (change `profile.sh` with it); and the motd is written only at import, so it is never updated.
+  so a change to any companion alone reaches no existing store (change `profile.sh` with it); and
+  the motd is written at import and refreshed on startup by `Rootfs.updateMotd`, which replaces
+  only the known old text (the one whose example installed the Codex CLI), leaving an edited one.
 - apk takes its database lock without waiting unless given `--wait` (which apk 3 accepts though
   its help does not list it): hence the install lock and the retry with `--wait`; a tab whose login
   waits for an apk the user runs shows only that line until the apk ends or Ctrl-C. apt 3's

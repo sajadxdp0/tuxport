@@ -31,7 +31,7 @@ Inside the terminal, the environment is a normal Linux system:
 - `apk` installs packages from the Alpine repositories, over the phone's
   network.
 - Unmodified ARM64 binaries run as they are: Python, Node.js, Go, Rust,
-  tmux, Vim, Codex CLI.
+  tmux, Vim and the OpenCode CLI.
 - Programs keep running while the screen is off, and notifications report
   finished commands, bells and listening ports.
 - The terminal is Ghostty's libghostty-vt, with tabs, an extra keys row,
@@ -91,6 +91,9 @@ be signed with to install over this one.
 
 The Rust workspace tests need an ARM64 Linux host or container.
 `scripts/dev cargo test --workspace` runs them in the project container.
+On an x86 host the container runs emulated: expect everything to be slow,
+and network-heavy flows (mirror probes, `npm`, the differential suite's
+package installs) to stall; use real ARM64 hardware or CI for those.
 
 `scripts/fetch-rootfs` from the repository root brings in the Alpine
 minirootfs and the bundled packages. `scripts/difftest <case>` reruns one

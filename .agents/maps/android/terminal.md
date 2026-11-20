@@ -94,7 +94,8 @@ assets are `android/build`; authentication is `android/privacy`, notice UI `andr
   match its fixed dark theme; other configuration fields and other activities remain independent.
 - `onCreate` applies dynamic colours, reads `EXTRA_TAB` (only when the activity is not being
   recreated and was not opened from Recents: such an activity still has the intent that first
-  started it), reads the font size (kept in dp as `font_size_dp`, so it scales with a display size
+  started it), reads the font size (kept in dp as `font_size_dp`, defaulting to 14 dp, so it
+  scales with a display size
   change; a pixel size an earlier version kept as `font_size` is converted at the current density
   and removed), applies the saved Keep screen on choice (off by default), builds `TerminalLayout`
   (the status line says "Starting…", insets and IME animation are wired there), installs its root
