@@ -224,7 +224,7 @@ class SettingsFragment : PreferenceFragmentCompat(), TerminalService.Listener {
         val project = link(R.string.settings_project, PROJECT_URL)
         val privacyPolicy = link(R.string.settings_privacy_policy, PRIVACY_POLICY_URL)
         val version = action(R.string.settings_version) { onVersion() }.apply {
-            summary = "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
+            summary = BuildConfig.VERSION_NAME
         }
 
         group(R.string.settings_group_system, distro, account, reset)

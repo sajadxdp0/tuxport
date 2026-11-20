@@ -411,8 +411,8 @@ session consuming their state and events (`android/vt`).
   Tabs can handle the same VIEW intent; no handler produces the shared `link_no_app` toast.
   The licenses summary names GNU AGPL 3.0 or later; the full copyright, warranty disclaimer and
   license text remain in the Tuxport notice on the license page.
-- About's final Version action shows `BuildConfig.VERSION_NAME` followed by `BuildConfig.VERSION_CODE`
-  in parentheses (`1.0.0 (1)`). It opens the project's GitHub Releases page
+- About's final Version action shows `BuildConfig.VERSION_NAME` alone (`0.0.1`); the internal
+  version code stays out of the UI. It opens the project's GitHub Releases page
   (`https://github.com/sajadxdp0/tuxport/releases`) with a VIEW intent; no URL handler shows
   `link_no_app`. Tuxport is not published on Google Play.
 - Service-dependent preferences are disabled before binding, on disconnect and on stopping;
