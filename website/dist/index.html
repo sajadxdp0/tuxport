@@ -57,7 +57,10 @@
 
       .col { max-width: 44rem; margin-inline: auto; padding-inline: var(--pad); }
 
-      a { color: inherit; transition: color 150ms ease; }
+      /* Author-origin rules beat the UA link blue at any specificity; :where keeps the base
+         floor beneath the local :where() color rules (which win by order) and beneath
+         a:hover (which wins by specificity), so every link hovers to the accent. */
+      :where(a) { color: inherit; transition: color 150ms ease; }
       a:hover { color: var(--accent); }
       a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
       .ext::after { content: " \2197"; color: var(--faint); }
@@ -97,7 +100,7 @@
       .brand { display: inline-flex; align-items: center; gap: 0.625rem; }
       .brand img { display: block; width: 1.375rem; height: 1.375rem; }
       .header-row nav { display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; }
-      .header-row nav a { color: var(--muted); }
+      :where(.header-row nav a) { color: var(--muted); }
 
       main { padding-block-start: clamp(4rem, 3.25rem + 5vw, 7rem); }
 
@@ -142,7 +145,7 @@
         border-radius: var(--radius-s);
       }
       .get:hover { color: var(--accent-ink); }
-      .actions > a:not(.get) { color: var(--muted); }
+      :where(.actions > a:not(.get)) { color: var(--muted); }
 
       .facts {
         display: grid;
@@ -170,7 +173,7 @@
         color: var(--faint);
       }
       .foot-row { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; }
-      .foot-row a { color: var(--faint); }
+      :where(.foot-row a) { color: var(--faint); }
       .foot-row p { margin: 0; }
     </style>
   </head>

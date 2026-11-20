@@ -5,7 +5,7 @@
 >
 > Verified: 2026-11-17 (three source-research concerns and nine independently checked claims; static checks passed, external release and visual checks remain below)
 >
-> Maintained: 2026-11-20 (targeted verification only since the full mapping; latest change: bundled wordmark font, creamy header band, highlighted fact panel and pared footer)
+> Maintained: 2026-11-20 (targeted verification only since the full mapping; latest change: hover-accent specificity fixed with :where() floors, pitfall recorded as an invariant)
 
 ## Responsibilities
 
@@ -110,6 +110,11 @@ user-directed sharing and network traffic from guest programs.
 - Use site-relative links for internal navigation: the Pages project site serves the
   pages under `/tuxport/`, so the brand links use `./` rather than `/`, which would
   escape to the user-site root.
+- Link colors sit under the hover rule on purpose: the base anchor floor is `:where(a)`
+  (author rules beat the UA link blue at any specificity) and the local muted/faint link
+  colors use `:where()` wrappers that win the floor by source order, so `a:hover` wins on
+  every link; a bare `.selector a { color: ... }` rule placed after `a:hover` silently
+  kills the accent hover there.
 - Review `dist/favicon.svg` after Android launcher changes and update it directly as
   needed; check the fixed crop and appearance at small sizes when geometry changes.
 - Review dependency-added permissions in the merged release manifest, including
