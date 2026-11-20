@@ -3,7 +3,7 @@
 A single page in `dist/index.html` links to the English privacy policy in
 `dist/privacy.html`. The page is a minimal dark one-pager that mirrors the
 app's Neon Terminal theme: the flat near-black `#0d1117` base, the app's
-own `favicon.svg` as the prompt mark in the header and the hero, a short
+own `favicon.svg` as the prompt mark anchoring the hero, a short
 headline with two actions, and a highlighted fact panel whose labels
 carry the app's magenta secondary and whose cyan primary drives hovers,
 focus and selection. Inline CSS, a local SVG favicon and wordmark font,
