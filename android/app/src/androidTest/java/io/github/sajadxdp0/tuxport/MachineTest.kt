@@ -387,6 +387,34 @@ class MachineTest {
     }
 
     /**
+     * The startup updates recognize the app's own files by their authorship rather than by exact
+     * bytes: a profile or motd that still carries Tuxport's marks is refreshed even when no known
+     * text matches it (a store can hold an edited or otherwise diverged copy), while one that no
+     * longer looks like Tuxport's is kept as it is.
+     */
+    @Test
+    fun updatesRefreshAuthoredFilesAndKeepCustomizedOnes() {
+        val store = Rootfs.store(context).path
+        fun read(path: String) = String(Native.readFile(store, path)!!)
+        fun write(path: String, text: String) = Native.writeFile(store, path, text.toByteArray(), 420 /* 0644 */, true)
+        val profile = "/etc/profile.d/tuxport.sh"
+
+        write(profile, read(profile) + "\n# a local change\n")
+        write("/etc/motd", "Welcome to Tuxport!\nAlpine Linux 3.24, running on Android.\n\nAn unknown older copy.\n")
+        Rootfs.updateProfile(context)
+        Rootfs.updateMotd(context)
+        assertTrue(read(profile), "The app's mark" in read(profile))
+        assertTrue(read("/etc/motd"), "install the OpenCode CLI" in read("/etc/motd"))
+
+        write(profile, "#!/bin/sh\necho mine\n")
+        write("/etc/motd", "My own welcome.\n")
+        Rootfs.updateProfile(context)
+        Rootfs.updateMotd(context)
+        assertEquals("#!/bin/sh\necho mine\n", read(profile))
+        assertEquals("My own welcome.\n", read("/etc/motd"))
+    }
+
+    /**
      * A system imported from Alpine logs in with bash (the android/setup map): root's shell is
      * /bin/bash, and while the packages the app bundles are missing (moved away here) the login
      * uses /bin/sh; the next login with them installs them offline and deletes them. bash's

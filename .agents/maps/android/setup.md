@@ -478,13 +478,15 @@ session consuming their state and events (`android/vt`).
   instrumentation tests make one) still overwrites (Alpine) and deletes the shared cached tarball.
 - `writeFile` while the kernel runs is seen at once (the store's commit counter invalidates kernel
   caches).
-- `updateProfile` replaces only the versions it knows, compared whole (`OLD_PROFILE` and
-  `UNMARKED_PROFILE` by text, later ones by sha256 in `REPLACED_PROFILES`): changing `profile.sh`
-  must add the sha256 of the text it replaces (the committed asset, byte for byte), or stores keep
-  the version they have; `ashrc.sh`, `bashrc.sh` and `zshrc.sh` are written only with the profile,
-  so a change to any companion alone reaches no existing store (change `profile.sh` with it); and
-  the motd is written at import and refreshed on startup by `Rootfs.updateMotd`, which replaces
-  only the known old text (the one whose example installed the Codex CLI), leaving an edited one.
+- `updateProfile` and `updateMotd` run before every kernel start and replace their files whenever
+  the store's copies are Tuxport's own: the current text, an earlier version it knows
+  (`OLD_PROFILE` and `UNMARKED_PROFILE` by text, later ones by sha256 in `REPLACED_PROFILES`), or,
+  the net for everything else, a copy that still names Tuxport as its author (the profile asset's
+  header comment, [Rootfs.AUTHORED]) or still carries the welcome's first line. A copy that no
+  longer looks like Tuxport's is treated as the user's and kept, and every decision (replaced,
+  kept, unreadable) is logged for diagnostic exports. `ashrc.sh`, `bashrc.sh` and `zshrc.sh` are
+  written only with the profile, so a change to any companion alone reaches no existing store
+  (change `profile.sh` with it).
 - The profile centers its mark with shell arithmetic, not the awk that centers the motd: busybox
   awk counts `length` in bytes, and a half block is three, so lines would each skew by their
   block count. The awk centers the motd as one block, every line taking the pad of the widest

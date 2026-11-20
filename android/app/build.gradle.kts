@@ -75,8 +75,8 @@ android {
         applicationId = "io.github.sajadxdp0.tuxport"
         minSdk = 30
         targetSdk = 37
-        versionCode = 8
-        versionName = "0.0.1"
+        versionCode = 9
+        versionName = "0.0.2"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "ALPINE_BRANCH", "\"$alpineBranch\"")
     }

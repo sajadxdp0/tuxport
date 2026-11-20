@@ -1,5 +1,5 @@
-# Written by Tuxport into new systems, and replaced by Tuxport's later versions of it as long as it is
-# left unchanged: a copy you edit is kept as it is.
+# Written by Tuxport into new systems, and replaced by Tuxport's later versions of it whenever it
+# still names Tuxport as its author: a copy that no longer does is treated as yours and kept as it is.
 #
 # Shows the motd, sets the terminal and language, and gives bash, busybox ash and zsh a coloured
 # prompt with shell integration: OSC 133 marks telling Tuxport's terminal where each prompt, the

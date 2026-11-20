@@ -219,10 +219,15 @@ internal object Rootfs {
 
     /**
      * `/etc/motd`, the welcome the profile centers on the terminal width at login. Written at
-     * import and refreshed by [updateMotd] on upgrades, when the store still has the version an
-     * earlier app wrote.
+     * import and refreshed on every startup by [updateMotd], which replaces any copy that still
+     * carries Tuxport's welcome (a store's copy can carry an earlier version's text, or a text
+     * this app no longer knows byte for byte).
      */
     private fun writeMotd(store: String, distro: Distro) {
+        write(store, "/etc/motd", motd(distro))
+    }
+
+    private fun motd(distro: Distro): String {
         val (packages, install) = when (distro) {
             Distro.ALPINE -> "apk" to "apk add"
             Distro.DEBIAN -> "apt" to "apt install"
@@ -230,7 +235,7 @@ internal object Rootfs {
         // OpenCode's musl build links the C++ runtime dynamically, which Alpine's base does not
         // include (its installer does not install it either); Debian's base carries libstdc++6
         val opencodePackages = if (distro == Distro.ALPINE) "nodejs npm libstdc++" else "nodejs npm"
-        write(store, "/etc/motd", motdText(distro.label, packages, install, opencodePackages))
+        return motdText(distro.label, packages, install, opencodePackages)
     }
 
     private fun motdText(label: String, packages: String, install: String, opencodePackages: String) = """
@@ -553,11 +558,12 @@ netns = "host"
      * moved the cursor, the one that marked them for bash and busybox ash only, until zsh got
      * its marks, the one with ash's marks in itself, until `ashrc.sh` took them, and the one with
      * bash's and zsh's marks in itself, until `bashrc.sh` and `zshrc.sh` took them; the one whose
-     * example installed the Codex CLI, until the OpenCode CLI took its place; the one that showed
-     * no mark above the welcome, until the mark joined it; and the one that centered every line by
-     * itself, until the welcome centered as one block. A change to
+     * example installed the Codex CLI, until the OpenCode CLI took its place; and the one that
+     * centered every line by itself, until the welcome centered as one block. A change to
      * `profile.sh` adds the sha256 of the text it replaces
-     * (`git show HEAD:android/app/src/main/assets/profile.sh | shasum -a 256` before committing).
+     * (`git show HEAD:android/app/src/main/assets/profile.sh | shasum -a 256` before committing)
+     * so the update recognizes it precisely; [AUTHORED] below is the net for any authored copy
+     * no entry here knows.
      */
     private val REPLACED_PROFILES = setOf(
         "4a35d44e55e23aaf94543d87dc02deafcc7b324902e90ae18872fe20242642fc",
@@ -574,33 +580,67 @@ netns = "host"
     )
 
     /**
+     * The line every profile the app has shipped since the rebrand opens its comments with: the
+     * net of [updateProfile], which replaces a copy that still names Tuxport as its author even
+     * when no known text or sha256 matches it (the copies before the rebrand have no comments at
+     * all, and are known by their texts above).
+     */
+    private const val AUTHORED = "Written by Tuxport into new systems"
+
+    /**
      * Replaces the profile the app wrote into a previously imported store with the current one
-     * ([writeProfile], with the files of ash's, bash's and zsh's marks), if it is an earlier version left
-     * unchanged. A change to `ashrc.sh`, `bashrc.sh` or `zshrc.sh` alone reaches no existing store: change
-     * `profile.sh` with it.
+     * ([writeProfile], with the files of ash's, bash's and zsh's marks) whenever the store's copy
+     * is Tuxport's own: an earlier version it recognizes by text or sha256, or any copy that still
+     * names Tuxport as its author, whatever else was done to it (a text that no longer does is
+     * treated as the user's and left alone). Every decision is logged, so a diagnostic export
+     * shows why a profile did or did not update.
      */
     @Throws(IOException::class)
     fun updateProfile(context: Context) {
         val store = store(context).path
         val path = "/etc/profile.d/tuxport.sh"
-        val old = runCatching { Native.readFile(store, path) }.getOrNull() ?: return
-        val earlier = String(old) in listOf(OLD_PROFILE, UNMARKED_PROFILE) ||
-            hex(MessageDigest.getInstance("SHA-256").digest(old)) in REPLACED_PROFILES
-        if (earlier) writeProfile(context, store, installed(context) ?: Distro.ALPINE)
+        val old = runCatching { Native.readFile(store, path) }.getOrNull()
+        if (old == null) {
+            Log.w(TAG, "cannot read $path; it is left alone")
+            return
+        }
+        val text = String(old)
+        if (text == asset(context, "profile.sh")) return
+        val earlier = text in listOf(OLD_PROFILE, UNMARKED_PROFILE) ||
+            hex(MessageDigest.getInstance("SHA-256").digest(old)) in REPLACED_PROFILES ||
+            AUTHORED in text
+        if (earlier) {
+            Log.i(TAG, "replacing an earlier $path with the current one")
+            writeProfile(context, store, installed(context) ?: Distro.ALPINE)
+        } else {
+            Log.i(TAG, "$path no longer names Tuxport as its author; it is left alone")
+        }
     }
 
     /**
-     * Replaces the motd an earlier app version wrote (the one whose example installed the Codex
-     * CLI) with the current one ([writeMotd]), which shows the OpenCode CLI instead. A motd the
-     * user edited is left alone: only the known old text is replaced.
+     * Replaces the motd on every startup with the current one ([writeMotd]) whenever the store's
+     * copy is Tuxport's own: it is not the current text and still carries Tuxport's welcome, be
+     * it an earlier version's or a copy this app no longer knows byte for byte. A motd that no
+     * longer looks like Tuxport's is treated as the user's and left alone. Every decision is
+     * logged, so a diagnostic export shows why a welcome did or did not refresh.
      */
     @Throws(IOException::class)
     fun updateMotd(context: Context) {
         val store = store(context).path
-        val old = runCatching { Native.readFile(store, "/etc/motd") }.getOrNull() ?: return
+        val distro = installed(context) ?: Distro.ALPINE
+        val old = runCatching { Native.readFile(store, "/etc/motd") }.getOrNull()
+        if (old == null) {
+            Log.w(TAG, "cannot read /etc/motd; the welcome is left alone")
+            return
+        }
         val text = String(old)
-        if ("For example, install Codex:" !in text || "@openai/codex" !in text) return
-        writeMotd(store, installed(context) ?: Distro.ALPINE)
+        if (text == motd(distro)) return
+        if ("Welcome to Tuxport!" in text) {
+            Log.i(TAG, "replacing an earlier welcome with the current one")
+            writeMotd(store, distro)
+        } else {
+            Log.i(TAG, "the motd no longer looks like Tuxport's; it is left alone")
+        }
     }
 
     /**
