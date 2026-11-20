@@ -5,7 +5,7 @@
 >
 > Verified: 2026-11-17 (three source-research concerns and nine independently checked claims; static checks passed, external release and visual checks remain below)
 >
-> Maintained: 2026-11-20 (targeted verification only since the full mapping; latest change: site redesigned onto the app's Neon Terminal palette, license row removed, colophon is tuxport)
+> Maintained: 2026-11-21 (targeted verification only since the full mapping; latest change: compact vertical rhythm, unified 42rem column and tighter chrome on both pages)
 
 ## Responsibilities
 
@@ -97,10 +97,11 @@ user-directed sharing and network traffic from guest programs.
 ## Invariants and gotchas
 
 - Keep the English language attribute and one main heading per page, and the policy's
-  section label references. The policy keeps a 42rem reading column and the homepage a
-  44rem content column (34rem lede measure) with no layout breakpoints; both use fluid
-  narrow-screen spacing, long-word wrapping (fact values break anywhere) and visible link
-  focus; the policy has print adjustments.
+  section label references. Both pages share a 42rem column (the homepage's lede keeps a
+  34rem measure) with no layout breakpoints; the homepage's rhythm is deliberately compact
+  (the hero, actions and fact panel sit close on a 4px grid) while the policy keeps its airy
+  1.85 line-height for reading; both use fluid narrow-screen spacing, long-word wrapping
+  (fact values break anywhere) and visible link focus; the policy has print adjustments.
 - Keep `dist/` in Git: it contains maintained source files. The one generated file is
   `fonts/tuxport-mono.woff2`, rebuilt from `android/app/src/main/assets/fonts/JetBrainsMono.ttf`
   with the README's pyftsubset command whenever the pages' glyphs change; keep
