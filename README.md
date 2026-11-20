@@ -38,6 +38,8 @@ Inside the terminal, the environment is a normal Linux system:
   scrollback find and safe paste confirmation.
 - A privacy lock requires biometrics to reopen the app, and a diagnostic log
   exporter helps with problems.
+- Check for updates in Settings downloads a newer release's package,
+  and Android's installer takes it from there.
 
 The execution mode is selectable. The default translates guest instructions
 into native code for speed. An interpreter mode runs every instruction step
