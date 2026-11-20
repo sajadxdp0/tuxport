@@ -518,6 +518,9 @@ session consuming their state and events (`android/vt`).
   prompt text are not sanitized.
 - Automatic command titles cover bash and zsh only. Busybox ash has no preexec hook; it still
   needs terminal-side or foreground-process detection to report commands that set no title.
+- `Updater.intoDownloads` deletes the verified package only once the Downloads provider has given
+  a row: a provider that answers no row leaves the 16 MB file in the cache until a later
+  download of the same name replaces it.
 
 - **The rules miss changes that rename nothing in `/etc`.** A shadow or group file edited in place
   (an append, a text editor writing the file itself) changes no entry of `/etc`, a burst of more

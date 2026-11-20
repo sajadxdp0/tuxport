@@ -109,7 +109,7 @@ Android builds `android/build`, rootfs fetching `android/setup`, kernel run/cons
   `target/ghostty` and Zig's global cache cached by the script's hash), then cargo-ndk clippy at
   API level 30, `assembleDebug lintDebug`, the APK as an artifact. Both quick workflows cancel a
   run in progress when the same branch is pushed again.
-- `full.yml`, nightly at 18:00 UTC on develop when its tip was committed in the last 25 hours, on
+- `full.yml`, nightly at 18:00 UTC on main when it has new commits, on
   pushes to master and on demand: the network test, a lockstep run of 200,000 iterations,
   `scripts/build-starnix-tests` (its tarball cached by the hash of the script and
   `tests/starnix/compat`) and `scripts/build-gvisor-tests` (cached by the hash of the script,
@@ -151,12 +151,15 @@ Android builds `android/build`, rootfs fetching `android/setup`, kernel run/cons
   through `rustup toolchain install`.
 - A test that holds the BKL in one long syscall, or spins in one, cannot be stopped by the case's
   guest `timeout`; only killing `tuxport-run` ends it.
-- GitHub runs scheduled workflows only from the default branch (master): the nightly `full.yml`
-  uses master's copy of the workflow while checking out develop.
+- GitHub runs scheduled workflows only from the default branch: the nightly `full.yml`
+  uses main's copy of the workflow and checks out main.
 - `full.yml` must build release `tuxport-run` itself before the differential tests: no other step
   there makes it (cargo test builds debug, lockstep builds only `tuxport-lockstep`), and difftest
   never builds one.
 - CI's clang step relies on the runner image's clang; CI installs only llvm and musl-tools.
+- No workflow sets a timeout, so GitHub's default 6-hour job limit applies: the 2026-11-19
+  nightly ended cancelled at exactly that limit, and a slow differential run can end the same
+  way without anything failing.
 
 ## Open questions
 
