@@ -368,6 +368,18 @@ session consuming their state and events (`android/vt`).
   Failures restore the row and show a localized message. A provider failure may leave an empty or
   incomplete destination; cancelling authentication occurs before the picker creates any document.
 - Privacy mode is an authenticated exception to service-owned changes: its nonpersistent switch asks before enabling, then calls the shared `Privacy` gate; disabling also authenticates. No setting changes on cancellation or failed/unavailable authentication. File access stays disabled while privacy is on, with a localized explanation; turning privacy off leaves file access off. Material dialogs use `showPrivate`, and restored choice dialogs use `Privacy.protect`.
+- The About group ends with Check for updates before Version. `Updater.latest` reads the project's
+  newest release from GitHub's API on the `tuxport-update` thread (the user's tap is the only
+  trigger) and takes its `tuxport-<version>-arm64-release.apk` asset with the API's size and
+  sha256 digest; a release without either is a failed check, and `Updater.newer` compares dotted
+  numbers, answering false for a tag it cannot parse. The download reuses `Rootfs.fetch` into the
+  cache, resumed and digest-verified like every rootfs tarball, with the row showing progress and
+  offering to stop, and `Updater.intoDownloads` then inserts it into MediaStore's Downloads
+  folder pending until complete. The offer's Open launches ACTION_VIEW with a read grant: the
+  system installer shows the package only after the user once allows this app as an install
+  source, so the manifest declares REQUEST_INSTALL_PACKAGES and Android keeps its switch off by
+  default. A stopped fragment drops the summary updates and the dialogs; the download itself
+  still lands in Downloads, announced by a toast with the application context.
 - Binding: the fragment's `onStart` starts and binds the service, `onStop` unbinds; once bound it listens,
   renders, shows a pending notice and loads the regular accounts on a background thread, again
   when the kernel is ready; account loads use the application context and a generation to discard
@@ -475,7 +487,9 @@ session consuming their state and events (`android/vt`).
   only the known old text (the one whose example installed the Codex CLI), leaving an edited one.
 - The profile centers its mark with shell arithmetic, not the awk that centers the motd: busybox
   awk counts `length` in bytes, and a half block is three, so lines would each skew by their
-  block count. Below 35 columns the mark is skipped; the awk pads any width, so the motd never is.
+  block count. The awk centers the motd as one block, every line taking the pad of the widest
+  one so the sections stay aligned; it reads the file first and prints in END. Below 35 columns
+  the mark is skipped; the awk pads any width, so the motd never is.
 - apk takes its database lock without waiting unless given `--wait` (which apk 3 accepts though
   its help does not list it): hence the install lock and the retry with `--wait`; a tab whose login
   waits for an apk the user runs shows only that line until the apk ends or Ctrl-C. apt 3's

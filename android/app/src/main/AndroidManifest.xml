@@ -18,6 +18,10 @@
 
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
 
+    <!-- Only for the settings' update check: the installer asks for the app to be allowed to
+         install the package it just downloaded; Android keeps the switch itself, off by default -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+
     <!-- localeConfig enables the system language picker on Android 13+; older versions ignore it. -->
     <application
             android:name=".MainApplication"

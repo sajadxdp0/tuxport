@@ -41,19 +41,24 @@ EOF
     esac
 fi
 # The motd, centered on the live terminal width when a terminal and awk exist; plain cat otherwise.
-# The awk pads only when a line is shorter than the width (n > 0), so any width is safe.
+# The awk centers it as one block: every line is padded by the space the widest line leaves, so the
+# sections stay aligned at one column (the mark above is centered the same way, by its own width).
 if [ -r /etc/motd ]; then
     if [ -t 1 ] && command -v awk >/dev/null 2>&1; then
         cols=$(stty size </dev/tty 2>/dev/null | cut -d' ' -f2)
         case "$cols" in
             ''|*[!0-9]*) cat /etc/motd ;;
             *) awk -v c="$cols" 'BEGIN {
-                    sp = "                                                                                                                    "
+                    sp = "                                                                                                                                                                                                                                                                                        "
                 } {
-                    if (length($0) == 0) { print; next }
-                    n = int((c - length($0)) / 2)
-                    if (n > 0) printf "%s", substr(sp, 1, n)
-                    print
+                    line[NR] = $0
+                    if (length($0) > wide) wide = length($0)
+                } END {
+                    if (wide > 0 && c > wide) pad = substr(sp, 1, int((c - wide) / 2))
+                    for (i = 1; i <= NR; i++) {
+                        if (line[i] == "") print ""
+                        else print pad line[i]
+                    }
                 }' /etc/motd ;;
         esac
     else

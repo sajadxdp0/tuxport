@@ -127,6 +127,17 @@ class SettingsFragment : PreferenceFragmentCompat(), TerminalService.Listener {
     private lateinit var volumeKeys: SwitchPreferenceCompat
     private lateinit var tabList: SwitchPreferenceCompat
     private lateinit var licenses: Preference
+    private lateinit var update: Preference
+
+    /** The last release offered, for the cancel question while it downloads. */
+    private var updateVersion = ""
+
+    /** The session of the last update check or download: a result from an older one is dropped. */
+    private var updateSession = 0
+    private var updateDownloading = false
+
+    @Volatile
+    private var updateCancelled = false
 
     private val connection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName, binder: IBinder) {
@@ -206,6 +217,9 @@ class SettingsFragment : PreferenceFragmentCompat(), TerminalService.Listener {
             startActivity(Intent(requireContext(), LicensesActivity::class.java))
         }
         licenses.setSummary(R.string.licenses_summary)
+        update = action(R.string.settings_update) { onUpdate() }.apply {
+            setSummary(R.string.update_summary)
+        }
         val support = link(R.string.settings_support, SUPPORT_URL)
         val project = link(R.string.settings_project, PROJECT_URL)
         val privacyPolicy = link(R.string.settings_privacy_policy, PRIVACY_POLICY_URL)
@@ -217,7 +231,7 @@ class SettingsFragment : PreferenceFragmentCompat(), TerminalService.Listener {
         group(R.string.settings_group_android, notifications, batteryUsage, runPolicy, privacy, fileAccess)
         group(R.string.settings_group_terminal, fillWide, cursorStyle, cursorBlink, tabList, volumeKeys)
         group(R.string.settings_group_debug, tier, export)
-        group(R.string.settings_group_about, support, project, privacyPolicy, licenses, version)
+        group(R.string.settings_group_about, support, project, privacyPolicy, licenses, update, version)
         render()
     }
 
@@ -283,6 +297,7 @@ class SettingsFragment : PreferenceFragmentCompat(), TerminalService.Listener {
         requireContext().unbindService(connection)
         service = null
         accountLoad++
+        updateSession++
         render()
         super.onStop()
     }
@@ -668,6 +683,110 @@ class SettingsFragment : PreferenceFragmentCompat(), TerminalService.Listener {
         } catch (e: ActivityNotFoundException) {
             Toast.makeText(requireContext(), R.string.link_no_app, Toast.LENGTH_SHORT).show()
         }
+    }
+
+    /** While a package downloads, the row asks whether to stop it; otherwise a check begins. */
+    private fun onUpdate() {
+        if (updateDownloading) {
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle(getString(R.string.cancel_download_title, updateVersion))
+                .setPositiveButton(R.string.cancel_download) { _, _ -> updateCancelled = true }
+                .setNegativeButton(R.string.keep_downloading, null)
+                .showPrivate()
+            return
+        }
+        val owner = requireActivity()
+        val session = ++updateSession
+        update.isEnabled = false
+        update.setSummary(R.string.update_checking)
+        thread(name = "tuxport-update") {
+            val result = runCatching { Updater.latest() }
+            owner.runOnUiThread {
+                if (!isAdded || session != updateSession) return@runOnUiThread
+                update.isEnabled = true
+                result.fold(onSuccess = { release -> showUpdate(release) }, onFailure = {
+                    update.setSummary(R.string.update_summary)
+                    Toast.makeText(owner, R.string.update_check_failed, Toast.LENGTH_LONG).show()
+                })
+            }
+        }
+    }
+
+    /** A release newer than the running one is offered; any other answers "up to date". */
+    private fun showUpdate(release: Updater.Release) {
+        if (!Updater.newer(release.version, BuildConfig.VERSION_NAME)) {
+            update.setSummary(R.string.update_up_to_date)
+            return
+        }
+        updateVersion = release.version
+        update.setSummary(getString(R.string.update_available, release.version))
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(getString(R.string.update_available, release.version))
+            .setMessage(getString(R.string.update_available_message, release.download.size shr 20))
+            .setPositiveButton(R.string.update_download) { _, _ -> downloadUpdate(release) }
+            .setNegativeButton(android.R.string.cancel, null)
+            .showPrivate()
+    }
+
+    /**
+     * Downloads the package with [Rootfs.fetch] and moves it into the Downloads folder. The row
+     * keeps the download's progress and stays enabled, so tapping it offers to stop the download.
+     */
+    private fun downloadUpdate(release: Updater.Release) {
+        val owner = requireActivity()
+        val context = owner.applicationContext
+        val session = updateSession
+        updateDownloading = true
+        updateCancelled = false
+        val packageFile = File(context.cacheDir, release.name)
+        thread(name = "tuxport-update") {
+            val result = runCatching {
+                Rootfs.fetch(
+                    release.download, packageFile, { updateCancelled },
+                ) { done, total ->
+                    val text = owner.getString(R.string.switch_downloading, release.version, done shr 20, total shr 20)
+                    owner.runOnUiThread {
+                        if (isAdded && session == updateSession) update.setSummary(text)
+                    }
+                }
+                Updater.intoDownloads(context, packageFile, release.name)
+            }
+            owner.runOnUiThread {
+                updateDownloading = false
+                if (updateCancelled) {
+                    if (isAdded && session == updateSession) update.setSummary(R.string.update_summary)
+                    return@runOnUiThread
+                }
+                // The package reaches the Downloads folder even when this page is gone; say so
+                // wherever the user now is.
+                result.fold(onSuccess = { uri ->
+                    if (isAdded && session == updateSession) offerPackage(uri, release.version)
+                    else Toast.makeText(context, R.string.update_downloaded_message, Toast.LENGTH_LONG).show()
+                }, onFailure = {
+                    if (isAdded && session == updateSession) update.setSummary(R.string.update_summary)
+                    Toast.makeText(context, R.string.update_download_failed, Toast.LENGTH_LONG).show()
+                })
+            }
+        }
+    }
+
+    /** Points the installer at the downloaded package; Android then asks for the app to be allowed. */
+    private fun offerPackage(uri: Uri, version: String) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(getString(R.string.update_downloaded_title, version))
+            .setMessage(R.string.update_downloaded_message)
+            .setPositiveButton(R.string.update_open) { _, _ ->
+                try {
+                    startActivity(Intent(Intent.ACTION_VIEW).apply {
+                        setDataAndType(uri, "application/vnd.android.package-archive")
+                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    })
+                } catch (_: ActivityNotFoundException) {
+                    Toast.makeText(requireContext(), R.string.update_no_installer, Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton(android.R.string.ok, null)
+            .showPrivate()
     }
 
     companion object {

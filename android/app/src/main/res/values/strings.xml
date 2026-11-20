@@ -230,6 +230,20 @@
     <string name="settings_privacy_policy">Privacy policy</string>
     <string name="settings_version">Version</string>
 
+    <string name="settings_update">Check for updates</string>
+    <string name="update_summary">Look for a newer release of the app</string>
+    <string name="update_checking">Checking…</string>
+    <string name="update_up_to_date">Up to date</string>
+    <string name="update_available">Version %1$s is available</string>
+    <string name="update_available_message">The package is %1$d MB. It downloads to the system\'s Downloads folder, and you open it from there to install.</string>
+    <string name="update_download">Download</string>
+    <string name="update_downloaded_title">Version %1$s downloaded</string>
+    <string name="update_downloaded_message">The package is in the Downloads folder. Open it to install.</string>
+    <string name="update_open">Open</string>
+    <string name="update_check_failed">Could not check for updates</string>
+    <string name="update_download_failed">Could not download the package</string>
+    <string name="update_no_installer">No app is available to open the package</string>
+
     <string name="settings_licenses">Open source licenses</string>
     <string name="licenses_summary">GNU AGPL 3.0 or later</string>
     <string name="license_public_domain">Public domain</string>

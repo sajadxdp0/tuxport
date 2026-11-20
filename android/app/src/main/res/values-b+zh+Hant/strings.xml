@@ -226,6 +226,20 @@
     <string name="settings_privacy_policy">隱私權政策</string>
     <string name="settings_version">版本</string>
 
+    <string name="settings_update">檢查更新</string>
+    <string name="update_summary">檢查應用是否有新版本</string>
+    <string name="update_checking">正在檢查…</string>
+    <string name="update_up_to_date">已是最新版本</string>
+    <string name="update_available">版本 %1$s 可用</string>
+    <string name="update_available_message">安裝包大小為 %1$d MB，將下載到系統下載資料夾，然後從那裡開啟安裝。</string>
+    <string name="update_download">下載</string>
+    <string name="update_downloaded_title">版本 %1$s 已下載</string>
+    <string name="update_downloaded_message">安裝包已儲存到下載資料夾，開啟即可安裝。</string>
+    <string name="update_open">開啟</string>
+    <string name="update_check_failed">無法檢查更新</string>
+    <string name="update_download_failed">無法下載安裝包</string>
+    <string name="update_no_installer">沒有可以開啟安裝包的應用程式</string>
+
     <string name="settings_licenses">開放原始碼授權</string>
     <string name="licenses_summary">GNU AGPL 3.0 或更新版本</string>
     <string name="license_public_domain">公眾領域</string>

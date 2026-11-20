@@ -553,8 +553,9 @@ netns = "host"
      * moved the cursor, the one that marked them for bash and busybox ash only, until zsh got
      * its marks, the one with ash's marks in itself, until `ashrc.sh` took them, and the one with
      * bash's and zsh's marks in itself, until `bashrc.sh` and `zshrc.sh` took them; the one whose
-     * example installed the Codex CLI, until the OpenCode CLI took its place; and the one that
-     * showed no mark above the welcome, until the mark joined it. A change to
+     * example installed the Codex CLI, until the OpenCode CLI took its place; the one that showed
+     * no mark above the welcome, until the mark joined it; and the one that centered every line by
+     * itself, until the welcome centered as one block. A change to
      * `profile.sh` adds the sha256 of the text it replaces
      * (`git show HEAD:android/app/src/main/assets/profile.sh | shasum -a 256` before committing).
      */
@@ -569,6 +570,7 @@ netns = "host"
         "3257013eafeb90230ae0d6772e73d8af87be62f8d6f74460dd4189ea56271021",
         "6a8510a9e25a4820db044c8f7e1a1461daf01cf1bbbcaae34831510cdbbdc8c3",
         "b9a392e69cf98178b2a74a544131b202a8c8eaae8810db8b95e00ef7f589ccdb",
+        "b88394160c41f02125bd114f9c98aaf8548d47caa04ada672aa274bd63a306b2",
     )
 
     /**
