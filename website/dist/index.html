@@ -24,14 +24,15 @@
       }
 
       :root {
+        /* The app's Neon Terminal palette (android values/colors.xml). */
         --bg: #0d1117;
-        --cream: #171310;
         --surface: #161b22;
         --text: #e6edf3;
         --muted: #8b949e;
         --faint: #7d8590;
-        --accent: #00e5ff;
-        --accent-ink: #003943;
+        --primary: #00e5ff;
+        --secondary: #ff4081;
+        --primary-ink: #003943;
         --hairline: color-mix(in srgb, var(--text) 9%, transparent);
         --sans: system-ui, -apple-system, "Segoe UI", sans-serif;
         --mono: "JetBrainsMono Nerd Font", "JetBrainsMono NF", "Tuxport Mono",
@@ -61,13 +62,13 @@
          floor beneath the local :where() color rules (which win by order) and beneath
          a:hover (which wins by specificity), so every link hovers to the accent. */
       :where(a) { color: inherit; transition: color 150ms ease; }
-      a:hover { color: var(--accent); }
-      a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+      a:hover { color: var(--primary); }
+      a:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
       .ext::after { content: " \2197"; color: var(--faint); }
       a:hover.ext::after,
-      a:focus-visible.ext::after { color: var(--accent); }
+      a:focus-visible.ext::after { color: var(--primary); }
 
-      ::selection { background: color-mix(in srgb, var(--accent) 30%, transparent); }
+      ::selection { background: color-mix(in srgb, var(--primary) 30%, transparent); }
 
       .skip {
         position: fixed;
@@ -83,10 +84,7 @@
       }
       .skip:focus { inset-inline-start: var(--pad); }
 
-      .site-header {
-        background: var(--cream);
-        border-block-end: 1px solid var(--hairline);
-      }
+      .site-header { border-block-end: 1px solid var(--hairline); }
       .header-row {
         display: flex;
         flex-wrap: wrap;
@@ -144,7 +142,7 @@
         color: var(--bg);
         border-radius: var(--radius-s);
       }
-      .get:hover { color: var(--accent-ink); }
+      .get:hover { color: var(--primary-ink); }
       :where(.actions > a:not(.get)) { color: var(--muted); }
 
       .facts {
@@ -159,7 +157,7 @@
         font-family: var(--mono);
         font-size: 0.875rem;
       }
-      .facts dt { color: var(--faint); }
+      .facts dt { color: var(--secondary); }
       .facts dd { margin: 0; color: var(--text); overflow-wrap: anywhere; }
       .facts dt,
       .facts dd { padding-block: 0.75rem; border-block-end: 1px solid var(--hairline); }
@@ -172,9 +170,7 @@
         font-size: 0.8125rem;
         color: var(--faint);
       }
-      .foot-row { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; }
-      :where(.foot-row a) { color: var(--faint); }
-      .foot-row p { margin: 0; }
+      .site-footer p { margin: 0; }
     </style>
   </head>
   <body>
@@ -198,7 +194,7 @@
       <img class="mark" src="favicon.svg" alt="Tuxport logo" width="112" height="112">
       <p class="kicker">a linux terminal for android</p>
       <h1>run linux on your phone</h1>
-      <p class="lede">Alpine Linux ships inside the app, so the first launch opens a root shell. No root access, no setup.</p>
+      <p class="lede">Alpine Linux ships inside the app, so the first launch opens a root shell. No root, no setup.</p>
       <div class="actions">
         <a class="get" href="https://github.com/sajadxdp0/tuxport/releases">download</a>
         <a class="ext" href="https://github.com/sajadxdp0/tuxport">view source</a>
@@ -209,18 +205,13 @@
         <dd>alpine linux 3.24 bundled, debian from settings</dd>
         <dt>requirements</dt>
         <dd>android 11 or later, 64-bit arm device</dd>
-        <dt>license</dt>
-        <dd>gnu agpl 3.0 or later</dd>
         <dt>support</dt>
         <dd><a class="ext" href="https://github.com/sajadxdp0/tuxport/issues">github.com/sajadxdp0/tuxport/issues</a></dd>
       </dl>
     </main>
 
     <footer class="site-footer col">
-      <div class="foot-row">
-        <a href="./">tuxport</a>
-        <p>&copy; 2026 sajad</p>
-      </div>
+      <p>&copy; 2026 tuxport</p>
     </footer>
   </body>
 </html>

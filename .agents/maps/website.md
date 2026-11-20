@@ -5,7 +5,7 @@
 >
 > Verified: 2026-11-17 (three source-research concerns and nine independently checked claims; static checks passed, external release and visual checks remain below)
 >
-> Maintained: 2026-11-20 (targeted verification only since the full mapping; latest change: hover-accent specificity fixed with :where() floors, pitfall recorded as an invariant)
+> Maintained: 2026-11-20 (targeted verification only since the full mapping; latest change: site redesigned onto the app's Neon Terminal palette, license row removed, colophon is tuxport)
 
 ## Responsibilities
 
@@ -21,15 +21,18 @@ preview, content maintenance and publication. `dist/favicon.svg` is a directly m
 asset adapted from the Android launcher foreground and colors, and `dist/fonts/tuxport-mono.woff2`
 is the app's terminal typeface (JetBrains Mono, OFL beside it) subset for the site's glyphs,
 rebuilt with the README's pyftsubset command. Both pages share inline design tokens from the
-app palette (base `#0d1117`, text `#e6edf3`, cyan `#00e5ff`; the homepage's fact panel and the
-policy's code chips use a `#161b22` surface tone) plus modern plain CSS: custom properties,
-`color-mix()` hairlines, `clamp()` fluid type and spacing, and grid/flex layout, still with no
-JavaScript or remote assets. Both headers are full-bleed creamy-black bands (`#171310`) with the
+app's Neon Terminal palette (`values/colors.xml`: base `#0d1117`, cyan primary `#00e5ff`,
+magenta secondary `#ff4081`; text `#e6edf3`; the homepage's fact panel and the policy's code
+chips use a `#161b22` surface tone) plus modern plain CSS: custom properties, `color-mix()`
+hairlines, `clamp()` fluid type and spacing, and grid/flex layout, still with no JavaScript or
+remote assets. Both headers are flat on the base color with a full-bleed hairline and the
 inner column row, and the mono stack puts `JetBrainsMono Nerd Font` first so machines with it
 use their own copy, falling back to the bundled subset. The homepage is one left-aligned fluid
 column with no layout breakpoints: the prompt mark as its only visual, a short headline with
-two actions, the `dl` fact table as a highlighted surface panel, and a one-line footer
-(wordmark link, copyright); the policy page adds a site header linking home and keeps its ten
+two actions, and the `dl` fact table (distribution, requirements, support — the license row is
+deliberately absent) as a highlighted surface panel whose labels carry the magenta secondary,
+with the cyan primary driving hovers, focus and selection; the footer is the single colophon
+line "© 2026 tuxport". The policy page adds a site header linking home and keeps its ten
 sections verbatim.
 
 ## Public entry points

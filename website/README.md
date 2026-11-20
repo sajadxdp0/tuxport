@@ -1,17 +1,17 @@
 # Tuxport website
 
 A single page in `dist/index.html` links to the English privacy policy in
-`dist/privacy.html`. The page is a minimal dark one-pager in a small-site
-style: a creamy-black mono header band, the app's own `favicon.svg` as the
-prompt mark in the header and the hero, a short headline with two actions,
-a highlighted fact panel, and a one-line footer. Inline CSS, a local SVG
-favicon and wordmark font, no JavaScript, no remote assets, no
-dependencies, no compilation step. Both pages share the app's palette,
-near-black `#0d1117` with one cyan accent, written in modern plain CSS:
-custom properties, `color-mix()` hairlines, grid and flex layout, and
-`clamp()` fluid type and spacing. The homepage is one left-aligned fluid
-column with no layout breakpoints; the policy keeps a 42rem reading
-column and print styles.
+`dist/privacy.html`. The page is a minimal dark one-pager that mirrors the
+app's Neon Terminal theme: the flat near-black `#0d1117` base, the app's
+own `favicon.svg` as the prompt mark in the header and the hero, a short
+headline with two actions, and a highlighted fact panel whose labels
+carry the app's magenta secondary and whose cyan primary drives hovers,
+focus and selection. Inline CSS, a local SVG favicon and wordmark font,
+no JavaScript, no remote assets, no dependencies, no compilation step.
+The pages are written in modern plain CSS: custom properties,
+`color-mix()` hairlines, grid and flex layout, and `clamp()` fluid type
+and spacing. The homepage is one left-aligned fluid column with no layout
+breakpoints; the policy keeps a 42rem reading column and print styles.
 
 `dist/` contains the directly maintained website source and is committed to Git.
 It is also the directory uploaded for deployment; no generation or copying is needed.
