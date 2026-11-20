@@ -8,8 +8,21 @@
     <title>Privacy Policy · Tuxport</title>
     <link rel="icon" href="favicon.svg" type="image/svg+xml" sizes="any">
     <style>
+      @font-face {
+        /* The app's terminal typeface (JetBrains Mono, OFL: fonts/OFL.txt), subset to the
+           glyphs this page uses so the wordmark renders the same everywhere without a
+           remote request. Machines with JetBrainsMono Nerd Font use their own copy first.
+           Regenerate with the command in website/README.md when the glyphs change. */
+        font-family: "Tuxport Mono";
+        src: url("fonts/tuxport-mono.woff2") format("woff2");
+        font-weight: 400;
+        font-style: normal;
+        font-display: swap;
+      }
+
       :root {
         --bg: #0d1117;
+        --cream: #171310;
         --surface: #161b22;
         --text: #e6edf3;
         --muted: #8b949e;
@@ -17,7 +30,8 @@
         --accent: #00e5ff;
         --hairline: color-mix(in srgb, var(--text) 9%, transparent);
         --sans: system-ui, -apple-system, "Segoe UI", sans-serif;
-        --mono: ui-monospace, "JetBrains Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+        --mono: "JetBrainsMono Nerd Font", "JetBrainsMono NF", "Tuxport Mono",
+          ui-monospace, "JetBrains Mono", "Cascadia Mono", Menlo, Consolas, monospace;
         --pad: clamp(1rem, 4vw, 1.5rem);
         --radius-s: 8px;
         color-scheme: dark;
@@ -66,9 +80,13 @@
       .skip:focus { inset-inline-start: var(--pad); }
 
       .site-header {
-        display: flex;
-        padding-block: 1rem;
+        background: var(--cream);
         border-block-end: 1px solid var(--hairline);
+      }
+      .header-row {
+        display: flex;
+        align-items: center;
+        padding-block: 1rem;
         font-family: var(--mono);
         font-size: 0.875rem;
       }
@@ -108,11 +126,13 @@
   </head>
   <body>
     <a class="skip" href="#main">skip to content</a>
-    <header class="site-header col">
-      <a class="brand" href="./">
-        <img src="favicon.svg" alt="" width="22" height="22">
-        <span>tuxport</span>
-      </a>
+    <header class="site-header">
+      <div class="header-row col">
+        <a class="brand" href="./">
+          <img src="favicon.svg" alt="" width="22" height="22">
+          <span>tuxport</span>
+        </a>
+      </div>
     </header>
     <main id="main" class="col">
       <header class="page-head">

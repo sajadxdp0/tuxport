@@ -11,8 +11,22 @@
     <title>tuxport — a linux terminal for android</title>
     <link rel="icon" href="favicon.svg" type="image/svg+xml" sizes="any">
     <style>
+      @font-face {
+        /* The app's terminal typeface (JetBrains Mono, OFL: fonts/OFL.txt), subset to the
+           glyphs this page uses so the wordmark renders the same everywhere without a
+           remote request. Machines with JetBrainsMono Nerd Font use their own copy first.
+           Regenerate with the command in website/README.md when the glyphs change. */
+        font-family: "Tuxport Mono";
+        src: url("fonts/tuxport-mono.woff2") format("woff2");
+        font-weight: 400;
+        font-style: normal;
+        font-display: swap;
+      }
+
       :root {
         --bg: #0d1117;
+        --cream: #171310;
+        --surface: #161b22;
         --text: #e6edf3;
         --muted: #8b949e;
         --faint: #7d8590;
@@ -20,9 +34,11 @@
         --accent-ink: #003943;
         --hairline: color-mix(in srgb, var(--text) 9%, transparent);
         --sans: system-ui, -apple-system, "Segoe UI", sans-serif;
-        --mono: ui-monospace, "JetBrains Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+        --mono: "JetBrainsMono Nerd Font", "JetBrainsMono NF", "Tuxport Mono",
+          ui-monospace, "JetBrains Mono", "Cascadia Mono", Menlo, Consolas, monospace;
         --pad: clamp(1rem, 4vw, 1.5rem);
         --radius-s: 8px;
+        --radius-m: 12px;
         color-scheme: dark;
         font-synthesis: none;
         text-rendering: optimizeLegibility;
@@ -65,20 +81,23 @@
       .skip:focus { inset-inline-start: var(--pad); }
 
       .site-header {
+        background: var(--cream);
+        border-block-end: 1px solid var(--hairline);
+      }
+      .header-row {
         display: flex;
         flex-wrap: wrap;
         align-items: center;
         justify-content: space-between;
         gap: 0.5rem 1.5rem;
         padding-block: 1rem;
-        border-block-end: 1px solid var(--hairline);
         font-family: var(--mono);
         font-size: 0.875rem;
       }
       .brand { display: inline-flex; align-items: center; gap: 0.625rem; }
       .brand img { display: block; width: 1.375rem; height: 1.375rem; }
-      .site-header nav { display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; }
-      .site-header nav a { color: var(--muted); }
+      .header-row nav { display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; }
+      .header-row nav a { color: var(--muted); }
 
       main { padding-block-start: clamp(4rem, 3.25rem + 5vw, 7rem); }
 
@@ -93,7 +112,6 @@
         margin: 0 0 1.25rem;
         font-family: var(--mono);
         font-size: clamp(1.8125rem, 1.25rem + 4vw, 2.375rem);
-        font-weight: 500;
         line-height: 1.15;
         letter-spacing: -0.01em;
         text-wrap: balance;
@@ -122,7 +140,6 @@
         background: var(--text);
         color: var(--bg);
         border-radius: var(--radius-s);
-        font-weight: 500;
       }
       .get:hover { color: var(--accent-ink); }
       .actions > a:not(.get) { color: var(--muted); }
@@ -132,12 +149,15 @@
         grid-template-columns: max-content minmax(0, 1fr);
         column-gap: 1.5rem;
         margin-block-start: clamp(3.5rem, 3rem + 3vw, 5.5rem);
-        border-block-start: 1px solid var(--hairline);
+        padding: clamp(1.25rem, 1rem + 2vw, 2rem);
+        background: var(--surface);
+        border: 1px solid var(--hairline);
+        border-radius: var(--radius-m);
         font-family: var(--mono);
-        font-size: 0.8125rem;
+        font-size: 0.875rem;
       }
       .facts dt { color: var(--faint); }
-      .facts dd { margin: 0; color: var(--muted); overflow-wrap: anywhere; }
+      .facts dd { margin: 0; color: var(--text); overflow-wrap: anywhere; }
       .facts dt,
       .facts dd { padding-block: 0.75rem; border-block-end: 1px solid var(--hairline); }
       .facts > :nth-last-child(-n + 2) { border-block-end: none; }
@@ -149,24 +169,26 @@
         font-size: 0.8125rem;
         color: var(--faint);
       }
-      .site-footer nav { display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; margin-block-end: 1rem; }
-      .site-footer nav a { color: var(--muted); }
-      .site-footer p { margin: 0; }
+      .foot-row { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; }
+      .foot-row a { color: var(--faint); }
+      .foot-row p { margin: 0; }
     </style>
   </head>
   <body>
     <a class="skip" href="#main">skip to content</a>
 
-    <header class="site-header col">
-      <a class="brand" href="./" aria-label="tuxport home">
-        <img src="favicon.svg" alt="" width="22" height="22">
-        <span>tuxport</span>
-      </a>
-      <nav aria-label="site">
-        <a class="ext" href="https://github.com/sajadxdp0/tuxport/releases">download</a>
-        <a class="ext" href="https://github.com/sajadxdp0/tuxport">source</a>
-        <a href="privacy.html">privacy</a>
-      </nav>
+    <header class="site-header">
+      <div class="header-row col">
+        <a class="brand" href="./" aria-label="tuxport home">
+          <img src="favicon.svg" alt="" width="22" height="22">
+          <span>tuxport</span>
+        </a>
+        <nav aria-label="site">
+          <a class="ext" href="https://github.com/sajadxdp0/tuxport/releases">download</a>
+          <a class="ext" href="https://github.com/sajadxdp0/tuxport">source</a>
+          <a href="privacy.html">privacy</a>
+        </nav>
+      </div>
     </header>
 
     <main id="main" class="col">
@@ -192,12 +214,10 @@
     </main>
 
     <footer class="site-footer col">
-      <nav aria-label="footer">
-        <a class="ext" href="https://github.com/sajadxdp0/tuxport">source</a>
-        <a class="ext" href="https://github.com/sajadxdp0/tuxport/releases">releases</a>
-        <a href="privacy.html">privacy policy</a>
-      </nav>
-      <p>&copy; 2026 sajad</p>
+      <div class="foot-row">
+        <a href="./">tuxport</a>
+        <p>&copy; 2026 sajad</p>
+      </div>
     </footer>
   </body>
 </html>

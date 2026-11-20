@@ -5,7 +5,7 @@
 >
 > Verified: 2026-11-17 (three source-research concerns and nine independently checked claims; static checks passed, external release and visual checks remain below)
 >
-> Maintained: 2026-11-19 (targeted verification only since the full mapping; latest change: dropped the transcript card for a single fluid left-aligned column with the prompt mark as the only visual)
+> Maintained: 2026-11-20 (targeted verification only since the full mapping; latest change: bundled wordmark font, creamy header band, highlighted fact panel and pared footer)
 
 ## Responsibilities
 
@@ -18,14 +18,19 @@ policy; changing this page does not change permission enforcement or data handli
 No runtime classes or application state. `dist/index.html` contains the homepage and
 `dist/privacy.html` contains the policy, each with inline CSS; `README.md` explains
 preview, content maintenance and publication. `dist/favicon.svg` is a directly maintained
-asset adapted from the Android launcher foreground and colors. Both pages share inline
-design tokens taken from the app palette (base `#0d1117`, text `#e6edf3`, cyan `#00e5ff`;
-the policy page adds a `#161b22` surface tone for its code chips) and modern plain CSS:
-custom properties, `color-mix()` hairlines, `clamp()` fluid type and spacing, and grid/flex
-layout, still with no JavaScript or remote assets. The homepage is one left-aligned fluid
-column with no layout breakpoints: the prompt mark as its only visual, a short headline
-with two actions, and a `dl` fact table, all on a single placement axis; the policy page
-adds a site header linking home and keeps its ten sections verbatim.
+asset adapted from the Android launcher foreground and colors, and `dist/fonts/tuxport-mono.woff2`
+is the app's terminal typeface (JetBrains Mono, OFL beside it) subset for the site's glyphs,
+rebuilt with the README's pyftsubset command. Both pages share inline design tokens from the
+app palette (base `#0d1117`, text `#e6edf3`, cyan `#00e5ff`; the homepage's fact panel and the
+policy's code chips use a `#161b22` surface tone) plus modern plain CSS: custom properties,
+`color-mix()` hairlines, `clamp()` fluid type and spacing, and grid/flex layout, still with no
+JavaScript or remote assets. Both headers are full-bleed creamy-black bands (`#171310`) with the
+inner column row, and the mono stack puts `JetBrainsMono Nerd Font` first so machines with it
+use their own copy, falling back to the bundled subset. The homepage is one left-aligned fluid
+column with no layout breakpoints: the prompt mark as its only visual, a short headline with
+two actions, the `dl` fact table as a highlighted surface panel, and a one-line footer
+(wordmark link, copyright); the policy page adds a site header linking home and keeps its ten
+sections verbatim.
 
 ## Public entry points
 
@@ -45,8 +50,8 @@ adds a site header linking home and keeps its ten sections verbatim.
 
 ## Data flow / lifecycle
 
-The browser renders each document with a local SVG favicon, without JavaScript,
-forms, remote assets or font downloads. The homepage contains the app name, a one-sentence description and
+The browser renders each document with a local SVG favicon and a locally bundled wordmark
+font, without JavaScript, forms or remote assets. The homepage contains the app name, a one-sentence description and
 the policy link. Content changes require editing the corresponding HTML. Preview
 uses Python's standard HTTP server bound to loopback with `website/dist/` as its
 document root; production hosting is outside this module. The public files live
@@ -93,7 +98,11 @@ user-directed sharing and network traffic from guest programs.
   44rem content column (34rem lede measure) with no layout breakpoints; both use fluid
   narrow-screen spacing, long-word wrapping (fact values break anywhere) and visible link
   focus; the policy has print adjustments.
-- Keep `dist/` in Git: it contains maintained source files, not generated output.
+- Keep `dist/` in Git: it contains maintained source files. The one generated file is
+  `fonts/tuxport-mono.woff2`, rebuilt from `android/app/src/main/assets/fonts/JetBrainsMono.ttf`
+  with the README's pyftsubset command whenever the pages' glyphs change; keep
+  `fonts/OFL.txt` beside it and the `@font-face` family name distinct from "JetBrains Mono"
+  (the licence's reserved name).
 - The public contact link is the project's GitHub issues URL and no email address
   appears on either page, so Cloudflare's default email obfuscation has nothing to
   rewrite; if an email link is ever added, wrap it in `email_off` comments to keep
@@ -139,6 +148,9 @@ None currently recorded.
   long-word-wrap and no-overflow checks in headless Chromium at 320–1280px, the
   policy's print emulation rendered white with the site header hidden, and Tab
   traversal revealed the skip link and drew the accent focus outline on every
-  tabbable link of both pages. Visual appearance at those widths and other
-  browsers' favicon rendering (last inspected for the earlier transparent mark,
-  not the current white-on-tile prompt) remain unverified.
+  tabbable link of both pages. Visual appearance at those widths, the bundled
+  wordmark subset's rendering in browsers other than Chromium (it loads and
+  parses there; machines without JetBrainsMono Nerd Font fetch the subset,
+  machines with it use their own copy), and other browsers' favicon rendering
+  (last inspected for the earlier transparent mark, not the current
+  white-on-tile prompt) remain unverified.

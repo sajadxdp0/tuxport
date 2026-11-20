@@ -2,9 +2,10 @@
 
 A single page in `dist/index.html` links to the English privacy policy in
 `dist/privacy.html`. The page is a minimal dark one-pager in a small-site
-style: the app's own `favicon.svg` as the prompt mark in the header and
-the hero, a short headline with two actions, and four quiet fact lines.
-Inline CSS, a local SVG favicon, no JavaScript, no remote assets, no
+style: a creamy-black mono header band, the app's own `favicon.svg` as the
+prompt mark in the header and the hero, a short headline with two actions,
+a highlighted fact panel, and a one-line footer. Inline CSS, a local SVG
+favicon and wordmark font, no JavaScript, no remote assets, no
 dependencies, no compilation step. Both pages share the app's palette,
 near-black `#0d1117` with one cyan accent, written in modern plain CSS:
 custom properties, `color-mix()` hairlines, grid and flex layout, and
@@ -52,6 +53,26 @@ remains legible at favicon sizes.
 Maintain the SVG directly. When the Android icon changes, update the favicon as
 needed and review its crop and appearance at small sizes. Deployment only copies
 the SVG; it does not need Python or the Android source tree.
+
+## Wordmark font
+
+`dist/fonts/tuxport-mono.woff2` is the app's terminal typeface (JetBrains
+Mono, `android/app/src/main/assets/fonts/JetBrainsMono.ttf`) subset to the
+glyphs these pages use, so the wordmark and terminal-voice text render the
+same everywhere without a remote request; `dist/fonts/OFL.txt` is its
+licence and must ship beside it. The font stack puts `JetBrainsMono Nerd
+Font` first, so machines that have it use their own copy. Regenerate the
+subset when the pages' glyphs change:
+
+```sh
+pyftsubset android/app/src/main/assets/fonts/JetBrainsMono.ttf \
+  --output-file=website/dist/fonts/tuxport-mono.woff2 --flavor=woff2 \
+  --unicodes="U+0020-007E,U+00A9,U+00B7,U+2014,U+2197" --layout-features=""
+```
+
+Keep the `@font-face` family name distinct from "JetBrains Mono", the
+licence's reserved name, and keep the subset's glyph set in step with the
+text the pages actually render.
 
 ## Content maintenance
 
