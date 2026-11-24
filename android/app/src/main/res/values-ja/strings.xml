@@ -43,6 +43,7 @@
 
     <string name="clear_screen">画面をクリア</string>
     <string name="reset_terminal">ターミナルをリセット</string>
+    <string name="reset_text_size">文字サイズを標準に戻す</string>
     <string name="keep_screen_on">画面をオンに保つ</string>
     <string name="modifier_locked">%1$sをロックしました</string>
     <string name="tmux_control_detached">tmuxコントロールモード（tmux -CC）はここでは表示できないため、Tuxportがデタッチしました。セッションは継続しています。tmux attachで再接続できます。</string>

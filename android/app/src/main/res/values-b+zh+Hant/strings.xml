@@ -43,6 +43,7 @@
 
     <string name="clear_screen">清除畫面</string>
     <string name="reset_terminal">重設終端機</string>
+    <string name="reset_text_size">還原預設文字大小</string>
     <string name="keep_screen_on">保持螢幕開啟</string>
     <string name="modifier_locked">%1$s 已鎖定</string>
     <string name="tmux_control_detached">這裡無法顯示 tmux 控制模式（tmux -CC），Tuxport 已將其分離；工作階段仍在執行，可用 tmux attach 重新連接。</string>

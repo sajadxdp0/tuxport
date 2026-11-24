@@ -103,11 +103,10 @@ fetch/provisioning `android/setup`. CI orchestration remains `harness`.
   `GradleDependency`, `AndroidGradlePluginVersion`, `OldTargetApi`, `ExpiringTargetSdkVersion` and
   `OutdatedLibrary`, which follow data outside the repository and are informational.
 - Release: signed with the release keystore when `android/local.properties` (gitignored)
-  carries the `signing.*` entries, else the debug key, so CI and keyless machines keep
-  building; versionCode 2 and versionName 1.1.0. R8 uses the
-  optimized Android defaults and shrinks unused resources. `app/proguard-rules.pro` keeps app
-  JNI declarations and the public void `VtSession.on*` callbacks looked up by the native pump;
-  callbacks outside that pattern need a matching keep rule. The release mapping is under
+  carries the `signing.*` entries, else the debug key, so versionCode 10 and versionName 0.0.3.
+  R8 uses the optimized Android defaults and shrinks unused resources. `app/proguard-rules.pro`
+  keeps app JNI declarations and the public void `VtSession.on*` callbacks looked up by the native
+  pump; callbacks outside that pattern need a matching keep rule. The release mapping is under
   `app/build/outputs/mapping/release/`.
 
 ### Notices

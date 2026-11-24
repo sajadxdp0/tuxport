@@ -45,6 +45,7 @@
 
     <string name="clear_screen">Clear screen</string>
     <string name="reset_terminal">Reset terminal</string>
+    <string name="reset_text_size">Reset text size</string>
     <string name="keep_screen_on">Keep screen on</string>
     <string name="modifier_locked">%1$s locked</string>
     <string name="tmux_control_detached">tmux control mode (tmux -CC) cannot be shown here, so Tuxport detached it; its session goes on, and tmux attach brings it back.</string>

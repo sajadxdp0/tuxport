@@ -43,6 +43,7 @@
 
     <string name="clear_screen">화면 지우기</string>
     <string name="reset_terminal">터미널 초기화</string>
+    <string name="reset_text_size">글자 크기를 기본값으로 재설정</string>
     <string name="keep_screen_on">화면 켜짐 유지</string>
     <string name="modifier_locked">%1$s 잠금 설정됨</string>
     <string name="tmux_control_detached">여기서는 tmux 제어 모드(tmux -CC)를 표시할 수 없어 Tuxport이 연결을 분리했습니다. 세션은 계속 실행 중이며 tmux attach로 다시 연결할 수 있습니다.</string>

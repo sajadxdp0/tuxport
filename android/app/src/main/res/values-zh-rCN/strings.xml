@@ -43,6 +43,7 @@
 
     <string name="clear_screen">清屏</string>
     <string name="reset_terminal">重置终端</string>
+    <string name="reset_text_size">恢复默认文字大小</string>
     <string name="keep_screen_on">保持屏幕常亮</string>
     <string name="modifier_locked">%1$s 已锁定</string>
     <string name="tmux_control_detached">这里显示不了 tmux 控制模式（tmux -CC），Tuxport 已让它断开；会话还在，用 tmux attach 接回。</string>

@@ -517,9 +517,9 @@ class MainActivity : FragmentActivity(), TerminalService.Listener, Privacy.Liste
 
     /**
      * `⋮`: finding text in the current tab (none: disabled), clearing its screen (also disabled on
-     * the alternate screen, where Ghostty's clear_screen does nothing) or resetting its terminal
-     * (disabled before its shell starts), closing the other tabs (none other: disabled) or all of
-     * them, keeping the screen on, and Settings.
+     * the alternate screen, where Ghostty's clear_screen does nothing), resetting the text size
+     * (disabled without a terminal), resetting its terminal (disabled before its shell starts),
+     * closing tabs, keeping the screen on, and Settings.
      */
     private fun showMenu(anchor: View) {
         closeTabList()
@@ -537,6 +537,10 @@ class MainActivity : FragmentActivity(), TerminalService.Listener, Privacy.Liste
                     terminal?.clear()
                     true
                 }
+            menu.add(R.string.reset_text_size).apply { isEnabled = terminal != null }.setOnMenuItemClickListener {
+                resetFontSize()
+                true
+            }
             menu.add(R.string.reset_terminal).apply { isEnabled = terminal != null }.setOnMenuItemClickListener {
                 terminal?.reset()
                 true
@@ -744,6 +748,12 @@ class MainActivity : FragmentActivity(), TerminalService.Listener, Privacy.Liste
             }
         }
         return prefs.getFloat(PREF_FONT_SIZE, DEFAULT_FONT_DP) * density
+    }
+
+    /** Restores the terminal text to its default size and persists that choice across launches. */
+    private fun resetFontSize() {
+        layout.screen.setFontSize(DEFAULT_FONT_DP * resources.displayMetrics.density)
+        getPreferences(MODE_PRIVATE).edit { putFloat(PREF_FONT_SIZE, DEFAULT_FONT_DP) }
     }
 
     // ---- The views' targets ----
